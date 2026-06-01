@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}気持ちの記録 | Ability Compass{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="bg-gradient-to-br from-purple-50 via-white to-pink-50 min-h-screen py-10 px-4">
+  <div class="max-w-2xl mx-auto">
+
+    <div class="text-center mb-10">
+      <div class="text-5xl mb-3">💭</div>
+      <h1 class="text-3xl font-black text-gray-800">気持ちの記録</h1>
+      <p class="text-gray-500 mt-1">毎日の気持ちを記録しよう</p>
+    </div>
+
+    <!-- 今日の記録フォーム -->
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-7 mb-8">
+      <h2 class="text-xl font-bold text-gray-800 mb-6">
+        {% if today_log %}✏️ 今日の気持ちを更新する{% else %}📝 今日の気持ちを記録する{% endif %}
+      </h2>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <!-- 感情選択 -->
+        <div class="flex justify-center gap-3 mb-6">
+          {% for option in emotion_options %}
+          <label class="cursor-pointer emotion-label">
+            <input type="radio" name="score" value="{{ option.score }}"
+                   class="sr-only emotion-radio"
+                   {% if today_log and today_log.score == option.score %}checked{% elif not today_log and option.score == 3 %}checked{% endif %}>
+            <div class="emotion-btn flex flex-col items-center gap-1 p-3 rounded-2xl border-2 border-gray-200 hover:border-purple-400 transition-all w-16">
+              <span class="text-4xl">{{ option.emoji }}</span>
+              <span class="text-xs text-gray-500 text-center leading-tight">{{ option.label }}</span>
+            </div>
+          </label>
+          {% endfor %}
+        </div>
+
+        <!-- メモ -->
+        <div class="mb-5">
+          <label class="block font-bold text-gray-700 mb-2">今日あったこと・気づいたこと（任意）</label>
+          <textarea name="note" rows="3"
+                    class="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 focus:outline-none focus:border-purple-400 text-gray-700 resize-none"
+                    placeholder="書きたいことがあれば...">{% if today_log %}{{ today_log.note }}{% endif %}</textarea>
+        </div>
+
+        <button type="submit"
+                class="w-full bg-purple-600 text-white font-bold text-lg py-4 rounded-2xl hover:bg-purple-700 transition-colors shadow-lg">
+          💾 記録する
+        </button>
+      </form>
+    </div>
+
+    <!-- 過去2週間のトレンド -->
+    {% if trend_data %}
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-7 mb-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-5">📈 気持ちの移り変わり</h2>
+      <canvas id="emotion-chart" height="120"></canvas>
+    </div>
+
+    <!-- 直近の記録リスト -->
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-7">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">📅 最近の記録</h2>
+      <div class="space-y-3">
+        {% for log in trend_data reversed %}
+        <div class="flex items-center gap-3 p-3 rounded-xl" style="background-color: {{ log.color }}33;">
+          <span class="text-3xl">{{ log.emoji }}</span>
+          <div class="flex-1">
+            <p class="font-bold text-gray-700">{{ log.date }}</p>
+            <p class="text-sm text-gray-500">{{ log.label }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="mt-6 text-center">
+      <a href="/daily/" class="text-brand-600 hover:underline font-medium">← ダッシュボードに戻る</a>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .emotion-radio:checked + .emotion-btn {
+    border-color: #9333ea;
+    background-color: #faf5ff;
+    transform: scale(1.12);
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+  }
+  .emotion-btn { transition: all 0.15s ease; }
+</style>
+
+<script>
+// 選択時のスタイル更新
+document.querySelectorAll('.emotion-radio').forEach(radio => {
+  radio.addEventListener('change', () => {
+    document.querySelectorAll('.emotion-btn').forEach(btn => {
+      btn.style.borderColor = '';
+      btn.style.backgroundColor = '';
+      btn.style.transform = '';
+      btn.style.boxShadow = '';
+    });
+    if (radio.checked) {
+      const btn = radio.nextElementSibling;
+      btn.style.borderColor = '#9333ea';
+      btn.style.backgroundColor = '#faf5ff';
+      btn.style.transform = 'scale(1.12)';
+      btn.style.boxShadow = '0 4px 12px rgba(147,51,234,0.3)';
+    }
+  });
+  if (radio.checked) {
+    const btn = radio.nextElementSibling;
+    btn.style.borderColor = '#9333ea';
+    btn.style.backgroundColor = '#faf5ff';
+    btn.style.transform = 'scale(1.12)';
+  }
+});
+
+// Chart.js グラフ
+{% if trend_data %}
+const trendData = {{ trend_json|safe }};
+const labels = trendData.map(d => d.date);
+const scores = trendData.map(d => d.score);
+const colors = trendData.map(d => d.color);
+
+new Chart(document.getElementById('emotion-chart'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [{
+      label: '気持ちスコア',
+      data: scores,
+      fill: true,
+      backgroundColor: 'rgba(147, 51, 234, 0.08)',
+      borderColor: '#9333ea',
+      borderWidth: 2.5,
+      pointBackgroundColor: colors,
+      pointBorderColor: '#9333ea',
+      pointRadius: 6,
+      tension: 0.4,
+    }]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: { min: 0.5, max: 5.5, ticks: { stepSize: 1, callback: v => ['', '😢', '😟', '😐', '😊', '😄'][v] || '' } },
+      x: { grid: { display: false } }
+    },
+    plugins: { legend: { display: false } }
+  }
+});
+{% endif %}
+</script>
+{% endblock %}

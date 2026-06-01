@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}診断結果 | Ability Compass{% endblock %}
+
+{% block content %}
+<div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen py-12 px-4">
+  <div class="max-w-3xl mx-auto">
+
+    <!-- 完了バナー -->
+    <div class="text-center mb-10 animate-fade-in-up">
+      <div class="text-7xl mb-4">🎉</div>
+      <h1 class="text-3xl font-black text-gray-800 mb-3">診断が完了しました！</h1>
+      <p class="text-gray-500 text-lg">AIがあなたの強みと可能性を分析しました</p>
+    </div>
+
+    <!-- サマリーメッセージ -->
+    {% if summary %}
+    <div class="bg-gradient-to-r from-brand-600 to-purple-600 text-white rounded-3xl p-7 mb-8 shadow-lg animate-fade-in-up animate-delay-1">
+      <div class="flex items-start gap-4">
+        <span class="text-3xl">✨</span>
+        <p class="text-lg font-medium leading-relaxed">{{ summary }}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- あなたの強み -->
+    {% if strengths %}
+    <div class="mb-8 animate-fade-in-up animate-delay-1">
+      <h2 class="text-2xl font-black text-gray-800 mb-5 flex items-center gap-2">
+        <span>💪</span> あなたの強み TOP3
+      </h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        {% for strength in strengths %}
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 card-hover text-center">
+          <div class="text-4xl mb-3">{{ strength.emoji }}</div>
+          <h3 class="font-bold text-gray-800 text-lg mb-2">{{ strength.title }}</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">{{ strength.description }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- 向いている職業 -->
+    {% if careers %}
+    <div class="mb-10 animate-fade-in-up animate-delay-2">
+      <h2 class="text-2xl font-black text-gray-800 mb-5 flex items-center gap-2">
+        <span>🎯</span> 向いている職業
+      </h2>
+      <div class="space-y-4">
+        {% for career in careers %}
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-5 card-hover">
+          <div class="text-4xl flex-shrink-0">{{ career.emoji }}</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-1">
+              <h3 class="font-bold text-gray-800 text-xl">{{ career.name }}</h3>
+              {% if career.match_score %}
+              <span class="bg-brand-100 text-brand-700 text-xs font-bold px-3 py-1 rounded-full">
+                マッチ度 {{ career.match_score }}%
+              </span>
+              {% endif %}
+            </div>
+            <p class="text-gray-500 text-sm">{{ career.reason }}</p>
+          </div>
+          <a href="/roadmap/{{ career.key }}/"
+             class="bg-brand-600 text-white font-bold text-sm px-4 py-2 rounded-xl hover:bg-brand-700 transition-colors flex-shrink-0">
+            ロードマップ →
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- 他の職業も探す -->
+    <div class="bg-white rounded-3xl p-7 shadow-sm border border-gray-100 mb-8 animate-fade-in-up animate-delay-3">
+      <h2 class="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+        <span>🗺️</span> 他の職業のロードマップも見る
+      </h2>
+      <p class="text-gray-500 text-sm mb-5">提案された職業以外にも、14種類の職業のロードマップを見ることができます。</p>
+      <a href="/roadmap/"
+         class="inline-flex items-center gap-2 bg-gray-100 text-gray-700 font-bold px-6 py-3 rounded-xl hover:bg-gray-200 transition-colors">
+        すべての職業を見る →
+      </a>
+    </div>
+
+    <!-- 再診断 -->
+    <div class="text-center">
+      <a href="/diagnosis/"
+         class="text-gray-400 hover:text-gray-600 text-sm underline transition-colors">
+        もう一度診断する
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

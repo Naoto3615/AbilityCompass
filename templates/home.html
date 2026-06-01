@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Ability Compass | 発達障害を持つ子供の可能性を広げるアプリ{% endblock %}
+
+{% block content %}
+
+<!-- ヒーローセクション -->
+<section class="gradient-bg text-white py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+    <div class="text-7xl mb-6 animate-fade-in-up">🧭</div>
+    <h1 class="text-4xl md:text-5xl font-black mb-6 leading-tight animate-fade-in-up animate-delay-1">
+      あなたの<span class="text-yellow-300">「違い」</span>は<br>才能の始まり
+    </h1>
+    <p class="text-xl md:text-2xl text-indigo-100 mb-8 animate-fade-in-up animate-delay-2">
+      発達障害を持つすべての子供たちの<br>無限の可能性を発見するAIコンパス
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animate-delay-3">
+      <a href="/diagnosis/"
+         class="bg-white text-brand-700 font-bold text-lg px-8 py-4 rounded-2xl hover:bg-yellow-50 transition-all shadow-lg hover:shadow-xl">
+        🔍 適性診断を始める（無料）
+      </a>
+      <a href="/roadmap/"
+         class="bg-white/20 text-white font-bold text-lg px-8 py-4 rounded-2xl hover:bg-white/30 transition-all border border-white/40">
+        🗺️ ロードマップを見る
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 特徴セクション -->
+<section class="py-20 px-4 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-black text-center text-gray-800 mb-4">Ability Compass でできること</h2>
+    <p class="text-center text-gray-500 mb-14">3つのステップで、あなたの可能性を見つける</p>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- 機能1 -->
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 card-hover border border-blue-100">
+        <div class="text-5xl mb-4">🔍</div>
+        <div class="inline-block bg-brand-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">STEP 1</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">適性診断</h3>
+        <p class="text-gray-600 leading-relaxed">
+          15の質問に答えるだけで、AIがあなたの強みと向いている職業を分析。
+          欠点ではなく<strong>強みにフォーカス</strong>した診断です。
+        </p>
+      </div>
+
+      <!-- 機能2 -->
+      <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 card-hover border border-purple-100">
+        <div class="text-5xl mb-4">🎯</div>
+        <div class="inline-block bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">STEP 2</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">職業を選ぶ</h3>
+        <p class="text-gray-600 leading-relaxed">
+          診断結果から提案された職業、または自分でなりたい職業を14種類から選択。
+          夢があるならその道を進もう。
+        </p>
+      </div>
+
+      <!-- 機能3 -->
+      <div class="bg-gradient-to-br from-green-50 to-teal-50 rounded-3xl p-8 card-hover border border-green-100">
+        <div class="text-5xl mb-4">🗺️</div>
+        <div class="inline-block bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">STEP 3</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">年齢別ロードマップ</h3>
+        <p class="text-gray-600 leading-relaxed">
+          幼少期から社会人まで、6段階の年齢別に「今何をすべきか」をAIが具体的に提示。
+          学習だけでなく人間性・習慣まで。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 年齢フェーズセクション -->
+<section class="py-16 px-4 bg-gray-50">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-black text-center text-gray-800 mb-12">6つの成長フェーズに対応</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      {% for phase in phases %}
+      <div class="bg-white rounded-2xl p-4 text-center shadow-sm border border-gray-100 card-hover">
+        <div class="text-3xl mb-2">{{ phase.emoji }}</div>
+        <div class="font-bold text-sm text-gray-800">{{ phase.label }}</div>
+        <div class="text-xs text-gray-500 mt-1">{{ phase.range }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CTAセクション -->
+<section class="py-20 px-4 bg-white">
+  <div class="max-w-2xl mx-auto text-center">
+    <div class="text-6xl mb-6">✨</div>
+    <h2 class="text-3xl font-black text-gray-800 mb-4">
+      今すぐあなたの可能性を<br>発見しよう
+    </h2>
+    <p class="text-gray-500 mb-8 text-lg">
+      たった15問の質問で、AIがあなただけの強みを<br>分析します。所要時間は約5分。
+    </p>
+    <a href="/diagnosis/"
+       class="inline-block bg-brand-600 text-white font-bold text-xl px-10 py-5 rounded-2xl hover:bg-brand-700 transition-all shadow-lg hover:shadow-xl">
+      🔍 無料で診断を始める
+    </a>
+    <p class="text-sm text-gray-400 mt-4">登録不要・完全無料</p>
+  </div>
+</section>
+
+{% endblock %}
