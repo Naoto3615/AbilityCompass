@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "仕事タイプを選ぼう" "しごとタイプを えらぼう" %} — {% t "ステップアップナビ" "すてっぷあっぷなび" %}{% endblock %}
+
+{% block content %}
+<div class="text-center mb-8 fade-in">
+  <div class="text-5xl mb-3">💼</div>
+  <h1 class="text-2xl font-bold text-blue-700">{% t "仕事タイプを選ぼう" "しごとタイプを えらぼう" %}</h1>
+  <p class="text-gray-600 mt-2">{% t "あなたに向いている仕事を選んでロードマップを見てみよう！" "あなたに むいている しごとを えらんで ろーどまっぷを みてみよう！" %}</p>
+</div>
+
+{% if suggested_job_type %}
+<div class="card mb-6 bg-yellow-50 border-2 border-yellow-200 fade-in">
+  <p class="text-center text-yellow-700 font-bold">
+    🔍 {% t "診断結果では「" "しんだんけっかでは「" %}
+    {% if suggested_job_type == 'agriculture' %}🌱 {% t "農業・園芸系" "のうぎょう・えんげいけい" %}
+    {% elif suggested_job_type == 'manufacturing' %}🔧 {% t "製造・組み立て系" "せいぞう・くみたてけい" %}
+    {% elif suggested_job_type == 'cleaning' %}🧹 {% t "清掃・環境整備系" "せいそう・かんきょうせいびけい" %}
+    {% elif suggested_job_type == 'food_processing' %}🍱 {% t "食品加工系" "しょくひんかこうけい" %}
+    {% elif suggested_job_type == 'service' %}🛒 {% t "接客・販売補助系" "せっきゃく・はんばいほじょけい" %}
+    {% endif %}
+    」{% t "が向いていました！" "が むいていました！" %}
+  </p>
+</div>
+{% endif %}
+
+<div class="space-y-4 fade-in" style="animation-delay:0.1s">
+  {% for job in job_types %}
+  <a href="/roadmap/{{ job.key }}/"
+     class="card flex items-center gap-5 hover:shadow-lg transition-all no-underline group
+            {% if job.key == suggested_job_type %}border-2 border-green-400 bg-green-50{% endif %}">
+    <span class="text-5xl group-hover:scale-110 transition-transform">{{ job.emoji }}</span>
+    <div class="flex-1">
+      <div class="flex items-center gap-2">
+        <h2 class="text-xl font-bold text-gray-800">{{ job.name }}</h2>
+        {% if job.key == suggested_job_type %}
+        <span class="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">{% t "おすすめ！" "おすすめ！" %}</span>
+        {% endif %}
+      </div>
+      <p class="text-gray-600 text-base mt-1">{{ job.description }}</p>
+    </div>
+    <div class="text-gray-400 text-2xl group-hover:text-green-500 transition-colors">→</div>
+  </a>
+  {% endfor %}
+</div>
+
+<div class="text-center mt-8 fade-in" style="animation-delay:0.2s">
+  <p class="text-gray-500 text-sm mb-3">{% t "どれが向いているかわからない？" "どれが むいているか わからない？" %}</p>
+  <a href="/diagnosis/" class="btn-main btn-green">🔍 {% t "診断をする" "しんだんを する" %}</a>
+</div>
+{% endblock %}

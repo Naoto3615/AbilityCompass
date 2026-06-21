@@ -1,76 +1,73 @@
-{% extends 'base.html' %}
-
-{% block title %}適性診断を始める | Ability Compass{% endblock %}
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "特性診断" "とくちょう しんだん" %} — {% t "ステップアップナビ" "すてっぷあっぷなび" %}{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-16 px-4">
-  <div class="max-w-2xl mx-auto">
+<div class="text-center fade-in">
+  <div class="text-6xl mb-4">🔍</div>
+  <h1 class="text-2xl font-bold text-green-700 mb-3">{% t "特性診断" "とくちょう しんだん" %}</h1>
+  <p class="text-gray-600 mb-8">{% t "簡単な　質問に　答えると、" "かんたんな　しつもんに　こたえると、" %}<br>{% t "あなたに　向いている　仕事が　わかります！" "あなたに　むいている　しごとが　わかります！" %}</p>
+</div>
 
-    <!-- ヘッダー -->
-    <div class="text-center mb-12">
-      <div class="text-6xl mb-4">🔍</div>
-      <h1 class="text-3xl font-black text-gray-800 mb-3">適性診断</h1>
-      <p class="text-gray-500 text-lg">あなたの強みと向いている職業を発見しよう</p>
+<div class="card mb-6 fade-in" style="animation-delay:0.1s">
+  <h2 class="text-lg font-bold text-gray-700 mb-4">📋 {% t "診断について" "しんだんについて" %}</h2>
+  <div class="space-y-3">
+    <div class="flex items-center gap-3 text-gray-600">
+      <span class="text-2xl">📝</span>
+      <span>{% t "質問：" "しつもん：" %}<strong>13{% t "問" "もん" %}</strong></span>
     </div>
-
-    <!-- 説明カード -->
-    <div class="bg-white rounded-3xl shadow-lg p-8 mb-8 border border-gray-100">
-      <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-        <span>📋</span> 診断について
-      </h2>
-      <div class="space-y-4">
-        <div class="flex items-start gap-4 p-4 bg-blue-50 rounded-2xl">
-          <span class="text-2xl">⏱️</span>
-          <div>
-            <p class="font-bold text-gray-800">所要時間：約5分</p>
-            <p class="text-gray-500 text-sm">15の質問に答えるだけ</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 p-4 bg-green-50 rounded-2xl">
-          <span class="text-2xl">💪</span>
-          <div>
-            <p class="font-bold text-gray-800">強みにフォーカス</p>
-            <p class="text-gray-500 text-sm">できないことではなく、得意なことを発見します</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 p-4 bg-purple-50 rounded-2xl">
-          <span class="text-2xl">🤖</span>
-          <div>
-            <p class="font-bold text-gray-800">AIが分析</p>
-            <p class="text-gray-500 text-sm">回答をもとにAIが強みと向いている職業を提案</p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 p-4 bg-yellow-50 rounded-2xl">
-          <span class="text-2xl">👨‍👩‍👧</span>
-          <div>
-            <p class="font-bold text-gray-800">保護者と一緒でもOK</p>
-            <p class="text-gray-500 text-sm">小さいお子様は保護者の方と一緒に答えてください</p>
-          </div>
-        </div>
-      </div>
+    <div class="flex items-center gap-3 text-gray-600">
+      <span class="text-2xl">⏱️</span>
+      <span>{% t "かかる時間：" "かかる じかん：" %}<strong>{% t "約5分" "やく 5ふん" %}</strong></span>
     </div>
-
-    <!-- 注意事項 -->
-    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-8">
-      <p class="text-amber-800 text-sm leading-relaxed">
-        <span class="font-bold">💡 ヒント：</span>
-        「正しい答え」はありません。今の自分の気持ちに正直に答えてください。
-        すべての回答があなたの強みを見つけるための大切な情報になります。
-      </p>
+    <div class="flex items-center gap-3 text-gray-600">
+      <span class="text-2xl">📊</span>
+      <span>{% t "6つの特性を　はかります" "6つの とくちょうを　はかります" %}</span>
     </div>
-
-    <!-- 開始ボタン -->
-    <form method="post">
-      {% csrf_token %}
-      <button type="submit"
-              class="w-full bg-brand-600 text-white font-bold text-xl py-5 rounded-2xl hover:bg-brand-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3">
-        <span>🚀</span>
-        <span>診断を始める</span>
-        <span>→</span>
-      </button>
-    </form>
-
-    <p class="text-center text-gray-400 text-sm mt-4">登録不要・完全無料</p>
+    <div class="flex items-center gap-3 text-gray-600">
+      <span class="text-2xl">💼</span>
+      <span>{% t "向いている　仕事タイプが　わかります" "むいている　しごとたいぷが　わかります" %}</span>
+    </div>
   </div>
+</div>
+
+<div class="card mb-6 fade-in" style="animation-delay:0.2s">
+  <h2 class="text-lg font-bold text-gray-700 mb-4">🌟 {% t "はかる特性" "はかる とくちょう" %}</h2>
+  <div class="grid grid-cols-2 gap-3">
+    <div class="flex items-center gap-2 p-3 bg-green-50 rounded-xl">
+      <span class="text-xl">🔁</span>
+      <span class="text-sm font-medium text-gray-700">{% t "集中力" "しゅうちゅうりょく" %}</span>
+    </div>
+    <div class="flex items-center gap-2 p-3 bg-blue-50 rounded-xl">
+      <span class="text-xl">👋</span>
+      <span class="text-sm font-medium text-gray-700">{% t "コミュニケーション力" "こみゅにけーしょんりょく" %}</span>
+    </div>
+    <div class="flex items-center gap-2 p-3 bg-orange-50 rounded-xl">
+      <span class="text-xl">💪</span>
+      <span class="text-sm font-medium text-gray-700">{% t "体力・持続力" "たいりょく・じぞくりょく" %}</span>
+    </div>
+    <div class="flex items-center gap-2 p-3 bg-purple-50 rounded-xl">
+      <span class="text-xl">🔍</span>
+      <span class="text-sm font-medium text-gray-700">{% t "几帳面さ・正確性" "きちょうめんさ・せいかくせい" %}</span>
+    </div>
+    <div class="flex items-center gap-2 p-3 bg-pink-50 rounded-xl">
+      <span class="text-xl">😌</span>
+      <span class="text-sm font-medium text-gray-700">{% t "感情コントロール" "かんじょう こんとろーる" %}</span>
+    </div>
+    <div class="flex items-center gap-2 p-3 bg-yellow-50 rounded-xl">
+      <span class="text-xl">📚</span>
+      <span class="text-sm font-medium text-gray-700">{% t "学習意欲・適応力" "がくしゅういよく・てきおうりょく" %}</span>
+    </div>
+  </div>
+</div>
+
+<div class="text-center fade-in" style="animation-delay:0.3s">
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn-main btn-green text-xl px-10 py-4">
+      🔍 {% t "診断を始める！" "しんだんを はじめる！" %}
+    </button>
+  </form>
+  <p class="text-gray-400 text-sm mt-4">{% t "ログインなしでも使えます" "ろぐいんなしでも つかえます" %}</p>
 </div>
 {% endblock %}

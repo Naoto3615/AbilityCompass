@@ -1,67 +1,51 @@
 import json
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import RoadmapCache, CAREER_CHOICES
-from .services import get_age_groups, get_roadmap_categories, generate_roadmap_with_ai
-from diagnosis.services import get_career_list
+from .services import get_step_definitions, get_job_roadmap, resolve_data
+from diagnosis.services import get_job_types
 
 
-class CareerSelectView(View):
+class JobTypeSelectView(View):
     def get(self, request):
-        career_list = get_career_list()
-        suggested_careers = request.session.get('diagnosis_careers', [])
+        text_mode = request.session.get('text_mode', 'hiragana')
+        job_types = resolve_data(get_job_types(), text_mode)
+        suggested_job_type = request.session.get('diagnosis_job_type', '')
         context = {
-            'career_list': career_list,
-            'suggested_careers': suggested_careers,
+            'job_types': job_types,
+            'suggested_job_type': suggested_job_type,
         }
-        return render(request, 'roadmap/career_select.html', context)
+        return render(request, 'roadmap/job_select.html', context)
 
 
 class RoadmapView(View):
-    def get(self, request, career_key):
-        age_groups = get_age_groups()
-        categories = get_roadmap_categories()
-        career_list = get_career_list()
+    def get(self, request, job_type_key):
+        text_mode = request.session.get('text_mode', 'hiragana')
 
-        career_info = next((c for c in career_list if c['key'] == career_key), None)
-        if not career_info:
-            return redirect('roadmap:career_select')
+        raw_job_types = get_job_types()
+        job_info_raw = next((j for j in raw_job_types if j['key'] == job_type_key), None)
+        if not job_info_raw:
+            return redirect('roadmap:job_select')
+        job_info = resolve_data(job_info_raw, text_mode)
 
-        selected_age_key = request.GET.get('age', 'lower_elementary')
-        selected_age = next((a for a in age_groups if a['key'] == selected_age_key), age_groups[1])
+        step_defs = resolve_data(get_step_definitions(), text_mode)
+        roadmap_data = resolve_data(get_job_roadmap(job_type_key), text_mode)
 
-        cached = RoadmapCache.objects.filter(career=career_key, age_group=selected_age_key).first()
-
-        if cached:
-            roadmap_data = cached.get_content()
-        else:
-            roadmap_data = generate_roadmap_with_ai(
-                career_key=career_key,
-                career_name=career_info['name'],
-                age_group_key=selected_age_key,
-                age_group_label=f"{selected_age['label']}（{selected_age['range']}）",
-            )
-            RoadmapCache.objects.create(
-                career=career_key,
-                career_name=career_info['name'],
-                age_group=selected_age_key,
-                content=json.dumps(roadmap_data, ensure_ascii=False),
-            )
-
-        items = roadmap_data.get('items', {})
-        enriched_categories = []
-        for cat in categories:
-            enriched_categories.append({
-                **cat,
-                'actions': items.get(cat['key'], []),
+        steps = []
+        for step_num in [1, 2, 3]:
+            step_def = step_defs[step_num]
+            step_key = f"step{step_num}"
+            step_content = roadmap_data.get(step_key, {})
+            steps.append({
+                **step_def,
+                'number': step_num,
+                'tasks': step_content.get('tasks', []),
+                'message': step_content.get('message', ''),
             })
 
         context = {
-            'career': career_info,
-            'age_groups': age_groups,
-            'selected_age': selected_age,
-            'categories': enriched_categories,
-            'message': roadmap_data.get('message', ''),
-            'milestone': roadmap_data.get('milestone', ''),
+            'job_info': job_info,
+            'steps': steps,
+            'job_type_key': job_type_key,
+            'text_mode': text_mode,
         }
         return render(request, 'roadmap/roadmap.html', context)

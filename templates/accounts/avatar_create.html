@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "アバターをつくる" "あばたーを つくる" %} — {% t "ステップアップナビ" "すてっぷあっぷなび" %}{% endblock %}
+
+{% block extra_head %}
+<style>
+  .part-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .part-btn {
+    width: 52px; height: 52px; border-radius: 50%; border: 3px solid transparent;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; font-weight: bold; transition: all 0.15s;
+    background: #f3f4f6;
+  }
+  .part-btn:hover { transform: scale(1.12); }
+  .part-btn.selected { border-color: #22c55e; box-shadow: 0 0 0 3px #bbf7d0; }
+  .part-btn-wide {
+    width: auto; min-width: 72px; height: 48px; border-radius: 1rem;
+    padding: 0 14px; font-size: 1rem; font-weight: bold;
+    border: 3px solid transparent; cursor: pointer;
+    background: #f3f4f6; transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .part-btn-wide:hover { transform: scale(1.05); }
+  .part-btn-wide.selected { border-color: #22c55e; box-shadow: 0 0 0 3px #bbf7d0; }
+  .section-label { font-size: 1rem; font-weight: bold; color: #374151; margin-bottom: 8px; display: block; }
+  #preview-area { display: flex; justify-content: center; align-items: center; padding: 12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card mb-6 fade-in">
+  <h1 class="text-xl font-bold text-gray-800 mb-1">🎨 {% t "アバターをつくろう" "あばたーを つくろう" %}</h1>
+  <p class="text-gray-500 text-base">{% t "自分に似たキャラクターを作れるよ！" "じぶんに にた きゃらくたーを つくれるよ！" %}</p>
+</div>
+
+<div class="card mb-6 fade-in" style="animation-delay:0.05s">
+  <!-- プレビュー -->
+  <div id="preview-area">
+    <div id="avatar-preview">
+      {% load text_mode %}
+      {% render_avatar config size=140 %}
+    </div>
+  </div>
+</div>
+
+<form method="post" id="avatar-form">
+  {% csrf_token %}
+
+  <!-- ─── 肌の色 ─── -->
+  <div class="card mb-4 fade-in" style="animation-delay:0.1s">
+    <span class="section-label">🌸 {% t "肌の色" "はだの いろ" %}</span>
+    <div class="part-grid">
+      {% for s in skin_options %}
+      <button type="button"
+        class="part-btn {% if config.skin == s.value %}selected{% endif %}"
+        style="background: {{ s.color }};"
+        onclick="choose('skin','{{ s.value }}',this)"
+        title="{{ s.label }}"
+        aria-label="{{ s.label }}"
+      ></button>
+      {% endfor %}
+    </div>
+    <input type="hidden" name="skin" id="val-skin" value="{{ config.skin }}">
+  </div>
+
+  <!-- ─── 髪型 ─── -->
+  <div class="card mb-4 fade-in" style="animation-delay:0.12s">
+    <span class="section-label">💇 {% t "髪型" "かみがた" %}</span>
+    <div class="part-grid">
+      {% for h in hair_style_options %}
+      <button type="button"
+        class="part-btn-wide {% if config.hair_style == h.value %}selected{% endif %}"
+        onclick="choose('hair_style','{{ h.value }}',this)"
+      >{{ h.emoji }} {{ h.label }}</button>
+      {% endfor %}
+    </div>
+    <input type="hidden" name="hair_style" id="val-hair_style" value="{{ config.hair_style }}">
+  </div>
+
+  <!-- ─── 髪の色 ─── -->
+  <div class="card mb-4 fade-in" style="animation-delay:0.14s">
+    <span class="section-label">🎨 {% t "髪の色" "かみの いろ" %}</span>
+    <div class="part-grid">
+      {% for h in hair_color_options %}
+      <button type="button"
+        class="part-btn {% if config.hair_color == h.value %}selected{% endif %}"
+        style="background: {{ h.color }};"
+        onclick="choose('hair_color','{{ h.value }}',this)"
+        title="{{ h.label }}"
+        aria-label="{{ h.label }}"
+      ></button>
+      {% endfor %}
+    </div>
+    <input type="hidden" name="hair_color" id="val-hair_color" value="{{ config.hair_color }}">
+  </div>
+
+  <!-- ─── 目 ─── -->
+  <div class="card mb-4 fade-in" style="animation-delay:0.16s">
+    <span class="section-label">👀 {% t "目のかたち" "めの かたち" %}</span>
+    <div class="part-grid">
+      {% for e in eye_options %}
+      <button type="button"
+        class="part-btn-wide {% if config.eye_type == e.value %}selected{% endif %}"
+        onclick="choose('eye_type','{{ e.value }}',this)"
+      >{{ e.emoji }} {{ e.label }}</button>
+      {% endfor %}
+    </div>
+    <input type="hidden" name="eye_type" id="val-eye_type" value="{{ config.eye_type }}">
+  </div>
+
+  <!-- ─── 表情 ─── -->
+  <div class="card mb-4 fade-in" style="animation-delay:0.18s">
+    <span class="section-label">😊 {% t "表情" "ひょうじょう" %}</span>
+    <div class="part-grid">
+      {% for ex in expression_options %}
+      <button type="button"
+        class="part-btn-wide {% if config.expression == ex.value %}selected{% endif %}"
+        onclick="choose('expression','{{ ex.value }}',this)"
+      >{{ ex.emoji }} {{ ex.label }}</button>
+      {% endfor %}
+    </div>
+    <input type="hidden" name="expression" id="val-expression" value="{{ config.expression }}">
+  </div>
+
+  <!-- ─── アクセサリー ─── -->
+  <div class="card mb-4 fade-in" style="animation-delay:0.20s">
+    <span class="section-label">👓 {% t "アクセサリー" "あくせさりー" %}</span>
+    <div class="part-grid">
+      {% for a in accessory_options %}
+      <button type="button"
+        class="part-btn-wide {% if config.accessory == a.value %}selected{% endif %}"
+        onclick="choose('accessory','{{ a.value }}',this)"
+      >{{ a.emoji }} {{ a.label }}</button>
+      {% endfor %}
+    </div>
+    <input type="hidden" name="accessory" id="val-accessory" value="{{ config.accessory }}">
+  </div>
+
+  <button type="submit" class="btn-main btn-green w-full text-center mt-2">
+    ✅ {% t "このアバターで決める" "この あばたーで きめる" %}
+  </button>
+</form>
+
+<div class="mt-4 text-center">
+  <a href="/daily/" class="text-gray-400 text-base underline">
+    {% t "あとで決める" "あとで きめる" %}
+  </a>
+</div>
+
+<script>
+// パーツ値を保持するオブジェクト
+const vals = {
+  skin:       '{{ config.skin }}',
+  hair_style: '{{ config.hair_style }}',
+  hair_color: '{{ config.hair_color }}',
+  eye_type:   '{{ config.eye_type }}',
+  expression: '{{ config.expression }}',
+  accessory:  '{{ config.accessory }}',
+};
+
+function choose(part, value, btn) {
+  vals[part] = value;
+  document.getElementById('val-' + part).value = value;
+
+  // ボタン選択状態更新
+  btn.closest('.part-grid').querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+
+  // プレビューをサーバーから再取得
+  refreshPreview();
+}
+
+function refreshPreview() {
+  const params = new URLSearchParams(vals);
+  fetch('/accounts/avatar/preview/?' + params.toString())
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById('avatar-preview').innerHTML = html;
+    })
+    .catch(() => {/* preview失敗は無視 */});
+}
+</script>
+{% endblock %}

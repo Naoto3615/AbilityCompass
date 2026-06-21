@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import UserProfile, SupporterProfile, SupporterNote
 
-# Register your models here.
+admin.site.register(UserProfile)
+admin.site.register(SupporterProfile)
+admin.site.register(SupporterNote)

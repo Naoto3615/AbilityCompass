@@ -1,59 +1,56 @@
-{% extends 'base.html' %}
-{% block title %}ログイン | Ability Compass{% endblock %}
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "ログイン" "ろぐいん" %} — {% t "ステップアップナビ" "すてっぷあっぷなび" %}{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-16 px-4 flex items-center justify-center">
-  <div class="w-full max-w-md">
+<div class="text-center mb-6 fade-in">
+  <div class="text-5xl mb-3">🔑</div>
+  <h1 class="text-2xl font-bold text-green-700">{% t "ログイン" "ろぐいん" %}</h1>
+</div>
 
-    <div class="text-center mb-10">
-      <div class="text-6xl mb-4">🧭</div>
-      <h1 class="text-3xl font-black text-gray-800">ログイン</h1>
-      <p class="text-gray-500 mt-2">Ability Compass へようこそ</p>
+<div class="card fade-in" style="animation-delay:0.1s">
+  <form method="post" class="space-y-5">
+    {% csrf_token %}
+    {% if next %}
+    <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
+
+    {% if error %}
+    <div class="p-4 bg-red-50 rounded-xl border-2 border-red-200">
+      <p class="text-red-700 font-medium">⚠️ {{ error }}</p>
+    </div>
+    {% endif %}
+
+    <div>
+      <label class="block font-bold text-gray-700 mb-2">🔑 {% t "ログインID" "ろぐいんID" %}</label>
+      <input
+        type="text"
+        name="username"
+        required
+        placeholder="{% t "ログインIDを入力してください" "ろぐいんIDを いれてください" %}"
+        class="w-full border-2 border-green-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-green-500"
+      >
     </div>
 
-    <div class="bg-white rounded-3xl shadow-lg p-8 border border-gray-100">
-      {% if error %}
-      <div class="bg-red-50 border border-red-200 text-red-700 rounded-2xl p-4 mb-6 text-sm">⚠️ {{ error }}</div>
-      {% endif %}
-
-      <form method="post">
-        {% csrf_token %}
-        {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
-
-        <div class="mb-5">
-          <label class="block font-bold text-gray-700 mb-2">ログインID</label>
-          <input type="text" name="username" required
-                 class="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 text-lg focus:outline-none focus:border-brand-400 transition-colors"
-                 placeholder="ログインIDを入力">
-        </div>
-
-        <div class="mb-6">
-          <label class="block font-bold text-gray-700 mb-2">パスワード</label>
-          <input type="password" name="password" required
-                 class="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 text-lg focus:outline-none focus:border-brand-400 transition-colors"
-                 placeholder="パスワードを入力">
-        </div>
-
-        <button type="submit"
-                class="w-full bg-brand-600 text-white font-bold text-lg py-4 rounded-2xl hover:bg-brand-700 transition-colors shadow-lg">
-          ログインする →
-        </button>
-      </form>
+    <div>
+      <label class="block font-bold text-gray-700 mb-2">🔒 {% t "パスワード" "ぱすわーど" %}</label>
+      <input
+        type="password"
+        name="password"
+        required
+        placeholder="{% t "パスワードを入力してください" "ぱすわーどを いれてください" %}"
+        class="w-full border-2 border-green-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-green-500"
+      >
     </div>
 
-    <div class="mt-8 grid grid-cols-2 gap-4">
-      <a href="/accounts/signup/child/"
-         class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center hover:border-brand-400 transition-colors card-hover">
-        <div class="text-3xl mb-2">👦</div>
-        <p class="font-bold text-gray-800 text-sm">子供アカウント<br>新規登録</p>
-      </a>
-      <a href="/accounts/signup/parent/"
-         class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center hover:border-brand-400 transition-colors card-hover">
-        <div class="text-3xl mb-2">👨‍👩‍👧</div>
-        <p class="font-bold text-gray-800 text-sm">保護者アカウント<br>新規登録</p>
-      </a>
-    </div>
+    <button type="submit" class="btn-main btn-green w-full text-xl py-4">
+      🔑 {% t "ログインする" "ろぐいんする" %}
+    </button>
+  </form>
+</div>
 
-  </div>
+<div class="text-center mt-4 space-y-2">
+  <a href="/accounts/signup/" class="text-green-600 hover:underline">{% t "アカウントがない → 利用者登録" "まだ アカウントがない → りようしゃとうろく" %}</a><br>
+  <a href="/accounts/signup/supporter/" class="text-gray-500 text-sm hover:underline">{% t "支援者として登録する" "しえんしゃとして とうろくする" %}</a>
 </div>
 {% endblock %}

@@ -1,48 +1,63 @@
 from django.db import models
+from django.contrib.auth.models import User
 import json
 
 
-AGE_GROUP_CHOICES = [
-    ('early_childhood', '幼少期（3〜6歳）'),
-    ('lower_elementary', '小学校低学年（7〜9歳）'),
-    ('upper_elementary', '小学校高学年（10〜12歳）'),
-    ('middle_school', '中学生（13〜15歳）'),
-    ('high_school', '高校生（16〜18歳）'),
-    ('adult', '大学・社会人（19歳〜）'),
+STEP_CHOICES = [
+    (1, 'ステップ1：生活習慣・基礎スキル'),
+    (2, 'ステップ2：作業スキル'),
+    (3, 'ステップ3：就労準備'),
 ]
 
-CAREER_CHOICES = [
-    ('programmer', 'プログラマー・エンジニア'),
-    ('designer', 'デザイナー・アーティスト'),
-    ('musician', '音楽家・作曲家'),
-    ('scientist', '科学者・研究者'),
-    ('writer', '作家・ライター'),
-    ('mathematician', '数学者・データサイエンティスト'),
-    ('game_creator', 'ゲームクリエイター'),
-    ('chef', 'シェフ・料理研究家'),
-    ('animal_care', '動物の専門家（獣医・トレーナー）'),
-    ('architect', '建築家・空間デザイナー'),
-    ('teacher', '教師・支援員'),
-    ('athlete', 'スポーツ選手・コーチ'),
-    ('photographer', '写真家・映像作家'),
-    ('entrepreneur', '起業家・経営者'),
-    ('doctor', '医師・医療専門家'),
-    ('other', 'その他（AI が提案）'),
+JOB_TYPE_CHOICES = [
+    ('agriculture', '🌱 農業・園芸系'),
+    ('manufacturing', '🔧 製造・組み立て系'),
+    ('cleaning', '🧹 清掃・環境整備系'),
+    ('food_processing', '🍱 食品加工系'),
+    ('service', '🛒 接客・販売補助系'),
 ]
+
+
+class GrowthStep(models.Model):
+    """就労ステップごとのタスク"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='growth_steps', null=True, blank=True)
+    session_key = models.CharField(max_length=100, blank=True)
+    step_number = models.IntegerField('ステップ番号', choices=STEP_CHOICES)
+    job_type = models.CharField('仕事タイプ', max_length=30, choices=JOB_TYPE_CHOICES, blank=True)
+    category = models.CharField('カテゴリ', max_length=50)
+    content = models.TextField('タスク内容')
+    daily_action = models.TextField('今日できる小さな行動', blank=True)
+    is_completed = models.BooleanField('完了', default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['step_number', 'id']
+
+    def complete(self):
+        if not self.is_completed:
+            from django.utils import timezone
+            self.is_completed = True
+            self.completed_at = timezone.now()
+            self.save()
+            return True
+        return False
+
+    def __str__(self):
+        return f"Step{self.step_number} / {self.content[:30]}"
 
 
 class RoadmapCache(models.Model):
-    career = models.CharField(max_length=50, choices=CAREER_CHOICES)
-    career_name = models.CharField(max_length=100)
-    age_group = models.CharField(max_length=30, choices=AGE_GROUP_CHOICES)
+    """AI生成ロードマップのキャッシュ"""
+    job_type = models.CharField(max_length=30, choices=JOB_TYPE_CHOICES)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('career', 'age_group')
+        unique_together = ('job_type',)
 
     def get_content(self):
         return json.loads(self.content)
 
     def __str__(self):
-        return f"{self.career_name} / {self.get_age_group_display()}"
+        return f"Roadmap: {self.job_type}"

@@ -1,9 +1,10 @@
+{% load text_mode %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Ability Compass | 可能性を広げよう{% endblock %}</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% t "ステップアップナビ" "すてっぷあっぷなび" %}{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -11,96 +12,93 @@
         extend: {
           colors: {
             brand: {
-              50:  '#f0f4ff',
-              100: '#dde8ff',
-              200: '#c3d4fe',
-              400: '#7da4fc',
-              500: '#5585f7',
-              600: '#3d65e5',
-              700: '#2e4fc8',
-            },
-            accent: {
-              400: '#fb923c',
-              500: '#f97316',
+              green: '#22c55e',
+              orange: '#f97316',
+              light: '#f0fdf4',
             }
           },
           fontFamily: {
-            sans: ['"Noto Sans JP"', 'system-ui', 'sans-serif'],
+            sans: ['Hiragino Sans', 'Meiryo', 'sans-serif'],
           }
         }
       }
     }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Noto Sans JP', sans-serif; }
-    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
-    .progress-bar { transition: width 0.4s ease; }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
+    body { font-size: 18px; line-height: 1.8; }
+    .btn-main {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 1rem 2rem; border-radius: 1rem; font-size: 1.2rem;
+      font-weight: bold; transition: all 0.2s; cursor: pointer;
+      border: none; text-decoration: none; min-height: 3.5rem;
     }
-    .animate-fade-in-up { animation: fadeInUp 0.5s ease forwards; }
-    .animate-delay-1 { animation-delay: 0.1s; opacity: 0; }
-    .animate-delay-2 { animation-delay: 0.2s; opacity: 0; }
-    .animate-delay-3 { animation-delay: 0.3s; opacity: 0; }
+    .btn-green { background: #22c55e; color: white; }
+    .btn-green:hover { background: #16a34a; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(34,197,94,0.4); }
+    .btn-orange { background: #f97316; color: white; }
+    .btn-orange:hover { background: #ea580c; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(249,115,22,0.4); }
+    .card { background: white; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .stamp-btn {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 1rem; border-radius: 1rem; border: 3px solid transparent;
+      cursor: pointer; transition: all 0.2s; background: #f9fafb;
+      font-size: 2rem;
+    }
+    .stamp-btn:hover, .stamp-btn.selected {
+      border-color: #22c55e; background: #f0fdf4; transform: scale(1.05);
+    }
+    .progress-bar {
+      background: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 12px;
+    }
+    .progress-fill { background: #22c55e; height: 100%; border-radius: 9999px; transition: width 0.5s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.5s ease forwards; }
   </style>
   {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen">
+<body class="bg-green-50 min-h-screen">
 
-  <!-- ナビゲーション -->
-  <nav class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-2 font-black text-xl text-brand-600 hover:text-brand-700">
-        <span class="text-2xl">🧭</span>
-        <span>Ability Compass</span>
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 text-green-600 font-bold text-xl no-underline">
+        <span class="text-2xl">🌱</span>
+        <span>{% t "ステップアップナビ" "すてっぷあっぷなび" %}</span>
       </a>
-      <div class="flex items-center gap-3 text-sm font-medium">
-        <a href="/diagnosis/" class="text-gray-600 hover:text-brand-600 transition-colors hidden sm:block">診断する</a>
-        <a href="/roadmap/" class="text-gray-600 hover:text-brand-600 transition-colors hidden sm:block">ロードマップ</a>
-        {% if user.is_authenticated %}
-          {% if user.child_profile %}
-          <a href="/daily/" class="flex items-center gap-1 bg-brand-600 text-white px-4 py-2 rounded-full hover:bg-brand-700 transition-colors">
-            <span>{{ user.child_profile.avatar_emoji }}</span>
-            <span class="hidden sm:inline">ダッシュボード</span>
-          </a>
-          {% elif user.parent_profile %}
-          <a href="/accounts/parent/dashboard/" class="flex items-center gap-1 bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition-colors">
-            <span>👨‍👩‍👧</span>
-            <span class="hidden sm:inline">保護者画面</span>
-          </a>
+      <nav class="flex items-center gap-3 flex-wrap justify-end">
+        {% if request.user.is_authenticated %}
+          {% if request.user.user_profile %}
+            <span class="text-gray-600 text-base">{{ request.user.user_profile.avatar_emoji }} {{ request.user.user_profile.nickname }}</span>
+            <a href="/daily/" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-base font-medium hover:bg-green-200">📒 {% t "記録" "きろく" %}</a>
+            <a href="/daily/chat/" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-base font-medium hover:bg-green-200">💬 {% t "チャット" "ちゃっと" %}</a>
+          {% elif request.user.supporter_profile %}
+            <span class="text-gray-600 text-base">👤 {% t "支援者" "しえんしゃ" %}</span>
+            <a href="/accounts/dashboard/" class="bg-orange-100 text-orange-700 px-3 py-1 rounded-lg text-base font-medium hover:bg-orange-200">📊 {% t "ダッシュボード" "だっしゅぼーど" %}</a>
           {% endif %}
-          <a href="/accounts/logout/" class="text-gray-400 hover:text-gray-600 transition-colors text-xs">ログアウト</a>
+          <a href="/accounts/logout/" class="text-gray-400 text-base hover:text-gray-600">{% t "ログアウト" "ろぐあうと" %}</a>
         {% else %}
-          <a href="/accounts/login/" class="text-gray-600 hover:text-brand-600 transition-colors">ログイン</a>
-          <a href="/accounts/signup/child/" class="bg-brand-600 text-white px-4 py-2 rounded-full hover:bg-brand-700 transition-colors">
-            無料登録
-          </a>
+          <a href="/accounts/login/" class="bg-green-500 text-white px-4 py-2 rounded-lg text-base font-medium hover:bg-green-600">{% t "ログイン" "ろぐいん" %}</a>
         {% endif %}
-      </div>
+        <form method="post" action="{% url 'toggle_text_mode' %}" class="inline">
+          {% csrf_token %}
+          <button type="submit" class="bg-gray-100 text-gray-600 px-3 py-1 rounded-lg text-sm font-medium hover:bg-gray-200 border border-gray-300 cursor-pointer whitespace-nowrap">
+            {% if request.session.text_mode == 'kanji' %}
+              🔤 ひらがなに する
+            {% else %}
+              🔤 かんじに する
+            {% endif %}
+          </button>
+        </form>
+      </nav>
     </div>
-  </nav>
+  </header>
 
-  <!-- メインコンテンツ -->
-  <main>
+  <main class="max-w-3xl mx-auto px-4 py-8">
     {% block content %}{% endblock %}
   </main>
 
-  <!-- フッター -->
-  <footer class="bg-gray-800 text-gray-400 py-10 mt-20">
-    <div class="max-w-5xl mx-auto px-4 text-center">
-      <div class="flex items-center justify-center gap-2 mb-3">
-        <span class="text-2xl">🧭</span>
-        <span class="font-bold text-white text-lg">Ability Compass</span>
-      </div>
-      <p class="text-sm">すべての子供たちの可能性を信じて。あなたの「違い」は、才能の始まり。</p>
-      <p class="text-xs mt-4">&copy; 2024 Ability Compass. All rights reserved.</p>
-    </div>
+  <footer class="text-center py-8 text-gray-400 text-sm mt-8">
+    <p>🌱 {% t "ステップアップナビ — はたらく一歩を、いっしょに。" "すてっぷあっぷなび — はたらく いっぽを、いっしょに。" %}</p>
   </footer>
 
+  {% block extra_js %}{% endblock %}
 </body>
 </html>

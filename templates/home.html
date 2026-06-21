@@ -1,107 +1,143 @@
-{% extends 'base.html' %}
-
-{% block title %}Ability Compass | 発達障害を持つ子供の可能性を広げるアプリ{% endblock %}
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "ステップアップナビ — はたらく一歩を、いっしょに" "すてっぷあっぷなび — はたらく いっぽを、いっしょに" %}{% endblock %}
 
 {% block content %}
+<div class="text-center mb-10 fade-in">
+  <div class="text-6xl mb-4">🌱</div>
+  <h1 class="text-3xl font-bold text-green-700 mb-3">{% t "ステップアップナビ" "すてっぷあっぷなび" %}</h1>
+  <p class="text-xl text-gray-600 mb-2">{% t "はたらく　一歩（いっぽ）を、いっしょに。" "はたらく　いっぽを、いっしょに。" %}</p>
+  <p class="text-gray-500 text-base">{% t "あなたの「つよみ」を見つけて、" "あなたの「つよみ」を みつけて、" %}<br>{% t "しごとに向けて　少しずつ　成長しよう！" "しごとに むけて　すこしずつ　せいちょうしよう！" %}</p>
+</div>
 
-<!-- ヒーローセクション -->
-<section class="gradient-bg text-white py-20 px-4">
-  <div class="max-w-4xl mx-auto text-center">
-    <div class="text-7xl mb-6 animate-fade-in-up">🧭</div>
-    <h1 class="text-4xl md:text-5xl font-black mb-6 leading-tight animate-fade-in-up animate-delay-1">
-      あなたの<span class="text-yellow-300">「違い」</span>は<br>才能の始まり
-    </h1>
-    <p class="text-xl md:text-2xl text-indigo-100 mb-8 animate-fade-in-up animate-delay-2">
-      発達障害を持つすべての子供たちの<br>無限の可能性を発見するAIコンパス
-    </p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animate-delay-3">
-      <a href="/diagnosis/"
-         class="bg-white text-brand-700 font-bold text-lg px-8 py-4 rounded-2xl hover:bg-yellow-50 transition-all shadow-lg hover:shadow-xl">
-        🔍 適性診断を始める（無料）
-      </a>
-      <a href="/roadmap/"
-         class="bg-white/20 text-white font-bold text-lg px-8 py-4 rounded-2xl hover:bg-white/30 transition-all border border-white/40">
-        🗺️ ロードマップを見る
-      </a>
+<div class="grid grid-cols-1 gap-5 mb-10 fade-in" style="animation-delay:0.1s">
+  <a href="/diagnosis/" class="card flex items-center gap-5 hover:shadow-lg transition-shadow no-underline group">
+    <div class="text-5xl group-hover:scale-110 transition-transform">🔍</div>
+    <div class="flex-1">
+      <h2 class="text-xl font-bold text-green-700 mb-1">① {% t "特性診断" "とくちょう しんだん" %}</h2>
+      <p class="text-gray-600 text-base">{% t "簡単な　質問に　答えると、" "かんたんな　しつもんに　こたえると、" %}<br>{% t "あなたに　向いている　仕事が　わかります！" "あなたに　むいている　しごとが　わかります！" %}</p>
     </div>
+    <div class="text-green-400 text-2xl">→</div>
+  </a>
+
+  <a href="/roadmap/" class="card flex items-center gap-5 hover:shadow-lg transition-shadow no-underline group">
+    <div class="text-5xl group-hover:scale-110 transition-transform">🗺️</div>
+    <div class="flex-1">
+      <h2 class="text-xl font-bold text-blue-700 mb-1">② {% t "成長ロードマップ" "せいちょう ろーどまっぷ" %}</h2>
+      <p class="text-gray-600 text-base">{% t "仕事に向けた　3ステップを" "しごとに むけた　3ステップを" %}<br>{% t "いっしょに　進もう！" "いっしょに　すすもう！" %}</p>
+    </div>
+    <div class="text-blue-400 text-2xl">→</div>
+  </a>
+
+  {% if request.user.is_authenticated and request.user.user_profile %}
+  <a href="/daily/" class="card flex items-center gap-5 hover:shadow-lg transition-shadow no-underline group">
+    <div class="text-5xl group-hover:scale-110 transition-transform">📒</div>
+    <div class="flex-1">
+      <h2 class="text-xl font-bold text-orange-700 mb-1">③ {% t "日々の記録" "まいにちの きろく" %}</h2>
+      <p class="text-gray-600 text-base">{% t "今日　できたことを　記録して" "きょう　できたことを　きろくして" %}<br>{% t "毎日　少しずつ　前へ！" "まいにち　すこしずつ　まえへ！" %}</p>
+    </div>
+    <div class="text-orange-400 text-2xl">→</div>
+  </a>
+  {% else %}
+  <div class="card flex items-center gap-5 opacity-60">
+    <div class="text-5xl">📒</div>
+    <div class="flex-1">
+      <h2 class="text-xl font-bold text-orange-700 mb-1">③ {% t "日々の記録" "まいにちの きろく" %}</h2>
+      <p class="text-gray-600 text-base">{% t "ログインすると　今日の　記録が　できます！" "ろぐいんすると　きょうの　きろくが　できます！" %}</p>
+    </div>
+    <a href="/accounts/login/" class="btn-main btn-orange text-base px-4 py-2">{% t "ログイン" "ろぐいん" %}</a>
   </div>
-</section>
+  {% endif %}
+</div>
 
-<!-- 特徴セクション -->
-<section class="py-20 px-4 bg-white">
-  <div class="max-w-5xl mx-auto">
-    <h2 class="text-3xl font-black text-center text-gray-800 mb-4">Ability Compass でできること</h2>
-    <p class="text-center text-gray-500 mb-14">3つのステップで、あなたの可能性を見つける</p>
-
-    <div class="grid md:grid-cols-3 gap-8">
-      <!-- 機能1 -->
-      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 card-hover border border-blue-100">
-        <div class="text-5xl mb-4">🔍</div>
-        <div class="inline-block bg-brand-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">STEP 1</div>
-        <h3 class="text-xl font-bold text-gray-800 mb-3">適性診断</h3>
-        <p class="text-gray-600 leading-relaxed">
-          15の質問に答えるだけで、AIがあなたの強みと向いている職業を分析。
-          欠点ではなく<strong>強みにフォーカス</strong>した診断です。
-        </p>
-      </div>
-
-      <!-- 機能2 -->
-      <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 card-hover border border-purple-100">
-        <div class="text-5xl mb-4">🎯</div>
-        <div class="inline-block bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">STEP 2</div>
-        <h3 class="text-xl font-bold text-gray-800 mb-3">職業を選ぶ</h3>
-        <p class="text-gray-600 leading-relaxed">
-          診断結果から提案された職業、または自分でなりたい職業を14種類から選択。
-          夢があるならその道を進もう。
-        </p>
-      </div>
-
-      <!-- 機能3 -->
-      <div class="bg-gradient-to-br from-green-50 to-teal-50 rounded-3xl p-8 card-hover border border-green-100">
-        <div class="text-5xl mb-4">🗺️</div>
-        <div class="inline-block bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">STEP 3</div>
-        <h3 class="text-xl font-bold text-gray-800 mb-3">年齢別ロードマップ</h3>
-        <p class="text-gray-600 leading-relaxed">
-          幼少期から社会人まで、6段階の年齢別に「今何をすべきか」をAIが具体的に提示。
-          学習だけでなく人間性・習慣まで。
-        </p>
+<div class="card mb-8 fade-in" style="animation-delay:0.2s">
+  <h2 class="text-xl font-bold text-gray-700 mb-5 text-center">🌟 {% t "3ステップで　仕事を　めざそう！" "3ステップで　しごとを　めざそう！" %}</h2>
+  <div class="space-y-4">
+    <div class="flex items-start gap-4 p-4 bg-green-50 rounded-xl">
+      <span class="text-3xl">🌱</span>
+      <div>
+        <div class="font-bold text-green-700 text-lg">{% t "ステップ 1" "ステップ 1" %}</div>
+        <div class="text-gray-600">{% t "生活習慣・基本スキル" "せいかつしゅうかん・きほんスキル" %}</div>
+        <div class="text-sm text-gray-500 mt-1">{% t "時刻を守る、あいさつ、報告" "じこくを まもる、あいさつ、ほうこく" %}</div>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- 年齢フェーズセクション -->
-<section class="py-16 px-4 bg-gray-50">
-  <div class="max-w-5xl mx-auto">
-    <h2 class="text-3xl font-black text-center text-gray-800 mb-12">6つの成長フェーズに対応</h2>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-      {% for phase in phases %}
-      <div class="bg-white rounded-2xl p-4 text-center shadow-sm border border-gray-100 card-hover">
-        <div class="text-3xl mb-2">{{ phase.emoji }}</div>
-        <div class="font-bold text-sm text-gray-800">{{ phase.label }}</div>
-        <div class="text-xs text-gray-500 mt-1">{{ phase.range }}</div>
+    <div class="flex items-start gap-4 p-4 bg-blue-50 rounded-xl">
+      <span class="text-3xl">🔧</span>
+      <div>
+        <div class="font-bold text-blue-700 text-lg">{% t "ステップ 2" "ステップ 2" %}</div>
+        <div class="text-gray-600">{% t "作業スキル" "さぎょうスキル" %}</div>
+        <div class="text-sm text-gray-500 mt-1">{% t "指示どおりに動く、くりかえし作業の練習" "しじどおりに うごく、くりかえし さぎょうの れんしゅう" %}</div>
       </div>
-      {% endfor %}
+    </div>
+    <div class="flex items-start gap-4 p-4 bg-orange-50 rounded-xl">
+      <span class="text-3xl">🚀</span>
+      <div>
+        <div class="font-bold text-orange-700 text-lg">{% t "ステップ 3" "ステップ 3" %}</div>
+        <div class="text-gray-600">{% t "就労準備" "しゅうろうじゅんび" %}</div>
+        <div class="text-sm text-gray-500 mt-1">{% t "職場体験・ジョブコーチとの連携" "しょくばたいけん・じょぶコーチとの れんけい" %}</div>
+      </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- CTAセクション -->
-<section class="py-20 px-4 bg-white">
-  <div class="max-w-2xl mx-auto text-center">
-    <div class="text-6xl mb-6">✨</div>
-    <h2 class="text-3xl font-black text-gray-800 mb-4">
-      今すぐあなたの可能性を<br>発見しよう
-    </h2>
-    <p class="text-gray-500 mb-8 text-lg">
-      たった15問の質問で、AIがあなただけの強みを<br>分析します。所要時間は約5分。
-    </p>
-    <a href="/diagnosis/"
-       class="inline-block bg-brand-600 text-white font-bold text-xl px-10 py-5 rounded-2xl hover:bg-brand-700 transition-all shadow-lg hover:shadow-xl">
-      🔍 無料で診断を始める
+<div class="card mb-8 fade-in" style="animation-delay:0.3s">
+  <h2 class="text-xl font-bold text-gray-700 mb-4 text-center">💼 {% t "向いている　仕事を　さがそう" "むいている　しごとを　さがそう" %}</h2>
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    <a href="/roadmap/agriculture/" class="text-center p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors no-underline">
+      <div class="text-3xl mb-1">🌱</div>
+      <div class="text-sm font-bold text-green-700">{% t "農業・園芸系" "のうぎょう・えんげいけい" %}</div>
     </a>
-    <p class="text-sm text-gray-400 mt-4">登録不要・完全無料</p>
+    <a href="/roadmap/manufacturing/" class="text-center p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors no-underline">
+      <div class="text-3xl mb-1">🔧</div>
+      <div class="text-sm font-bold text-blue-700">{% t "製造・組み立て系" "せいぞう・くみたてけい" %}</div>
+    </a>
+    <a href="/roadmap/cleaning/" class="text-center p-4 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors no-underline">
+      <div class="text-3xl mb-1">🧹</div>
+      <div class="text-sm font-bold text-sky-700">{% t "清掃・環境整備系" "せいそう・かんきょうせいびけい" %}</div>
+    </a>
+    <a href="/roadmap/food_processing/" class="text-center p-4 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors no-underline">
+      <div class="text-3xl mb-1">🍱</div>
+      <div class="text-sm font-bold text-orange-700">{% t "食品加工系" "しょくひんかこうけい" %}</div>
+    </a>
+    <a href="/roadmap/service/" class="text-center p-4 bg-pink-50 rounded-xl hover:bg-pink-100 transition-colors no-underline">
+      <div class="text-3xl mb-1">🛒</div>
+      <div class="text-sm font-bold text-pink-700">{% t "接客・販売補助系" "せっきゃく・はんばいほじょけい" %}</div>
+    </a>
+    <a href="/diagnosis/" class="text-center p-4 bg-yellow-50 rounded-xl hover:bg-yellow-100 transition-colors no-underline">
+      <div class="text-3xl mb-1">🔍</div>
+      <div class="text-sm font-bold text-yellow-700">{% t "診断で探す" "しんだんで さがす" %}</div>
+    </a>
   </div>
-</section>
+</div>
 
+{% if not request.user.is_authenticated %}
+<div class="card bg-gradient-to-r from-green-500 to-green-600 text-white text-center fade-in" style="animation-delay:0.4s">
+  <h2 class="text-xl font-bold mb-3">📝 {% t "無料で　使えます！" "むりょうで　つかえます！" %}</h2>
+
+  <!-- 登録後のフロー -->
+  <div class="flex items-center justify-center gap-1 flex-wrap mb-5 text-sm">
+    <div class="flex flex-col items-center">
+      <span class="bg-white text-green-700 font-bold px-3 py-1 rounded-full">① {% t "とうろく" "とうろく" %}</span>
+    </div>
+    <span class="text-green-200 text-lg">→</span>
+    <div class="flex flex-col items-center">
+      <span class="bg-white text-blue-700 font-bold px-3 py-1 rounded-full">② {% t "しんだん" "しんだん" %}</span>
+    </div>
+    <span class="text-green-200 text-lg">→</span>
+    <div class="flex flex-col items-center">
+      <span class="bg-white text-purple-700 font-bold px-3 py-1 rounded-full">③ {% t "あばたー" "あばたー" %}</span>
+    </div>
+    <span class="text-green-200 text-lg">→</span>
+    <div class="flex flex-col items-center">
+      <span class="bg-white text-orange-700 font-bold px-3 py-1 rounded-full">④ {% t "まいにち きろく" "まいにち きろく" %}</span>
+    </div>
+  </div>
+
+  <p class="mb-5 text-green-100 text-sm">{% t "登録後すぐ診断を受けて、あなただけのアバターを作ろう！" "とうろくご すぐ しんだんを うけて、あなただけの あばたーを つくろう！" %}</p>
+  <div class="flex flex-col sm:flex-row gap-3 justify-center">
+    <a href="/accounts/signup/" class="btn-main bg-white text-green-700 hover:bg-green-50">🌱 {% t "利用者登録" "りようしゃ とうろく" %}</a>
+    <a href="/accounts/signup/supporter/" class="btn-main bg-green-700 text-white hover:bg-green-800">👥 {% t "支援者登録" "しえんしゃ とうろく" %}</a>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

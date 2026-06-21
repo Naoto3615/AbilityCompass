@@ -1,15 +1,12 @@
 import json
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.http import JsonResponse
 from datetime import timedelta
-from .models import DailyTask, EmotionLog, EMOTION_EMOJIS, EMOTION_LABELS, EMOTION_COLORS, TASK_CATEGORY_EMOJIS
-from .services import generate_daily_tasks, check_and_award_badges
-from accounts.models import BADGE_DEFINITIONS
-
+from .models import DailyRecord, AvatarChatMessage, EMOTION_CHOICES, HEALTH_CHOICES, EMOTION_EMOJIS, EMOTION_COLORS, EMOTION_LABELS
 
 LOGIN_URL = '/accounts/login/'
 
@@ -17,150 +14,179 @@ LOGIN_URL = '/accounts/login/'
 @method_decorator(login_required(login_url=LOGIN_URL), name='dispatch')
 class DashboardView(View):
     def get(self, request):
-        if not hasattr(request.user, 'child_profile'):
+        if not hasattr(request.user, 'user_profile'):
             return redirect('/')
 
-        profile = request.user.child_profile
+        profile = request.user.user_profile
         today = timezone.localdate()
 
-        tasks = generate_daily_tasks(profile)
-        today_emotion = EmotionLog.objects.filter(profile=profile, date=today).first()
+        today_record = DailyRecord.objects.filter(user=request.user, date=today).first()
 
-        completed_today = sum(1 for t in tasks if t.is_completed)
-        total_today = len(tasks)
-        progress_pct = round(completed_today / total_today * 100) if total_today else 0
-
-        week_tasks = DailyTask.objects.filter(
-            profile=profile,
-            date__gte=today - timedelta(days=6)
+        # 過去7日間の記録
+        week_ago = today - timedelta(days=6)
+        week_records = DailyRecord.objects.filter(
+            user=request.user, date__gte=week_ago
         ).order_by('date')
 
+        # 週間グラフデータ
         week_data = []
         for i in range(7):
-            d = today - timedelta(days=6 - i)
-            day_tasks = [t for t in week_tasks if t.date == d]
-            done = sum(1 for t in day_tasks if t.is_completed)
+            d = week_ago + timedelta(days=i)
+            rec = next((r for r in week_records if r.date == d), None)
             week_data.append({
-                'label': ['月', '火', '水', '木', '金', '土', '日'][(d.weekday())],
+                'label': ['月', '火', '水', '木', '金', '土', '日'][d.weekday()],
                 'date': d.strftime('%m/%d'),
-                'done': done,
-                'total': len(day_tasks),
+                'score': rec.emotion_stamp if rec else None,
+                'emoji': EMOTION_EMOJIS.get(rec.emotion_stamp, '') if rec else '',
+                'color': EMOTION_COLORS.get(rec.emotion_stamp, '#e5e7eb') if rec else '#e5e7eb',
                 'is_today': d == today,
+                'has_record': rec is not None,
             })
 
-        level_num, level_name, level_emoji = profile.get_level()
-        next_level_points = [50, 150, 350, 700, 99999][min(level_num - 1, 4)]
-        prev_level_points = [0, 50, 150, 350, 700][min(level_num - 1, 4)]
-        level_progress = 0
-        if next_level_points > prev_level_points:
-            level_progress = round(
-                (profile.total_points - prev_level_points) /
-                (next_level_points - prev_level_points) * 100
-            )
+        # 記録日数
+        record_count = week_records.count()
 
-        badges = [BADGE_DEFINITIONS.get(b, {}) for b in profile.get_badges()]
+        # アバター設定（今日の感情ログで表情を上書き）
+        avatar_config = profile.get_avatar_config()
+        if today_record:
+            stamp = today_record.emotion_stamp
+            if stamp >= 4:
+                avatar_config['expression'] = 'happy'
+            elif stamp <= 2:
+                avatar_config['expression'] = 'worried'
+            else:
+                avatar_config['expression'] = 'normal'
+
+        # タスク完了数・ログイン連続日数でバッジを更新
+        total_records = DailyRecord.objects.filter(user=request.user).count()
+        avatar_config['badge_count'] = total_records
 
         context = {
             'profile': profile,
-            'tasks': tasks,
             'today': today,
-            'today_emotion': today_emotion,
-            'completed_today': completed_today,
-            'total_today': total_today,
-            'progress_pct': progress_pct,
+            'today_record': today_record,
             'week_data': week_data,
-            'level_num': level_num,
-            'level_name': level_name,
-            'level_emoji': level_emoji,
-            'level_progress': level_progress,
-            'next_level_points': next_level_points,
-            'badges': badges,
-            'category_emojis': TASK_CATEGORY_EMOJIS,
+            'week_data_json': json.dumps(week_data, ensure_ascii=False, default=str),
+            'record_count': record_count,
+            'avatar_config': avatar_config,
         }
         return render(request, 'daily/dashboard.html', context)
 
 
 @method_decorator(login_required(login_url=LOGIN_URL), name='dispatch')
-class CompleteTaskView(View):
-    def post(self, request, task_id):
-        if not hasattr(request.user, 'child_profile'):
-            return JsonResponse({'ok': False}, status=403)
-
-        profile = request.user.child_profile
-        task = get_object_or_404(DailyTask, id=task_id, profile=profile)
-
-        newly_completed = task.complete()
-        new_badges = check_and_award_badges(profile) if newly_completed else []
-
-        profile.refresh_from_db()
-        level_num, level_name, level_emoji = profile.get_level()
-
-        return JsonResponse({
-            'ok': True,
-            'newly_completed': newly_completed,
-            'total_points': profile.total_points,
-            'level_num': level_num,
-            'level_name': level_name,
-            'level_emoji': level_emoji,
-            'new_badges': new_badges,
-        })
-
-
-@method_decorator(login_required(login_url=LOGIN_URL), name='dispatch')
-class EmotionLogView(View):
+class DailyRecordView(View):
     def get(self, request):
-        if not hasattr(request.user, 'child_profile'):
+        if not hasattr(request.user, 'user_profile'):
             return redirect('/')
 
-        profile = request.user.child_profile
         today = timezone.localdate()
-        today_log = EmotionLog.objects.filter(profile=profile, date=today).first()
-
-        past_logs = EmotionLog.objects.filter(
-            profile=profile,
-            date__gte=today - timedelta(days=13)
-        ).order_by('date')
+        today_record = DailyRecord.objects.filter(user=request.user, date=today).first()
 
         emotion_options = [
-            {'score': score, 'emoji': EMOTION_EMOJIS[score], 'label': EMOTION_LABELS[score], 'color': EMOTION_COLORS[score]}
-            for score in range(1, 6)
+            {'value': score, 'label': label, 'emoji': EMOTION_EMOJIS[score], 'color': EMOTION_COLORS[score]}
+            for score, label in sorted(EMOTION_CHOICES, key=lambda x: -x[0])
         ]
-
-        trend_data = [
-            {
-                'date': log.date.strftime('%m/%d'),
-                'score': log.score,
-                'emoji': log.get_emoji(),
-                'color': log.get_color(),
-                'label': log.get_label(),
-            }
-            for log in past_logs
+        health_options = [
+            {'value': score, 'label': label}
+            for score, label in HEALTH_CHOICES
         ]
 
         context = {
-            'profile': profile,
+            'profile': request.user.user_profile,
             'today': today,
-            'today_log': today_log,
+            'today_record': today_record,
             'emotion_options': emotion_options,
-            'trend_data': trend_data,
-            'trend_json': json.dumps(trend_data, ensure_ascii=False),
+            'health_options': health_options,
         }
-        return render(request, 'daily/emotion_log.html', context)
+        return render(request, 'daily/record.html', context)
 
     def post(self, request):
-        if not hasattr(request.user, 'child_profile'):
+        if not hasattr(request.user, 'user_profile'):
             return redirect('/')
 
-        profile = request.user.child_profile
         today = timezone.localdate()
-        score = int(request.POST.get('score', 3))
-        note = request.POST.get('note', '').strip()
+        did_well = request.POST.get('did_well', '').strip()
+        struggled_with = request.POST.get('struggled_with', '').strip()
+        emotion_stamp = int(request.POST.get('emotion_stamp', 3))
+        health_score = int(request.POST.get('health_score', 2))
 
-        log, created = EmotionLog.objects.update_or_create(
-            profile=profile,
+        DailyRecord.objects.update_or_create(
+            user=request.user,
             date=today,
-            defaults={'score': score, 'note': note},
+            defaults={
+                'did_well': did_well,
+                'struggled_with': struggled_with,
+                'emotion_stamp': emotion_stamp,
+                'health_score': health_score,
+            },
         )
 
-        check_and_award_badges(profile)
-        return redirect('daily:emotion_log')
+        return redirect('daily:dashboard')
+
+
+@method_decorator(login_required(login_url=LOGIN_URL), name='dispatch')
+class AvatarChatView(View):
+    """アバターチャットページ"""
+
+    def get(self, request):
+        if not hasattr(request.user, 'user_profile'):
+            return redirect('/')
+
+        profile = request.user.user_profile
+        messages = AvatarChatMessage.objects.filter(profile=profile).order_by('created_at')[:30]
+        avatar_config = profile.get_avatar_config()
+        text_mode = request.session.get('text_mode', 'hiragana')
+
+        context = {
+            'profile': profile,
+            'messages': messages,
+            'avatar_config': avatar_config,
+            'text_mode': text_mode,
+        }
+        return render(request, 'daily/avatar_chat.html', context)
+
+    def post(self, request):
+        if not hasattr(request.user, 'user_profile'):
+            return JsonResponse({'error': 'profile not found'}, status=400)
+
+        profile = request.user.user_profile
+        text_mode = request.session.get('text_mode', 'hiragana')
+
+        try:
+            data = json.loads(request.body)
+            user_message = data.get('message', '').strip()
+        except (json.JSONDecodeError, AttributeError):
+            user_message = request.POST.get('message', '').strip()
+
+        if not user_message:
+            return JsonResponse({'error': 'empty message'}, status=400)
+
+        AvatarChatMessage.objects.create(
+            profile=profile,
+            role='user',
+            content=user_message,
+        )
+
+        from .services import chat_with_avatar
+        avatar_reply = chat_with_avatar(profile, user_message, text_mode)
+
+        AvatarChatMessage.objects.create(
+            profile=profile,
+            role='avatar',
+            content=avatar_reply,
+        )
+
+        return JsonResponse({'reply': avatar_reply})
+
+
+@method_decorator(login_required(login_url=LOGIN_URL), name='dispatch')
+class AvatarChatClearView(View):
+    """チャット履歴をクリアする"""
+
+    def post(self, request):
+        if not hasattr(request.user, 'user_profile'):
+            return redirect('/')
+
+        profile = request.user.user_profile
+        AvatarChatMessage.objects.filter(profile=profile).delete()
+        return redirect('daily:avatar_chat')

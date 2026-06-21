@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "支援者登録" "しえんしゃ とうろく" %} — {% t "ステップアップナビ" "すてっぷあっぷなび" %}{% endblock %}
+
+{% block content %}
+<div class="text-center mb-6 fade-in">
+  <div class="text-5xl mb-3">👥</div>
+  <h1 class="text-2xl font-bold text-orange-700">{% t "支援者登録" "しえんしゃ とうろく" %}</h1>
+  <p class="text-gray-600 mt-2">{% t "家族・支援員としてアカウントを作りましょう" "かぞく・しえんいんとして アカウントを つくりましょう" %}</p>
+</div>
+
+<div class="card fade-in" style="animation-delay:0.1s">
+  <form method="post" class="space-y-5">
+    {% csrf_token %}
+
+    <div>
+      <label class="block font-bold text-gray-700 mb-2">🔑 {% t "ログインID（ローマ字・数字）" "ろぐいんID（えいじと すうじ）" %}</label>
+      {{ form.username }}
+      {% if form.username.errors %}
+        {% for e in form.username.errors %}<p class="text-red-500 text-sm mt-1">{{ e }}</p>{% endfor %}
+      {% endif %}
+    </div>
+
+    <div>
+      <label class="block font-bold text-gray-700 mb-2">🔒 {% t "パスワード" "ぱすわーど" %}</label>
+      {{ form.password1 }}
+    </div>
+    <div>
+      <label class="block font-bold text-gray-700 mb-2">🔒 {% t "パスワード（もう一度）" "ぱすわーど（もう いちど）" %}</label>
+      {{ form.password2 }}
+      {% if form.password2.errors %}
+        {% for e in form.password2.errors %}<p class="text-red-500 text-sm mt-1">{{ e }}</p>{% endfor %}
+      {% endif %}
+    </div>
+
+    <div>
+      <label class="block font-bold text-gray-700 mb-2">👤 {% t "支援する人のログインID（省略可）" "しえんする ひとの ろぐいんID（しょうりゃくか）" %}</label>
+      {{ form.target_username }}
+      <p class="text-sm text-gray-400 mt-1">{% t "すでに登録している人はここにIDを入れてください" "すでに とうろく している ひとは ここに IDを いれてください" %}</p>
+    </div>
+
+    {% if form.non_field_errors %}
+    <div class="p-3 bg-red-50 rounded-xl border border-red-200">
+      {% for e in form.non_field_errors %}<p class="text-red-600 text-sm">{{ e }}</p>{% endfor %}
+    </div>
+    {% endif %}
+
+    <button type="submit" class="btn-main btn-orange w-full text-xl py-4">
+      👥 {% t "支援者として登録する！" "しえんしゃとして とうろくする！" %}
+    </button>
+  </form>
+</div>
+
+<div class="text-center mt-4 space-y-2">
+  <a href="/accounts/login/" class="text-orange-600 hover:underline">{% t "すでにアカウントがある → ログイン" "すでに アカウントがある → ろぐいん" %}</a><br>
+  <a href="/accounts/signup/" class="text-gray-500 text-sm hover:underline">{% t "利用者として登録する" "りようしゃとして とうろくする" %}</a>
+</div>
+{% endblock %}

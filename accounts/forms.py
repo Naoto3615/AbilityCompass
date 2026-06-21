@@ -1,83 +1,17 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import ChildProfile, AGE_GROUP_CHOICES
-
-AVATAR_CHOICES = [
-    ('🌟', '🌟 スター'),
-    ('🦁', '🦁 ライオン'),
-    ('🐬', '🐬 イルカ'),
-    ('🦋', '🦋 チョウ'),
-    ('🐉', '🐉 ドラゴン'),
-    ('🌈', '🌈 虹'),
-    ('🚀', '🚀 ロケット'),
-    ('⚡', '⚡ 雷'),
-    ('🎮', '🎮 ゲーム'),
-    ('🎨', '🎨 アート'),
-    ('🎵', '🎵 音楽'),
-    ('🔭', '🔭 望遠鏡'),
-]
-
-CAREER_CHOICES_FORM = [
-    ('', '──────── 選んでください ────────'),
-    ('programmer', 'プログラマー・エンジニア 💻'),
-    ('designer', 'デザイナー・アーティスト 🎨'),
-    ('musician', '音楽家・作曲家 🎼'),
-    ('scientist', '科学者・研究者 🔬'),
-    ('writer', '作家・ライター ✍️'),
-    ('mathematician', '数学者・データサイエンティスト 📐'),
-    ('game_creator', 'ゲームクリエイター 🎮'),
-    ('chef', 'シェフ・料理研究家 👨‍🍳'),
-    ('animal_care', '動物の専門家 🐾'),
-    ('architect', '建築家・空間デザイナー 🏛️'),
-    ('teacher', '教師・支援員 📚'),
-    ('athlete', 'スポーツ選手・コーチ ⚽'),
-    ('photographer', '写真家・映像作家 📷'),
-    ('entrepreneur', '起業家・経営者 🚀'),
-    ('doctor', '医師・医療専門家 🩺'),
-    ('undecided', 'まだ決まっていない 🌱'),
-]
-
-CAREER_NAME_MAP = {
-    'programmer': 'プログラマー・エンジニア',
-    'designer': 'デザイナー・アーティスト',
-    'musician': '音楽家・作曲家',
-    'scientist': '科学者・研究者',
-    'writer': '作家・ライター',
-    'mathematician': '数学者・データサイエンティスト',
-    'game_creator': 'ゲームクリエイター',
-    'chef': 'シェフ・料理研究家',
-    'animal_care': '動物の専門家',
-    'architect': '建築家・空間デザイナー',
-    'teacher': '教師・支援員',
-    'athlete': 'スポーツ選手・コーチ',
-    'photographer': '写真家・映像作家',
-    'entrepreneur': '起業家・経営者',
-    'doctor': '医師・医療専門家',
-    'undecided': 'まだ決まっていない',
-}
+from .models import UserProfile
 
 
-class ChildSignupForm(UserCreationForm):
+class UserSignupForm(UserCreationForm):
     nickname = forms.CharField(
         label='ニックネーム',
         max_length=30,
-        widget=forms.TextInput(attrs={'placeholder': 'たとえば：たろう、ゆいちゃん'}),
-    )
-    age_group = forms.ChoiceField(
-        label='いまの年齢',
-        choices=AGE_GROUP_CHOICES,
-    )
-    career_goal = forms.ChoiceField(
-        label='なりたい職業（あれば）',
-        choices=CAREER_CHOICES_FORM,
-        required=False,
-    )
-    avatar_emoji = forms.ChoiceField(
-        label='アバターを選ぶ',
-        choices=AVATAR_CHOICES,
-        widget=forms.RadioSelect,
-        initial='🌟',
+        widget=forms.TextInput(attrs={
+            'placeholder': 'たとえば：たろう　ゆいちゃん',
+            'class': 'w-full border-2 border-green-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-green-500',
+        }),
     )
 
     class Meta:
@@ -86,30 +20,109 @@ class ChildSignupForm(UserCreationForm):
         labels = {
             'username': 'ログインID（ローマ字・数字）',
         }
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'placeholder': 'hanako123',
+                'class': 'w-full border-2 border-green-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-green-500',
+            }),
+        }
+
+    def __init__(self, *args, text_mode='hiragana', **kwargs):
+        super().__init__(*args, **kwargs)
+        for fname in ['password1', 'password2']:
+            self.fields[fname].widget.attrs.update({
+                'class': 'w-full border-2 border-green-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-green-500',
+            })
+
+        if text_mode == 'kanji':
+            self.fields['nickname'].widget.attrs['placeholder'] = 'たとえば：太郎、ゆいちゃん'
+            self.fields['nickname'].error_messages.update({
+                'required': 'ニックネームを入力してください',
+                'max_length': '30文字以内で入力してください',
+            })
+            self.fields['username'].error_messages.update({
+                'required': 'ログインIDを入力してください',
+            })
+            self.fields['password1'].error_messages.update({
+                'required': 'パスワードを入力してください',
+            })
+            self.fields['password2'].error_messages.update({
+                'required': 'パスワード（確認）を入力してください',
+            })
+        else:
+            self.fields['nickname'].widget.attrs['placeholder'] = 'たとえば：たろう　ゆいちゃん'
+            self.fields['nickname'].error_messages.update({
+                'required': 'にっくねーむを いれてください',
+                'max_length': '30もじ いないで いれてください',
+            })
+            self.fields['username'].error_messages.update({
+                'required': 'ろぐいんIDを いれてください',
+            })
+            self.fields['password1'].error_messages.update({
+                'required': 'ぱすわーどを いれてください',
+            })
+            self.fields['password2'].error_messages.update({
+                'required': 'ぱすわーど（かくにん）を いれてください',
+            })
 
     def save(self, commit=True):
         user = super().save(commit=commit)
         if commit:
-            career_key = self.cleaned_data.get('career_goal', '')
-            ChildProfile.objects.create(
+            UserProfile.objects.create(
                 user=user,
                 nickname=self.cleaned_data['nickname'],
-                age_group=self.cleaned_data['age_group'],
-                career_goal=career_key,
-                career_goal_name=CAREER_NAME_MAP.get(career_key, ''),
-                avatar_emoji=self.cleaned_data['avatar_emoji'],
             )
         return user
 
 
-class ParentSignupForm(UserCreationForm):
-    child_username = forms.CharField(
-        label='お子様のログインID',
-        help_text='お子様がすでに登録している場合は入力してください（省略可）',
+class SupporterSignupForm(UserCreationForm):
+    target_username = forms.CharField(
+        label='支援する人のログインID',
+        help_text='すでに登録している場合は入力してください（省略可）',
         required=False,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'ろぐいんID（しょうりゃくか）',
+            'class': 'w-full border-2 border-orange-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-orange-500',
+        }),
     )
 
     class Meta:
         model = User
         fields = ('username', 'password1', 'password2')
-        labels = {'username': 'ログインID（保護者）'}
+        labels = {'username': 'ログインID（支援者）'}
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'placeholder': 'supporter_taro',
+                'class': 'w-full border-2 border-orange-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-orange-500',
+            }),
+        }
+
+    def __init__(self, *args, text_mode='hiragana', **kwargs):
+        super().__init__(*args, **kwargs)
+        for fname in ['password1', 'password2']:
+            self.fields[fname].widget.attrs.update({
+                'class': 'w-full border-2 border-orange-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-orange-500',
+            })
+
+        if text_mode == 'kanji':
+            self.fields['target_username'].widget.attrs['placeholder'] = 'ログインID（省略可）'
+            self.fields['username'].error_messages.update({
+                'required': 'ログインIDを入力してください',
+            })
+            self.fields['password1'].error_messages.update({
+                'required': 'パスワードを入力してください',
+            })
+            self.fields['password2'].error_messages.update({
+                'required': 'パスワード（確認）を入力してください',
+            })
+        else:
+            self.fields['target_username'].widget.attrs['placeholder'] = 'ろぐいんID（しょうりゃくか）'
+            self.fields['username'].error_messages.update({
+                'required': 'ろぐいんIDを いれてください',
+            })
+            self.fields['password1'].error_messages.update({
+                'required': 'ぱすわーどを いれてください',
+            })
+            self.fields['password2'].error_messages.update({
+                'required': 'ぱすわーど（かくにん）を いれてください',
+            })

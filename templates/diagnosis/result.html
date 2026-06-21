@@ -1,97 +1,139 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "診断結果" "しんだんけっか" %} — {% t "ステップアップナビ" "すてっぷあっぷなび" %}{% endblock %}
 
-{% block title %}診断結果 | Ability Compass{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+{% endblock %}
 
 {% block content %}
-<div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen py-12 px-4">
-  <div class="max-w-3xl mx-auto">
+<div class="text-center mb-8 fade-in">
+  <div class="text-5xl mb-3">🎉</div>
+  <h1 class="text-2xl font-bold text-green-700">{% t "診断結果が出ました！" "しんだん けっかが でました！" %}</h1>
+  {% if avatar_config and not show_avatar_prompt %}
+  <div class="flex justify-center mt-4 mb-2">
+    {% render_avatar avatar_config size=120 %}
+  </div>
+  <p class="text-sm text-gray-500">{% t "あなたのアバターに　仕事の制服が付きました！" "あなたの あばたーに　しごとの せいふくが つきました！" %}</p>
+  <a href="/accounts/avatar/" class="text-sm text-green-600 underline">
+    🎨 {% t "アバターをカスタマイズする" "あばたーを かすたまいずする" %}
+  </a>
+  {% endif %}
+</div>
 
-    <!-- 完了バナー -->
-    <div class="text-center mb-10 animate-fade-in-up">
-      <div class="text-7xl mb-4">🎉</div>
-      <h1 class="text-3xl font-black text-gray-800 mb-3">診断が完了しました！</h1>
-      <p class="text-gray-500 text-lg">AIがあなたの強みと可能性を分析しました</p>
-    </div>
+{% if show_avatar_prompt %}
+<div class="bg-green-50 border-2 border-green-300 rounded-xl p-5 mb-6 text-center fade-in" style="animation-delay:0.05s">
+  <div class="text-4xl mb-2">🎨</div>
+  <p class="text-lg font-bold text-green-700 mb-1">{% t "あなたのアバターを作ろう！" "あなたの あばたーを つくろう！" %}</p>
+  <p class="text-sm text-gray-600 mb-4">{% t "診断結果をもとに、仕事の制服と表情が自動で設定されます。あとは見た目をカスタマイズするだけ！" "しんだん けっかを もとに、しごとの せいふくと ひょうじょうが じどうで せっていされます。あとは みためを かすたまいずするだけ！" %}</p>
+  <a href="/accounts/avatar/" class="btn-main btn-green inline-block px-8 py-3 text-lg">
+    {% t "アバターを作る →" "あばたーを つくる →" %}
+  </a>
+  <div class="mt-3">
+    <a href="/daily/" class="text-gray-400 text-sm underline">{% t "あとで作る" "あとで つくる" %}</a>
+  </div>
+</div>
+{% endif %}
 
-    <!-- サマリーメッセージ -->
-    {% if summary %}
-    <div class="bg-gradient-to-r from-brand-600 to-purple-600 text-white rounded-3xl p-7 mb-8 shadow-lg animate-fade-in-up animate-delay-1">
-      <div class="flex items-start gap-4">
-        <span class="text-3xl">✨</span>
-        <p class="text-lg font-medium leading-relaxed">{{ summary }}</p>
+{% if job_type_info %}
+<div class="card mb-6 text-center bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 fade-in" style="animation-delay:0.1s">
+  <p class="text-gray-500 mb-2">{% t "あなたに向いている仕事タイプ" "あなたに むいている しごとタイプ" %}</p>
+  <div class="text-5xl mb-2">{{ job_type_info.emoji }}</div>
+  <h2 class="text-2xl font-bold text-green-700 mb-2">{{ job_type_info.name }}</h2>
+  <p class="text-gray-600">{{ job_type_info.description }}</p>
+</div>
+{% endif %}
+
+{% if summary %}
+<div class="card mb-6 bg-yellow-50 border-2 border-yellow-200 fade-in" style="animation-delay:0.15s">
+  <p class="text-xl text-center text-gray-700 leading-relaxed">💬 {{ summary }}</p>
+</div>
+{% endif %}
+
+<div class="card mb-6 fade-in" style="animation-delay:0.2s">
+  <h2 class="text-lg font-bold text-gray-700 mb-4">📊 {% t "特性のスコア" "とくちょうの スコア" %}</h2>
+  <div class="space-y-3">
+    {% for t_item in trait_chart_data %}
+    <div>
+      <div class="flex justify-between text-sm mb-1">
+        <span class="font-medium text-gray-700">{{ t_item.emoji }} {{ t_item.label }}</span>
+        <span class="text-gray-500">{{ t_item.score }} / 5</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ t_item.pct }}%; background: {% if t_item.pct >= 70 %}#22c55e{% elif t_item.pct >= 40 %}#f97316{% else %}#93c5fd{% endif %}"></div>
       </div>
     </div>
-    {% endif %}
+    {% endfor %}
+  </div>
+</div>
 
-    <!-- あなたの強み -->
-    {% if strengths %}
-    <div class="mb-8 animate-fade-in-up animate-delay-1">
-      <h2 class="text-2xl font-black text-gray-800 mb-5 flex items-center gap-2">
-        <span>💪</span> あなたの強み TOP3
-      </h2>
-      <div class="grid md:grid-cols-3 gap-4">
-        {% for strength in strengths %}
-        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 card-hover text-center">
-          <div class="text-4xl mb-3">{{ strength.emoji }}</div>
-          <h3 class="font-bold text-gray-800 text-lg mb-2">{{ strength.title }}</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">{{ strength.description }}</p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+  <div class="card bg-green-50 border-2 border-green-200 fade-in" style="animation-delay:0.25s">
+    <h2 class="text-lg font-bold text-green-700 mb-4">🌟 {% t "あなたの強み" "あなたの つよみ" %}</h2>
+    <div class="space-y-3">
+      {% for s in strengths %}
+      <div class="flex items-start gap-3 p-3 bg-white rounded-xl">
+        <span class="text-2xl">{{ s.emoji }}</span>
+        <div>
+          <div class="font-bold text-gray-800">{{ s.title }}</div>
+          <div class="text-sm text-gray-600">{{ s.description }}</div>
         </div>
-        {% endfor %}
       </div>
+      {% empty %}
+      <p class="text-gray-500 text-sm">{% t "診断中です..." "しんだん ちゅうです..." %}</p>
+      {% endfor %}
     </div>
-    {% endif %}
+  </div>
 
-    <!-- 向いている職業 -->
-    {% if careers %}
-    <div class="mb-10 animate-fade-in-up animate-delay-2">
-      <h2 class="text-2xl font-black text-gray-800 mb-5 flex items-center gap-2">
-        <span>🎯</span> 向いている職業
-      </h2>
-      <div class="space-y-4">
-        {% for career in careers %}
-        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-5 card-hover">
-          <div class="text-4xl flex-shrink-0">{{ career.emoji }}</div>
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-1">
-              <h3 class="font-bold text-gray-800 text-xl">{{ career.name }}</h3>
-              {% if career.match_score %}
-              <span class="bg-brand-100 text-brand-700 text-xs font-bold px-3 py-1 rounded-full">
-                マッチ度 {{ career.match_score }}%
-              </span>
-              {% endif %}
-            </div>
-            <p class="text-gray-500 text-sm">{{ career.reason }}</p>
-          </div>
-          <a href="/roadmap/{{ career.key }}/"
-             class="bg-brand-600 text-white font-bold text-sm px-4 py-2 rounded-xl hover:bg-brand-700 transition-colors flex-shrink-0">
-            ロードマップ →
-          </a>
+  <div class="card bg-orange-50 border-2 border-orange-200 fade-in" style="animation-delay:0.3s">
+    <h2 class="text-lg font-bold text-orange-700 mb-4">💪 {% t "これから伸ばそう" "これから のばそう" %}</h2>
+    <div class="space-y-3">
+      {% for c in challenges %}
+      <div class="flex items-start gap-3 p-3 bg-white rounded-xl">
+        <span class="text-2xl">{{ c.emoji }}</span>
+        <div>
+          <div class="font-bold text-gray-800">{{ c.title }}</div>
+          <div class="text-sm text-gray-600">{{ c.description }}</div>
         </div>
-        {% endfor %}
       </div>
+      {% empty %}
+      <p class="text-gray-500 text-sm">{% t "すべてが強み！" "すべてが つよみ！" %}</p>
+      {% endfor %}
     </div>
+  </div>
+</div>
+
+<div class="card mb-6 fade-in" style="animation-delay:0.35s">
+  <h2 class="text-lg font-bold text-gray-700 mb-4">🚀 {% t "次は何をする？" "つぎは なにをする？" %}</h2>
+  <div class="space-y-3">
+    {% if job_type_info %}
+    <a href="/roadmap/{{ session.job_type }}/" class="flex items-center gap-3 p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors no-underline">
+      <span class="text-3xl">🗺️</span>
+      <div>
+        <div class="font-bold text-green-700">{{ job_type_info.name }}の　{% t "ロードマップを見る" "ろーどまっぷを みる" %}</div>
+        <div class="text-sm text-gray-600">{% t "3ステップで　仕事を　めざそう！" "3ステップで　しごとを　めざそう！" %}</div>
+      </div>
+      <span class="text-green-400 ml-auto">→</span>
+    </a>
     {% endif %}
 
-    <!-- 他の職業も探す -->
-    <div class="bg-white rounded-3xl p-7 shadow-sm border border-gray-100 mb-8 animate-fade-in-up animate-delay-3">
-      <h2 class="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-        <span>🗺️</span> 他の職業のロードマップも見る
-      </h2>
-      <p class="text-gray-500 text-sm mb-5">提案された職業以外にも、14種類の職業のロードマップを見ることができます。</p>
-      <a href="/roadmap/"
-         class="inline-flex items-center gap-2 bg-gray-100 text-gray-700 font-bold px-6 py-3 rounded-xl hover:bg-gray-200 transition-colors">
-        すべての職業を見る →
-      </a>
-    </div>
+    <a href="/roadmap/" class="flex items-center gap-3 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors no-underline">
+      <span class="text-3xl">💼</span>
+      <div>
+        <div class="font-bold text-blue-700">{% t "他の仕事タイプを見る" "ほかの しごとタイプを みる" %}</div>
+        <div class="text-sm text-gray-600">{% t "5つの　仕事タイプから　えらべます" "5つの　しごとたいぷから　えらべます" %}</div>
+      </div>
+      <span class="text-blue-400 ml-auto">→</span>
+    </a>
 
-    <!-- 再診断 -->
-    <div class="text-center">
-      <a href="/diagnosis/"
-         class="text-gray-400 hover:text-gray-600 text-sm underline transition-colors">
-        もう一度診断する
-      </a>
-    </div>
-
+    <a href="/diagnosis/" class="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors no-underline">
+      <span class="text-3xl">🔄</span>
+      <div>
+        <div class="font-bold text-gray-700">{% t "診断をやり直す" "しんだんを やりなおす" %}</div>
+        <div class="text-sm text-gray-600">{% t "もう一度答えてみよう" "もう いちど こたえてみよう" %}</div>
+      </div>
+      <span class="text-gray-400 ml-auto">→</span>
+    </a>
   </div>
 </div>
 {% endblock %}

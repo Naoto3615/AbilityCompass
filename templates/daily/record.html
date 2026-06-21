@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "今日の記録" "きょうの きろく" %} — {% t "ステップアップナビ" "すてっぷあっぷなび" %}{% endblock %}
+
+{% block extra_head %}
+<style>
+  .emotion-btn { cursor: pointer; transition: all 0.2s; }
+  .emotion-btn input[type=radio] { display: none; }
+  .emotion-btn label {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 1rem 0.75rem; border-radius: 1rem; border: 3px solid #e5e7eb;
+    cursor: pointer; transition: all 0.2s; background: white; min-width: 70px;
+  }
+  .emotion-btn label:hover, .emotion-btn input[type=radio]:checked + label {
+    border-color: #22c55e; background: #f0fdf4; transform: scale(1.08);
+  }
+  .health-btn input[type=radio] { display: none; }
+  .health-btn label {
+    display: flex; align-items: center; gap: 2; padding: 0.75rem 1rem;
+    border-radius: 0.75rem; border: 2px solid #e5e7eb; cursor: pointer;
+    transition: all 0.2s; background: white; width: 100%;
+  }
+  .health-btn input[type=radio]:checked + label {
+    border-color: #22c55e; background: #f0fdf4; font-weight: bold;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="text-center mb-6 fade-in">
+  <div class="text-4xl mb-2">📝</div>
+  <h1 class="text-2xl font-bold text-gray-800">{% t "今日の記録" "きょうの きろく" %}</h1>
+  <p class="text-gray-500">{{ today }}</p>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+
+  <div class="card mb-5 fade-in" style="animation-delay:0.1s">
+    <h2 class="text-lg font-bold text-gray-700 mb-4">😊 {% t "今日の気持ちは？" "きょうの きもちは？" %}</h2>
+    <div class="flex gap-2 flex-wrap justify-center">
+      {% for opt in emotion_options %}
+      <div class="emotion-btn">
+        <input
+          type="radio"
+          name="emotion_stamp"
+          id="emotion_{{ opt.value }}"
+          value="{{ opt.value }}"
+          {% if today_record and today_record.emotion_stamp == opt.value %}checked{% elif not today_record and opt.value == 3 %}checked{% endif %}
+        >
+        <label for="emotion_{{ opt.value }}">
+          <span class="text-4xl">{{ opt.emoji }}</span>
+          <span class="text-xs mt-1 text-center text-gray-600">{{ opt.label }}</span>
+        </label>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card mb-5 fade-in" style="animation-delay:0.15s">
+    <h2 class="text-lg font-bold text-gray-700 mb-4">💪 {% t "体の様子は？" "からだの ようすは？" %}</h2>
+    <div class="space-y-2">
+      {% for opt in health_options %}
+      <div class="health-btn">
+        <input
+          type="radio"
+          name="health_score"
+          id="health_{{ opt.value }}"
+          value="{{ opt.value }}"
+          {% if today_record and today_record.health_score == opt.value %}checked
+          {% elif not today_record and opt.value == 2 %}checked{% endif %}
+        >
+        <label for="health_{{ opt.value }}">
+          <span class="text-xl mr-3">{% if opt.value == 3 %}💪{% elif opt.value == 2 %}😌{% else %}🤒{% endif %}</span>
+          <span class="text-gray-700">{{ opt.label }}</span>
+        </label>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card mb-5 fade-in" style="animation-delay:0.2s">
+    <h2 class="text-lg font-bold text-green-700 mb-3">✅ {% t "今日できたこと" "きょう できたこと" %}</h2>
+    <textarea
+      name="did_well"
+      rows="3"
+      placeholder="{% t "今日できたことを書いてみよう！（例：あいさつができた、時刻を守れた）" "きょう できたことを かいてみよう！&#10;（たとえば：あいさつができた、じこくをまもれた）" %}"
+      class="w-full border-2 border-green-200 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-green-400 resize-none"
+    >{{ today_record.did_well|default:'' }}</textarea>
+  </div>
+
+  <div class="card mb-6 fade-in" style="animation-delay:0.25s">
+    <h2 class="text-lg font-bold text-orange-700 mb-3">💪 {% t "難しかったこと" "むずかしかったこと" %}</h2>
+    <textarea
+      name="struggled_with"
+      rows="3"
+      placeholder="{% t "難しかったことを書いてみよう（例：集中が途切れた、気持ちを抑えるのが大変だった）" "むずかしかったことを かいてみよう&#10;（たとえば：ちゅうもくがとぎれた、きもちをおさえるのがたいへんだった）" %}"
+      class="w-full border-2 border-orange-200 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-orange-400 resize-none"
+    >{{ today_record.struggled_with|default:'' }}</textarea>
+    <p class="text-xs text-gray-400 mt-2">{% t "書かなくても大丈夫です" "かかなくても だいじょうぶです" %}</p>
+  </div>
+
+  <div class="text-center fade-in" style="animation-delay:0.3s">
+    <button type="submit" class="btn-main btn-green text-xl px-10 py-4 w-full">
+      💾 {% t "記録を保存する！" "きろくを ほぞんする！" %}
+    </button>
+  </div>
+</form>
+
+<div class="text-center mt-4">
+  <a href="/daily/" class="text-gray-400 hover:text-gray-600">← {% t "ダッシュボードに戻る" "だっしゅぼーどに もどる" %}</a>
+</div>
+{% endblock %}

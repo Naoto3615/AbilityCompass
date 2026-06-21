@@ -1,74 +1,69 @@
 from django.db import models
 from django.contrib.auth.models import User
+import json
 
 
-AGE_GROUP_CHOICES = [
-    ('early_childhood', '幼少期（3〜6歳）'),
-    ('lower_elementary', '小学校低学年（7〜9歳）'),
-    ('upper_elementary', '小学校高学年（10〜12歳）'),
-    ('middle_school', '中学生（13〜15歳）'),
-    ('high_school', '高校生（16〜18歳）'),
-    ('adult', '大学・社会人（19歳〜）'),
+DISABILITY_LEVEL_CHOICES = [
+    ('mild', '軽度'),
+    ('moderate', '中度'),
+    ('other', 'その他'),
 ]
 
-BADGE_DEFINITIONS = {
-    'first_task':    {'name': '初めての一歩', 'emoji': '👣', 'desc': '初めてタスクを完了した'},
-    'week_streak':   {'name': '7日連続', 'emoji': '🔥', 'desc': '7日連続でタスクを完了した'},
-    'emotion_log_5': {'name': '気持ちの記録家', 'emoji': '📔', 'desc': '感情ログを5日間記録した'},
-    'points_100':    {'name': '100ポイント達成', 'emoji': '⭐', 'desc': '合計100ポイントを獲得した'},
-    'points_500':    {'name': '500ポイント達成', 'emoji': '🏆', 'desc': '合計500ポイントを獲得した'},
-    'all_categories':{'name': 'バランスの達人', 'emoji': '🌈', 'desc': 'すべてのカテゴリのタスクを完了した'},
+
+DEFAULT_AVATAR_CONFIG = {
+    "skin": "light",
+    "hair_style": "short",
+    "hair_color": "black",
+    "eye_type": "normal",
+    "accessory": "none",
+    "job_outfit": "none",
+    "expression": "happy",
+    "badge_count": 0,
+    "rosy_cheeks": False,
 }
 
 
-class ChildProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='child_profile')
+class UserProfile(models.Model):
+    """就労支援利用者のプロフィール"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
     nickname = models.CharField('ニックネーム', max_length=30)
-    career_goal = models.CharField('目標の職業', max_length=50, blank=True)
-    career_goal_name = models.CharField('職業名', max_length=100, blank=True)
-    age_group = models.CharField('年齢フェーズ', max_length=30, choices=AGE_GROUP_CHOICES, default='lower_elementary')
-    total_points = models.IntegerField('合計ポイント', default=0)
-    badges = models.TextField('バッジ', default='[]')
+    disability_level = models.CharField('障害区分', max_length=20, choices=DISABILITY_LEVEL_CHOICES, default='mild')
     avatar_emoji = models.CharField('アバター絵文字', max_length=10, default='🌟')
+    avatar_config = models.JSONField('アバター設定', default=dict, blank=True)
+    supporter = models.ForeignKey(
+        'SupporterProfile', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='supported_users'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def get_badges(self):
-        import json
-        return json.loads(self.badges)
-
-    def add_badge(self, badge_key):
-        import json
-        current = self.get_badges()
-        if badge_key not in current:
-            current.append(badge_key)
-            self.badges = json.dumps(current)
-            self.save()
-            return True
-        return False
-
-    def get_level(self):
-        if self.total_points < 50:
-            return 1, '探索者', '🔍'
-        elif self.total_points < 150:
-            return 2, '挑戦者', '⚡'
-        elif self.total_points < 350:
-            return 3, '成長者', '🌱'
-        elif self.total_points < 700:
-            return 4, '輝く星', '⭐'
-        else:
-            return 5, 'レジェンド', '🏆'
-
-    def get_age_group_label(self):
-        return dict(AGE_GROUP_CHOICES).get(self.age_group, '')
+    def get_avatar_config(self):
+        """デフォルト値を補完したアバター設定を返す"""
+        config = dict(DEFAULT_AVATAR_CONFIG)
+        config.update(self.avatar_config or {})
+        return config
 
     def __str__(self):
         return f"{self.nickname} ({self.user.username})"
 
 
-class ParentProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='parent_profile')
-    children = models.ManyToManyField(ChildProfile, blank=True, related_name='parents')
+class SupporterProfile(models.Model):
+    """支援者（家族・支援員）のプロフィール"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='supporter_profile')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"保護者: {self.user.username}"
+        return f"支援者: {self.user.username}"
+
+
+class SupporterNote(models.Model):
+    """支援者のメモ"""
+    supporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notes_written')
+    target_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notes_received')
+    content = models.TextField('メモ内容')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.supporter.username} → {self.target_user.username}: {self.content[:30]}"

@@ -5,6 +5,7 @@ app_name = 'daily'
 
 urlpatterns = [
     path('', views.DashboardView.as_view(), name='dashboard'),
-    path('task/<int:task_id>/complete/', views.CompleteTaskView.as_view(), name='complete_task'),
-    path('emotion/', views.EmotionLogView.as_view(), name='emotion_log'),
+    path('record/', views.DailyRecordView.as_view(), name='record'),
+    path('chat/', views.AvatarChatView.as_view(), name='avatar_chat'),
+    path('chat/clear/', views.AvatarChatClearView.as_view(), name='avatar_chat_clear'),
 ]

@@ -1,135 +1,112 @@
-{% extends 'base.html' %}
-
-{% block title %}{{ career.name }}のロードマップ | Ability Compass{% endblock %}
-
-{% block extra_head %}
-<style>
-  .age-tab {
-    transition: all 0.15s ease;
-    white-space: nowrap;
-  }
-  .age-tab.active {
-    background-color: #3d65e5;
-    color: white;
-    box-shadow: 0 4px 12px rgba(61,101,229,0.35);
-  }
-  .action-item {
-    animation: fadeInUp 0.3s ease forwards;
-  }
-  .color-blue   { --cat-bg: #eff6ff; --cat-text: #1d4ed8; --cat-border: #bfdbfe; }
-  .color-pink   { --cat-bg: #fdf2f8; --cat-text: #9d174d; --cat-border: #fbcfe8; }
-  .color-yellow { --cat-bg: #fffbeb; --cat-text: #92400e; --cat-border: #fde68a; }
-  .color-green  { --cat-bg: #f0fdf4; --cat-text: #166534; --cat-border: #bbf7d0; }
-  .color-purple { --cat-bg: #faf5ff; --cat-text: #6b21a8; --cat-border: #e9d5ff; }
-  .cat-card {
-    background-color: var(--cat-bg);
-    border-color: var(--cat-border);
-  }
-  .cat-badge {
-    background-color: var(--cat-border);
-    color: var(--cat-text);
-  }
-</style>
-{% endblock %}
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{{ job_info.name }}{% t "のロードマップ" "の ろーどまっぷ" %} — {% t "ステップアップナビ" "すてっぷあっぷなび" %}{% endblock %}
 
 {% block content %}
-<div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen py-10 px-4">
-  <div class="max-w-4xl mx-auto">
+<div class="text-center mb-8 fade-in">
+  <div class="text-5xl mb-3">{{ job_info.emoji }}</div>
+  <h1 class="text-2xl font-bold text-gray-800">{{ job_info.name }}</h1>
+  <p class="text-gray-600 mt-2">{{ job_info.description }}</p>
+</div>
 
-    <!-- ヘッダー -->
-    <div class="text-center mb-10">
-      <div class="text-6xl mb-3">{{ career.emoji }}</div>
-      <h1 class="text-3xl font-black text-gray-800 mb-2">{{ career.name }}</h1>
-      <p class="text-gray-500">年齢フェーズを選んで、今やるべきことを確認しよう</p>
+<div class="grid grid-cols-3 gap-3 mb-8 fade-in" style="animation-delay:0.1s">
+  {% for step in steps %}
+  <button type="button" onclick="showStep({{ step.number }})" id="tab{{ step.number }}"
+    class="tab-btn text-center p-3 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer border-0 {% if forloop.first %}bg-green-500 text-white{% else %}bg-white text-gray-700{% endif %}">
+    <div class="text-2xl mb-1">{{ step.emoji }}</div>
+    <div class="text-xs font-bold">{{ step.name }}</div>
+    <div class="text-xs mt-0.5 opacity-80">{{ step.theme }}</div>
+  </button>
+  {% endfor %}
+</div>
+
+{% for step in steps %}
+<div id="step{{ step.number }}" class="step-content card mb-6 fade-in {% if not forloop.first %}hidden{% endif %}" style="animation-delay: {{ forloop.counter0|add:2 }}00ms">
+  <div class="flex items-center gap-3 mb-5 pb-3 border-b-2 border-gray-100">
+    <span class="text-3xl">{{ step.emoji }}</span>
+    <div>
+      <h2 class="text-xl font-bold text-gray-800">{{ step.name }}：{{ step.theme }}</h2>
+      <p class="text-sm text-gray-500">{{ step.description }}</p>
     </div>
+  </div>
 
-    <!-- 年齢タブ -->
-    <div class="bg-white rounded-2xl p-2 shadow-sm border border-gray-100 mb-8 overflow-x-auto">
-      <div class="flex gap-1 min-w-max">
-        {% for ag in age_groups %}
-        <a href="?age={{ ag.key }}"
-           class="age-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-gray-600 hover:bg-gray-100 {% if ag.key == selected_age.key %}active{% endif %}">
-          <span>{{ ag.emoji }}</span>
-          <span class="hidden sm:inline">{{ ag.label }}</span>
-          <span class="sm:hidden">{{ ag.range }}</span>
-        </a>
-        {% endfor %}
-      </div>
-    </div>
-
-    <!-- 現在のフェーズ情報 -->
-    <div class="bg-gradient-to-r from-brand-600 to-purple-600 text-white rounded-3xl p-6 mb-8 shadow-lg">
-      <div class="flex items-center gap-4 mb-3">
-        <span class="text-4xl">{{ selected_age.emoji }}</span>
-        <div>
-          <p class="text-white/70 text-sm">現在のフェーズ</p>
-          <h2 class="text-2xl font-black">{{ selected_age.label }}（{{ selected_age.range }}）</h2>
+  <div class="space-y-4">
+    {% for task in step.tasks %}
+    <div class="border-2 border-gray-100 rounded-xl p-4 hover:border-green-200 transition-colors">
+      <div class="flex items-start gap-3">
+        <span class="text-xl mt-0.5">✅</span>
+        <div class="flex-1">
+          <div class="text-sm text-gray-500 font-medium mb-1">【{{ task.category }}】</div>
+          <p class="font-bold text-gray-800 text-lg leading-relaxed">{{ task.content }}</p>
+          {% if task.daily_action %}
+          <div class="mt-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+            <p class="text-sm text-yellow-700">
+              <strong>💡 {% t "今日できる小さな行動：" "きょうできる ちいさな こうどう：" %}</strong><br>
+              {{ task.daily_action }}
+            </p>
+          </div>
+          {% endif %}
         </div>
       </div>
-      {% if milestone %}
-      <div class="bg-white/20 rounded-2xl p-4">
-        <p class="text-white/80 text-xs font-bold mb-1">🏆 このフェーズの目標</p>
-        <p class="font-bold text-lg">{{ milestone }}</p>
-      </div>
-      {% endif %}
-      {% if message %}
-      <p class="mt-3 text-white/90 text-sm leading-relaxed">💬 {{ message }}</p>
-      {% endif %}
     </div>
+    {% empty %}
+    <p class="text-gray-400 text-center py-4">{% t "データを読み込んでいます..." "データを よみこんでいます..." %}</p>
+    {% endfor %}
+  </div>
 
-    <!-- ロードマップカテゴリ -->
-    <div class="space-y-5">
-      {% for cat in categories %}
-      {% if cat.actions %}
-      <div class="cat-card color-{{ cat.color }} rounded-3xl border p-6 action-item">
-        <!-- カテゴリヘッダー -->
-        <div class="flex items-center gap-3 mb-5">
-          <span class="text-3xl">{{ cat.emoji }}</span>
-          <h3 class="font-black text-gray-800 text-xl">{{ cat.label }}</h3>
-          <span class="cat-badge text-xs font-bold px-3 py-1 rounded-full">
-            {{ cat.actions|length }} アクション
-          </span>
-        </div>
-        <!-- アクションリスト -->
-        <ul class="space-y-3">
-          {% for action in cat.actions %}
-          <li class="flex items-start gap-3 bg-white/70 rounded-2xl p-4">
-            <span class="text-green-500 font-bold text-lg flex-shrink-0 mt-0.5">✓</span>
-            <span class="text-gray-700 font-medium leading-relaxed">{{ action }}</span>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %}
-      {% endfor %}
-    </div>
+  {% if step.message %}
+  <div class="mt-4 p-4 bg-green-50 rounded-xl border border-green-200">
+    <p class="text-green-700 font-medium text-center">🌟 {{ step.message }}</p>
+  </div>
+  {% endif %}
+</div>
+{% endfor %}
 
-    <!-- ナビゲーション -->
-    <div class="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="/roadmap/"
-         class="flex items-center justify-center gap-2 bg-white text-gray-700 font-bold px-6 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
-        ← 職業を変える
-      </a>
-      <a href="/diagnosis/"
-         class="flex items-center justify-center gap-2 bg-brand-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-brand-700 transition-colors">
-        🔍 もう一度診断する
-      </a>
-    </div>
-
-    <!-- 他の年齢フェーズ -->
-    <div class="mt-10 bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-      <h3 class="font-bold text-gray-700 mb-4">他のフェーズも見る</h3>
-      <div class="flex flex-wrap gap-2">
-        {% for ag in age_groups %}
-        <a href="?age={{ ag.key }}"
-           class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-colors
-                  {% if ag.key == selected_age.key %}bg-brand-600 text-white border-brand-600{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:border-brand-400 hover:text-brand-600{% endif %}">
-          {{ ag.emoji }} {{ ag.label }}
-        </a>
-        {% endfor %}
-      </div>
-    </div>
-
+<div class="card fade-in" style="animation-delay:0.5s">
+  <h2 class="text-lg font-bold text-gray-700 mb-4">🚀 {% t "次のステップへ" "つぎの ステップへ" %}</h2>
+  <div class="space-y-3">
+    <a href="/diagnosis/" class="flex items-center gap-3 p-3 bg-green-50 rounded-xl hover:bg-green-100 transition-colors no-underline">
+      <span class="text-2xl">🔍</span>
+      <span class="font-medium text-green-700">{% t "診断をやってみる" "しんだんを やってみる" %}</span>
+      <span class="ml-auto text-green-400">→</span>
+    </a>
+    {% if request.user.is_authenticated %}
+    <a href="/daily/record/" class="flex items-center gap-3 p-3 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors no-underline">
+      <span class="text-2xl">📒</span>
+      <span class="font-medium text-orange-700">{% t "今日の記録をつける" "きょうの きろくを つける" %}</span>
+      <span class="ml-auto text-orange-400">→</span>
+    </a>
+    {% else %}
+    <a href="/accounts/signup/" class="flex items-center gap-3 p-3 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors no-underline">
+      <span class="text-2xl">📝</span>
+      <span class="font-medium text-orange-700">{% t "登録して記録をつける" "とうろくして きろくを つける" %}</span>
+      <span class="ml-auto text-orange-400">→</span>
+    </a>
+    {% endif %}
+    <a href="/roadmap/" class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors no-underline">
+      <span class="text-2xl">💼</span>
+      <span class="font-medium text-gray-700">{% t "他の仕事タイプを見る" "ほかの しごとタイプを みる" %}</span>
+      <span class="ml-auto text-gray-400">→</span>
+    </a>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function showStep(num) {
+    document.querySelectorAll('.step-content').forEach(function(el) {
+      el.classList.add('hidden');
+    });
+    document.getElementById('step' + num).classList.remove('hidden');
+
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+      btn.classList.remove('bg-green-500', 'text-white');
+      btn.classList.add('bg-white', 'text-gray-700');
+    });
+    var activeTab = document.getElementById('tab' + num);
+    activeTab.classList.remove('bg-white', 'text-gray-700');
+    activeTab.classList.add('bg-green-500', 'text-white');
+  }
+</script>
 {% endblock %}

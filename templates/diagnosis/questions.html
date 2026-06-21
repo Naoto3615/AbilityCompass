@@ -1,129 +1,101 @@
-{% extends 'base.html' %}
-
-{% block title %}診断中... | Ability Compass{% endblock %}
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "質問" "しつもん" %} — {% t "ステップアップナビ" "すてっぷあっぷなび" %}{% endblock %}
 
 {% block extra_head %}
 <style>
-  .score-btn {
-    transition: all 0.15s ease;
-    cursor: pointer;
+  .question-card { transition: all 0.3s; }
+  .score-option input[type=radio] { display: none; }
+  .score-option label {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0.75rem 0.5rem; border-radius: 0.75rem;
+    border: 2px solid #e5e7eb; cursor: pointer;
+    transition: all 0.2s; background: white; min-width: 60px;
+    font-size: 0.9rem; text-align: center;
   }
-  .score-btn:hover {
-    transform: scale(1.08);
+  .score-option label:hover { border-color: #22c55e; background: #f0fdf4; }
+  .score-option input[type=radio]:checked + label {
+    border-color: #22c55e; background: #dcfce7; font-weight: bold;
   }
-  .score-btn input:checked + label {
-    background-color: #3d65e5;
-    color: white;
-    border-color: #3d65e5;
-    box-shadow: 0 4px 12px rgba(61, 101, 229, 0.4);
-    transform: scale(1.08);
-  }
-  .question-card {
-    animation: fadeInUp 0.4s ease forwards;
-  }
+  .q-emoji { font-size: 1.8rem; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen py-12 px-4">
-  <div class="max-w-3xl mx-auto">
-
-    <!-- ヘッダー -->
-    <div class="text-center mb-10">
-      <h1 class="text-2xl font-black text-gray-800 mb-2">🔍 適性診断</h1>
-      <p class="text-gray-500">各質問について、あてはまる度合いを選んでください</p>
-    </div>
-
-    <!-- プログレスバー（JS制御） -->
-    <div class="bg-white rounded-2xl p-5 mb-8 shadow-sm border border-gray-100">
-      <div class="flex justify-between text-sm text-gray-500 mb-2">
-        <span>進捗</span>
-        <span id="progress-text">0 / {{ total }} 問 回答済み</span>
-      </div>
-      <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-        <div id="progress-bar" class="h-full bg-brand-600 rounded-full progress-bar" style="width: 0%"></div>
-      </div>
-    </div>
-
-    <!-- エラー -->
-    {% if error %}
-    <div class="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6 text-red-700 text-sm">
-      ⚠️ {{ error }}
-    </div>
-    {% endif %}
-
-    <!-- 質問フォーム -->
-    <form method="post" id="diagnosis-form">
-      {% csrf_token %}
-
-      <div class="space-y-6">
-        {% for q in questions %}
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 question-card" data-question="{{ q.id }}">
-          <!-- 質問ヘッダー -->
-          <div class="flex items-start gap-4 mb-6">
-            <div class="bg-brand-50 text-brand-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0">
-              {{ forloop.counter }}
-            </div>
-            <div>
-              <span class="text-2xl mr-2">{{ q.emoji }}</span>
-              <span class="text-gray-800 font-medium text-lg leading-relaxed">{{ q.text }}</span>
-            </div>
-          </div>
-
-          <!-- スコア選択 -->
-          <div class="flex gap-2 justify-center flex-wrap">
-            {% for score, label in score_labels.items %}
-            <div class="score-btn flex flex-col items-center">
-              <input type="radio"
-                     name="{{ q.id }}"
-                     id="{{ q.id }}_{{ score }}"
-                     value="{{ score }}"
-                     class="hidden score-input"
-                     {% if answers %}{% if answers|default_if_none:'' %}{% endif %}{% endif %}
-                     onchange="updateProgress()">
-              <label for="{{ q.id }}_{{ score }}"
-                     class="w-14 h-14 border-2 border-gray-200 rounded-2xl flex items-center justify-center cursor-pointer text-gray-600 font-bold text-lg hover:border-brand-400 transition-all">
-                {{ score }}
-              </label>
-              <span class="text-xs text-gray-400 mt-1 text-center w-16 leading-tight">{{ label }}</span>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-
-      <!-- 送信ボタン -->
-      <div class="mt-10">
-        <button type="submit"
-                id="submit-btn"
-                class="w-full bg-brand-600 text-white font-bold text-xl py-5 rounded-2xl hover:bg-brand-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed">
-          <span id="btn-icon">🔍</span>
-          <span id="btn-text">AI で診断する</span>
-          <span>→</span>
-        </button>
-        <p class="text-center text-gray-400 text-sm mt-3">全 {{ total }} 問に答えると診断できます</p>
-      </div>
-    </form>
-
+<div class="mb-6">
+  <div class="flex justify-between text-sm text-gray-500 mb-2">
+    <span>📝 {% t "質問に回答中..." "しつもん こたえちゅう..." %}</span>
+    <span id="progress-text">0 / {{ total }}</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
   </div>
 </div>
 
+{% if error %}
+<div class="card bg-red-50 border-2 border-red-300 mb-4">
+  <p class="text-red-700 font-bold">⚠️ {{ error }}</p>
+</div>
+{% endif %}
+
+<form method="post" id="questions-form">
+  {% csrf_token %}
+  <div class="space-y-6">
+    {% for q in questions %}
+    <div class="card question-card fade-in" style="animation-delay: {{ forloop.counter0|add:0 }}00ms" id="card-{{ q.id }}">
+      <div class="flex items-start gap-3 mb-4">
+        <span class="q-emoji">{{ q.emoji }}</span>
+        <div>
+          <span class="text-sm text-gray-400 font-medium">{% t "質問" "しつもん" %} {{ forloop.counter }}</span>
+          <p class="text-lg font-bold text-gray-800 mt-1 leading-relaxed">{{ q.text }}</p>
+        </div>
+      </div>
+
+      <div class="flex gap-2 flex-wrap justify-center" role="radiogroup">
+        {% for opt in score_options %}
+        <div class="score-option">
+          <input
+            type="radio"
+            name="{{ q.id }}"
+            id="{{ q.id }}_{{ opt.value }}"
+            value="{{ opt.value }}"
+            
+            onchange="updateProgress()"
+          >
+          <label for="{{ q.id }}_{{ opt.value }}">
+            <span class="text-2xl">{{ opt.emoji }}</span>
+            <span class="text-xs mt-1">{{ opt.label }}</span>
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="text-center mt-8">
+    <button type="submit" class="btn-main btn-green text-xl px-10 py-4">
+      ✅ {% t "回答を送る！" "こたえを おくる！" %}
+    </button>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
 <script>
-const totalQuestions = {{ total }};
+const total = {{ total }};
 
 function updateProgress() {
-  const answered = document.querySelectorAll('input[type="radio"]:checked').length;
-  const pct = Math.round((answered / totalQuestions) * 100);
-  document.getElementById('progress-bar').style.width = pct + '%';
-  document.getElementById('progress-text').textContent = answered + ' / ' + totalQuestions + ' 問 回答済み';
+  const answered = document.querySelectorAll('input[type=radio]:checked').length;
+  const pct = Math.round(answered / total * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = answered + ' / ' + total;
 }
 
-document.getElementById('diagnosis-form').addEventListener('submit', function(e) {
-  const btn = document.getElementById('submit-btn');
-  document.getElementById('btn-icon').textContent = '⏳';
-  document.getElementById('btn-text').textContent = 'AI が分析中...';
-  btn.disabled = true;
+const previousAnswers = {% if answers %}{{ answers|safe }}{% else %}{}{% endif %};
+Object.entries(previousAnswers).forEach(([qid, val]) => {
+  const radio = document.getElementById(qid + '_' + val);
+  if (radio) radio.checked = true;
 });
 
 updateProgress();

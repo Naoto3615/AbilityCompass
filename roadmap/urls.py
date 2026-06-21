@@ -4,6 +4,6 @@ from . import views
 app_name = 'roadmap'
 
 urlpatterns = [
-    path('', views.CareerSelectView.as_view(), name='career_select'),
-    path('<str:career_key>/', views.RoadmapView.as_view(), name='roadmap'),
+    path('', views.JobTypeSelectView.as_view(), name='job_select'),
+    path('<str:job_type_key>/', views.RoadmapView.as_view(), name='roadmap'),
 ]

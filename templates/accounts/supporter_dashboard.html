@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "支援者ダッシュボード" "しえんしゃ だっしゅぼーど" %} — {% t "ステップアップナビ" "すてっぷあっぷなび" %}{% endblock %}
+
+{% block content %}
+<div class="text-center mb-6 fade-in">
+  <div class="text-4xl mb-2">📊</div>
+  <h1 class="text-2xl font-bold text-orange-700">{% t "支援者ダッシュボード" "しえんしゃ だっしゅぼーど" %}</h1>
+  <p class="text-gray-500">{{ request.user.username }} さん</p>
+</div>
+
+{% if users_data %}
+  {% for data in users_data %}
+  <div class="card mb-6 fade-in">
+    <div class="flex items-center gap-4 mb-5 pb-4 border-b border-gray-100">
+      <div class="text-4xl">{{ data.profile.avatar_emoji }}</div>
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">{{ data.profile.nickname }} さん</h2>
+        <p class="text-gray-500 text-sm">{{ data.profile.user.username }}</p>
+      </div>
+      {% if data.avg_emotion %}
+      <div class="ml-auto text-center">
+        <div class="text-3xl">
+          {% if data.avg_emotion >= 4 %}😊
+          {% elif data.avg_emotion >= 3 %}😐
+          {% else %}😟
+          {% endif %}
+        </div>
+        <div class="text-xs text-gray-500">{% t "週平均気持ち" "しゅうへいきん きもち" %}</div>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if data.emotion_trend %}
+    <div class="mb-5">
+      <h3 class="font-bold text-gray-700 mb-3">📊 {% t "1週間の気持ち" "1しゅうかんの きもち" %}</h3>
+      <div class="flex items-end gap-2 h-20">
+        {% for trend in data.emotion_trend %}
+        <div class="flex-1 flex flex-col items-center">
+          <div class="text-sm">{{ trend.emoji }}</div>
+          <div class="w-full rounded-t-lg" style="height: {{ trend.score|add:0 }}0%; background: {{ trend.color }}; min-height: 4px; max-height: 60px;"></div>
+          <div class="text-xs text-gray-400 mt-1">{{ trend.date }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if data.recent_records %}
+    <div class="mb-5">
+      <h3 class="font-bold text-gray-700 mb-3">📒 {% t "最近の記録" "さいきんの きろく" %}</h3>
+      <div class="space-y-2">
+        {% for r in data.recent_records %}
+        <div class="p-3 bg-gray-50 rounded-xl flex items-start gap-3">
+          <span class="text-xl">{{ r.get_emotion_emoji }}</span>
+          <div class="flex-1">
+            <div class="text-xs text-gray-400">{{ r.date }}</div>
+            {% if r.did_well %}
+            <p class="text-sm text-gray-700"><strong>{% t "できた：" "できた：" %}</strong>{{ r.did_well|truncatechars:50 }}</p>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="p-4 bg-blue-50 rounded-xl border border-blue-200 mb-5">
+      <h3 class="font-bold text-blue-700 mb-2">🤖 {% t "支援アドバイス" "しえん あどばいす" %}</h3>
+      <p class="text-blue-800 text-sm leading-relaxed">{{ data.ai_advice }}</p>
+    </div>
+
+    <div>
+      <h3 class="font-bold text-gray-700 mb-3">📝 {% t "支援者メモ" "しえんしゃ めも" %}</h3>
+      {% if data.notes %}
+      <div class="space-y-2 mb-3">
+        {% for note in data.notes %}
+        <div class="p-3 bg-yellow-50 rounded-xl border border-yellow-200">
+          <p class="text-sm text-gray-700">{{ note.content }}</p>
+          <p class="text-xs text-gray-400 mt-1">{{ note.created_at|date:"Y/m/d H:i" }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="post" class="flex gap-2">
+        {% csrf_token %}
+        <input type="hidden" name="target_username" value="{{ data.profile.user.username }}">
+        <textarea
+          name="content"
+          rows="2"
+          placeholder="{% t "気になることをメモしよう..." "きになることを めもしよう..." %}"
+          class="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:border-orange-400 resize-none"
+        ></textarea>
+        <button type="submit" class="btn-main btn-orange px-4 py-2 text-base">
+          💾 {% t "保存" "ほぞん" %}
+        </button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+<div class="card text-center py-10 fade-in">
+  <div class="text-5xl mb-4">👤</div>
+  <h2 class="text-xl font-bold text-gray-700 mb-2">{% t "まだ支援対象者がいません" "まだ しえんたいしょうしゃが いません" %}</h2>
+  <p class="text-gray-500 mb-5">{% t "利用者がアカウントを作った後に支援者としてひもづけされます" "りようしゃが アカウントを つくった あとに しえんしゃとして ひもづけされます" %}</p>
+  <div class="p-4 bg-gray-50 rounded-xl text-left">
+    <p class="text-sm text-gray-600">
+      <strong>{% t "ひもづけ方法：" "ひもづけ ほうほう：" %}</strong><br>
+      1. {% t "利用者が「利用者登録」でアカウントを作成" "りようしゃが「りようしゃとうろく」で アカウントを さくせい" %}<br>
+      2. {% t "支援者ページで利用者のログインIDを入力" "しえんしゃぺーじで りようしゃの ろぐいんIDを にゅうりょく" %}<br>
+      3. {% t "または利用者が自分のプロフィールで支援者IDを設定" "または りようしゃが じぶんの ぷろふぃーるで しえんしゃIDを せってい" %}
+    </p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
