@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "利用者を追加する" "りようしゃを ついかする" %} — {% t "ステップアップナビ" "すてっぷあっぷなび" %}{% endblock %}
+
+{% block content %}
+<div class="text-center mb-6 fade-in">
+  <div class="text-5xl mb-3">➕</div>
+  <h1 class="text-2xl font-bold text-orange-700">{% t "担当利用者を追加する" "たんとう りようしゃを ついかする" %}</h1>
+  <p class="text-gray-600 mt-2">{% t "利用者のログインIDを入力してください" "りようしゃの ろぐいんIDを にゅうりょくしてください" %}</p>
+</div>
+
+<div class="card fade-in" style="animation-delay:0.1s">
+  <form method="post" class="space-y-5">
+    {% csrf_token %}
+
+    <div>
+      <label class="block font-bold text-gray-700 mb-2">👤 {% t "利用者のログインID" "りようしゃの ろぐいんID" %}</label>
+      {{ form.target_username }}
+      {% if form.target_username.errors %}
+        {% for e in form.target_username.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ e }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    {% if form.non_field_errors %}
+    <div class="p-3 bg-red-50 rounded-xl border border-red-200">
+      {% for e in form.non_field_errors %}<p class="text-red-600 text-sm">{{ e }}</p>{% endfor %}
+    </div>
+    {% endif %}
+
+    <button type="submit" class="btn-main btn-orange w-full text-xl py-4">
+      ➕ {% t "この利用者を担当に追加する" "この りようしゃを たんとうに ついかする" %}
+    </button>
+  </form>
+</div>
+
+<div class="text-center mt-4">
+  <a href="{% url 'accounts:supporter_dashboard' %}" class="text-orange-600 hover:underline">
+    ← {% t "ダッシュボードに戻る" "だっしゅぼーどに もどる" %}
+  </a>
+</div>
+{% endblock %}

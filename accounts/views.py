@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
-from .forms import UserSignupForm, SupporterSignupForm
+from .forms import UserSignupForm, SupporterSignupForm, AddSupportedUserForm
 from .models import SupporterProfile, SupporterNote, UserProfile, DEFAULT_AVATAR_CONFIG
 
 
@@ -270,3 +270,35 @@ class SupporterDashboardView(View):
                 pass
 
         return redirect('accounts:supporter_dashboard')
+
+
+@method_decorator(login_required(login_url='/accounts/login/'), name='dispatch')
+class AddSupportedUserView(View):
+    """支援者が担当利用者を後から追加するビュー"""
+
+    def get(self, request):
+        if not hasattr(request.user, 'supporter_profile'):
+            return redirect('/')
+        text_mode = request.session.get('text_mode', 'hiragana')
+        form = AddSupportedUserForm()
+        return render(request, 'accounts/add_supported_user.html', {'form': form})
+
+    def post(self, request):
+        if not hasattr(request.user, 'supporter_profile'):
+            return redirect('/')
+
+        form = AddSupportedUserForm(request.POST)
+        if form.is_valid():
+            from django.contrib.auth.models import User as DjangoUser
+            target_username = form.cleaned_data['target_username']
+            supporter_profile = request.user.supporter_profile
+            try:
+                target_user = DjangoUser.objects.get(username=target_username)
+                if hasattr(target_user, 'user_profile'):
+                    target_user.user_profile.supporter = supporter_profile
+                    target_user.user_profile.save()
+            except DjangoUser.DoesNotExist:
+                pass
+            return redirect('accounts:supporter_dashboard')
+
+        return render(request, 'accounts/add_supported_user.html', {'form': form})

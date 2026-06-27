@@ -10,6 +10,11 @@
 </div>
 
 {% if users_data %}
+  <div class="text-right mb-4">
+    <a href="{% url 'accounts:add_supported_user' %}" class="btn-main btn-orange inline-block px-5 py-2 text-base">
+      ➕ {% t "利用者を追加する" "りようしゃを ついかする" %}
+    </a>
+  </div>
   {% for data in users_data %}
   <div class="card mb-6 fade-in">
     <div class="flex items-center gap-4 mb-5 pb-4 border-b border-gray-100">
@@ -102,14 +107,16 @@
 {% else %}
 <div class="card text-center py-10 fade-in">
   <div class="text-5xl mb-4">👤</div>
-  <h2 class="text-xl font-bold text-gray-700 mb-2">{% t "まだ支援対象者がいません" "まだ しえんたいしょうしゃが いません" %}</h2>
-  <p class="text-gray-500 mb-5">{% t "利用者がアカウントを作った後に支援者としてひもづけされます" "りようしゃが アカウントを つくった あとに しえんしゃとして ひもづけされます" %}</p>
-  <div class="p-4 bg-gray-50 rounded-xl text-left">
+  <h2 class="text-xl font-bold text-gray-700 mb-2">{% t "まだ担当利用者が登録されていません" "まだ たんとう りようしゃが とうろくされていません" %}</h2>
+  <p class="text-gray-500 mb-5">{% t "利用者のログインIDを追加してください" "りようしゃの ろぐいんIDを ついかしてください" %}</p>
+  <a href="{% url 'accounts:add_supported_user' %}" class="btn-main btn-orange inline-block px-6 py-3 text-lg">
+    ➕ {% t "利用者のログインIDを追加する" "りようしゃの ろぐいんIDを ついかする" %}
+  </a>
+  <div class="p-4 bg-gray-50 rounded-xl text-left mt-6">
     <p class="text-sm text-gray-600">
       <strong>{% t "ひもづけ方法：" "ひもづけ ほうほう：" %}</strong><br>
       1. {% t "利用者が「利用者登録」でアカウントを作成" "りようしゃが「りようしゃとうろく」で アカウントを さくせい" %}<br>
-      2. {% t "支援者ページで利用者のログインIDを入力" "しえんしゃぺーじで りようしゃの ろぐいんIDを にゅうりょく" %}<br>
-      3. {% t "または利用者が自分のプロフィールで支援者IDを設定" "または りようしゃが じぶんの ぷろふぃーるで しえんしゃIDを せってい" %}
+      2. {% t "上のボタンから利用者のログインIDを入力して追加" "うえのぼたんから りようしゃの ろぐいんIDを にゅうりょくして ついか" %}
     </p>
   </div>
 </div>

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import UserProfile, SupporterProfile
 
 
 class UserSignupForm(UserCreationForm):
@@ -126,3 +126,35 @@ class SupporterSignupForm(UserCreationForm):
             self.fields['password2'].error_messages.update({
                 'required': 'ぱすわーど（かくにん）を いれてください',
             })
+
+    def clean_target_username(self):
+        username = self.cleaned_data.get('target_username', '').strip()
+        if not username:
+            return username
+        try:
+            target_user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise forms.ValidationError('そのログインIDの利用者は見つかりません。IDを確認してください。')
+        if not hasattr(target_user, 'user_profile'):
+            raise forms.ValidationError('そのIDは利用者アカウントではありません。')
+        return username
+
+
+class AddSupportedUserForm(forms.Form):
+    target_username = forms.CharField(
+        label='追加する利用者のログインID',
+        widget=forms.TextInput(attrs={
+            'placeholder': 'ろぐいんID',
+            'class': 'w-full border-2 border-orange-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-orange-500',
+        }),
+    )
+
+    def clean_target_username(self):
+        username = self.cleaned_data.get('target_username', '').strip()
+        try:
+            target_user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise forms.ValidationError('そのログインIDの利用者は見つかりません。IDを確認してください。')
+        if not hasattr(target_user, 'user_profile'):
+            raise forms.ValidationError('そのIDは利用者アカウントではありません。')
+        return username

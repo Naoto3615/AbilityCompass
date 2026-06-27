@@ -9,6 +9,7 @@ urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('dashboard/', views.SupporterDashboardView.as_view(), name='supporter_dashboard'),
+    path('add-user/', views.AddSupportedUserView.as_view(), name='add_supported_user'),
     path('avatar/', views.AvatarCreateView.as_view(), name='avatar_create'),
     path('avatar/preview/', views.AvatarPreviewView.as_view(), name='avatar_preview'),
 ]
