@@ -12,11 +12,9 @@ const KANJI_SIZE = 109;
 
 const ARROW_COLOR = '#dc2626';
 const STROKE_COLOR = '#1a1a1a';
-const STROKE_WIDTH = 4.2;
-const ARROW_STROKE_WIDTH = 1.1;
-const ARROW_OFFSET = 5;
-const MIN_ARROW_LENGTH = 40;
-const MAX_ARROWS = 4;
+const STROKE_WIDTH = 6.5;
+const ARROW_STROKE_WIDTH = 1.5;
+const MIN_ARROW_LENGTH = 10;
 const SAME_START_THRESHOLD = 8;
 
 interface LabelLayout {
@@ -353,60 +351,40 @@ function pointsToPath(points: { x: number; y: number }[]): string {
   return d;
 }
 
+/**
+ * KKJN-style: draw a short arc following the TAIL of the stroke (last 25-35%).
+ * This shows the direction without covering the whole stroke with a parallel line.
+ */
+function computeArrowForStroke(el: SVGPathElement): ParallelArrow {
+  const len = el.getTotalLength();
+  if (len < MIN_ARROW_LENGTH) return { pathD: '' };
+
+  // Use the last 25-35% of the stroke as the tail arrow segment
+  const tailFraction = len < 25 ? 0.55 : len < 50 ? 0.38 : 0.28;
+  const tStart = 1 - tailFraction;
+  const sampleCount = Math.max(4, Math.ceil(len * tailFraction / 5));
+
+  const points: { x: number; y: number }[] = [];
+  for (let j = 0; j <= sampleCount; j++) {
+    const t = tStart + (tailFraction * j) / sampleCount;
+    const p = el.getPointAtLength(len * t);
+    points.push({ x: p.x, y: p.y });
+  }
+
+  return { pathD: pointsToPath(points) };
+}
+
 function computeParallelArrows(refs: (SVGPathElement | null)[]): ParallelArrow[] {
-  const strokeLengths = refs.map((el, index) => ({
-    index,
-    length: el?.getTotalLength() ?? 0,
-  }));
-
-  const arrowIndices = new Set(
-    strokeLengths
-      .filter((stroke) => stroke.length >= MIN_ARROW_LENGTH)
-      .sort((a, b) => b.length - a.length)
-      .slice(0, MAX_ARROWS)
-      .map((stroke) => stroke.index),
-  );
-
-  return refs.map((el, index) => {
-    if (!el || !arrowIndices.has(index)) return { pathD: '' };
-
-    const len = el.getTotalLength();
-    if (len < MIN_ARROW_LENGTH) return { pathD: '' };
-
-    const sampleCount = Math.max(8, Math.ceil(len / 8));
-    const points: { x: number; y: number }[] = [];
-
-    for (let j = 0; j <= sampleCount; j++) {
-      const t = 0.12 + (0.76 * j) / sampleCount;
-      const dist = len * t;
-
-      const p1 = el.getPointAtLength(Math.max(0, dist - 0.5));
-      const p2 = el.getPointAtLength(Math.min(len, dist + 0.5));
-
-      const tx = p2.x - p1.x;
-      const ty = p2.y - p1.y;
-      const tangentLen = Math.sqrt(tx * tx + ty * ty);
-      if (tangentLen < 0.001) continue;
-
-      const nx = -ty / tangentLen;
-      const ny = tx / tangentLen;
-
-      const clamped = clampToViewBox(
-        p1.x + nx * ARROW_OFFSET,
-        p1.y + ny * ARROW_OFFSET,
-        2,
-      );
-      points.push(clamped);
-    }
-
-    return { pathD: pointsToPath(points) };
+  return refs.map((el) => {
+    if (!el) return { pathD: '' };
+    return computeArrowForStroke(el);
   });
 }
 
 /**
  * Renders a KKJN-style stroke-order guide for a kanji using KanjiVG data.
- * Strokes are drawn in black; each stroke gets a small numbered circle near
- * its start point and thin red direction arrows beside longer strokes.
+ * Black strokes; white-outlined red numbered circles; red direction arrows on
+ * every stroke — horizontal strokes get arrows below, vertical strokes to the right.
  *
  * KanjiVG data © Ulrich Apel — CC BY-SA 3.0
  */
@@ -523,12 +501,12 @@ export const StrokeGuide: React.FC<Props> = ({ kanji, size = 96 }) => {
             viewBox="0 0 10 10"
             refX="9"
             refY="5"
-            markerWidth="3"
-            markerHeight="3"
+            markerWidth="5"
+            markerHeight="5"
             orient="auto"
             markerUnits="userSpaceOnUse"
           >
-            <path d="M 0 1 L 9 5 L 0 9 z" fill={ARROW_COLOR} />
+            <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill={ARROW_COLOR} />
           </marker>
         </defs>
 
@@ -558,7 +536,7 @@ export const StrokeGuide: React.FC<Props> = ({ kanji, size = 96 }) => {
           />
         ))}
 
-        {/* 2. Thin red direction arrows parallel to longer strokes */}
+        {/* 2. KKJN-style tail arrows — red arc following the end of each stroke */}
         {parallelArrows.map((arrow, i) => {
           if (!arrow.pathD) return null;
           return (
