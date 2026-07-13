@@ -19,8 +19,9 @@ export interface PrintSettings {
   problemType: ProblemType;
   problemCount: number;
   theme: Theme;
-  showStampArea: boolean;
+  showStampRally: boolean;
   showDifficultyBadge: boolean;
   selectedKanjiIds: string[];
+  strokeOrderKanjiIds: string[];
   randomize: boolean;
 }

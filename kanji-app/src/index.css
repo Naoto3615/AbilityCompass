@@ -32,10 +32,57 @@
     width: 210mm;
     min-height: 297mm;
     margin: 0;
-    padding: 0;
+    padding: 12mm;
     box-shadow: none !important;
     border: none !important;
     page-break-after: always;
+  }
+
+  #print-area .print-problem-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Ensure stroke-order SVG guides print in color */
+  #print-area svg,
+  #print-area .stroke-guide,
+  #print-area .stroke-guide-base,
+  #print-area .stroke-guide-arrow,
+  #print-area .stroke-guide-label,
+  #print-area .stroke-guide-sequence,
+  #print-area .stroke-guide-sequence-badge,
+  #print-area .stroke-guide-points-label,
+  #print-area .stamp-rally-area {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  #print-area .stroke-guide-base {
+    stroke: #1a1a1a !important;
+  }
+
+  #print-area .stroke-guide-arrow {
+    stroke: #dc2626 !important;
+  }
+
+  #print-area .stroke-guide-label circle {
+    fill: #ffffff !important;
+    stroke: #dc2626 !important;
+  }
+
+  #print-area .stroke-guide-label text {
+    fill: #dc2626 !important;
+  }
+
+  #print-area .stroke-guide-sequence-badge {
+    background: #ffffff !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+  }
+
+  #print-area .stamp-rally-area {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 }
 
@@ -47,18 +94,20 @@
   user-select: none;
 }
 
-/* Writing box grid */
+/* Writing box grid (shared sizing with PrintPreview) */
 .writing-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(2, 100px);
+  gap: 6px;
 }
 
 .writing-cell {
-  aspect-ratio: 1;
+  width: 100px;
+  height: 100px;
   border: 2px solid #9ca3af;
-  border-radius: 4px;
+  border-radius: 6px;
   position: relative;
+  flex-shrink: 0;
 }
 
 .writing-cell::before,
@@ -82,15 +131,14 @@
   left: 0;
 }
 
-/* Stamp area */
-.stamp-circle {
-  width: 60px;
-  height: 60px;
+/* Stamp rally */
+.stamp-rally-cell {
+  width: 44px;
+  height: 44px;
   border: 2px dashed #d1d5db;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 8px;
+  background: white;
+  flex-shrink: 0;
 }
 
 /* Animations */

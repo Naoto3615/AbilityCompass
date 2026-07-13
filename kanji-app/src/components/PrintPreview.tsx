@@ -5,6 +5,8 @@ import { StrokeGuide } from './StrokeGuide';
 interface Props {
   settings: PrintSettings;
   kanjiList: KanjiEntry[];
+  /** When true, hides the preview heading (used for print-only render) */
+  printMode?: boolean;
 }
 
 // Theme decorations
@@ -69,61 +71,202 @@ const difficultyConfig: Record<Difficulty, { label: string; color: string; emoji
   challenge: { label: 'チャレンジ', color: '#fecaca', emoji: '🔥' },
 };
 
+// Print layout sizes (~2× previous values)
+const WRITING_CELL_SIZE = 100;
+const TRACE_BOX_SIZE = 160;
+const TRACE_FONT_SIZE = 112;
+const STROKE_GUIDE_SIZE = 96;
+const FILL_BLANK_SIZE = 56;
+
+const writingCellBorder = (borderColor: string) =>
+  borderColor === '#c4b5fd' ? '#a5b4fc' : borderColor === '#f9a8d4' ? '#f472b6' : '#67e8f9';
+
 // Writing grid cells
-const WritingCells: React.FC<{ count: number; borderColor: string }> = ({ count, borderColor }) => (
-  <div className="flex gap-1">
-    {Array.from({ length: count }).map((_, i) => (
+const WritingCells: React.FC<{
+  count: number;
+  borderColor: string;
+  layout?: 'row' | 'grid';
+}> = ({ count, borderColor, layout = 'row' }) => {
+  const cellStyle = {
+    width: WRITING_CELL_SIZE,
+    height: WRITING_CELL_SIZE,
+    border: `2px solid ${writingCellBorder(borderColor)}`,
+    borderRadius: 6,
+    flexShrink: 0,
+  } as const;
+
+  const cell = (i: number) => (
+    <div key={i} className="relative" style={cellStyle}>
+      <div style={{
+        position: 'absolute', top: 0, left: '50%', width: 1, height: '100%',
+        background: '#e5e7eb', transform: 'translateX(-50%)',
+      }} />
+      <div style={{
+        position: 'absolute', top: '50%', left: 0, width: '100%', height: 1,
+        background: '#e5e7eb', transform: 'translateY(-50%)',
+      }} />
+    </div>
+  );
+
+  if (layout === 'grid' && count === 4) {
+    return (
       <div
-        key={i}
-        className="relative"
+        className="inline-grid"
         style={{
-          width: 48,
-          height: 48,
-          border: `2px solid ${borderColor === '#c4b5fd' ? '#a5b4fc' : borderColor === '#f9a8d4' ? '#f472b6' : '#67e8f9'}`,
-          borderRadius: 4,
-          flexShrink: 0,
+          gridTemplateColumns: `repeat(2, ${WRITING_CELL_SIZE}px)`,
+          gap: 6,
         }}
       >
-        {/* center cross guides */}
-        <div style={{
-          position: 'absolute', top: 0, left: '50%', width: 1, height: '100%',
-          background: '#e5e7eb', transform: 'translateX(-50%)',
-        }} />
-        <div style={{
-          position: 'absolute', top: '50%', left: 0, width: '100%', height: 1,
-          background: '#e5e7eb', transform: 'translateY(-50%)',
-        }} />
+        {Array.from({ length: count }).map((_, i) => cell(i))}
       </div>
-    ))}
-  </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap" style={{ gap: 6 }}>
+      {Array.from({ length: count }).map((_, i) => cell(i))}
+    </div>
+  );
+};
+
+const RALLY_CELL_COUNT = 10;
+const RALLY_COLS = 5;
+
+const themeRallyStyle: Record<
+  Theme,
+  { border: string; bg: string; accent: string; cellBorder: string; titleColor: string }
+> = {
+  stars: {
+    border: '#a5b4fc',
+    bg: '#eef2ff',
+    accent: '#818cf8',
+    cellBorder: '#c4b5fd',
+    titleColor: '#4338ca',
+  },
+  flowers: {
+    border: '#f9a8d4',
+    bg: '#fdf2f8',
+    accent: '#f472b6',
+    cellBorder: '#fbcfe8',
+    titleColor: '#be185d',
+  },
+  ocean: {
+    border: '#67e8f9',
+    bg: '#ecfeff',
+    accent: '#22d3ee',
+    cellBorder: '#a5f3fc',
+    titleColor: '#0e7490',
+  },
+};
+
+const RallyStarDeco: React.FC<{ color: string }> = ({ color }) => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill={color} aria-hidden="true">
+    <path d="M7 0.5L8.4 5.1L13 5.1L9.3 8.1L10.7 12.7L7 9.7L3.3 12.7L4.7 8.1L1 5.1L5.6 5.1Z" />
+  </svg>
 );
 
-// Stamp area
-const StampArea: React.FC<{ theme: Theme }> = ({ theme }) => {
-  const emojis = theme === 'stars' ? ['⭐', '🌟', '✨'] : theme === 'flowers' ? ['🌸', '🌺', '🌷'] : ['🐠', '🐙', '🐚'];
+const RallyFlowerDeco: React.FC<{ color: string }> = ({ color }) => (
+  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+    <circle cx="7" cy="4" r="2.2" fill={color} opacity="0.85" />
+    <circle cx="4.2" cy="6.5" r="2.2" fill={color} opacity="0.85" />
+    <circle cx="9.8" cy="6.5" r="2.2" fill={color} opacity="0.85" />
+    <circle cx="5.5" cy="9.8" r="2.2" fill={color} opacity="0.85" />
+    <circle cx="8.5" cy="9.8" r="2.2" fill={color} opacity="0.85" />
+    <circle cx="7" cy="7" r="1.6" fill="#fef08a" />
+  </svg>
+);
+
+const RallyWaveDeco: React.FC<{ color: string }> = ({ color }) => (
+  <svg width="28" height="10" viewBox="0 0 28 10" aria-hidden="true">
+    <path
+      d="M0 6 C4 2, 8 2, 14 6 C20 10, 24 10, 28 6"
+      fill="none"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M0 9 C4 5, 8 5, 14 9 C20 13, 24 13, 28 9"
+      fill="none"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      opacity="0.6"
+    />
+  </svg>
+);
+
+const RallyDecoration: React.FC<{ theme: Theme; color: string }> = ({ theme, color }) => {
+  if (theme === 'stars') return <RallyStarDeco color={color} />;
+  if (theme === 'flowers') return <RallyFlowerDeco color={color} />;
+  return <RallyWaveDeco color={color} />;
+};
+
+const StampRallyArea: React.FC<{ theme: Theme; childName: string }> = ({ theme, childName }) => {
+  const style = themeRallyStyle[theme];
+  const title = childName
+    ? `${childName}ちゃんの スタンプラリー`
+    : 'がんばりスタンプ';
+
   return (
-    <div className="mt-4 pt-3 border-t-2 border-dashed border-gray-300">
-      <p className="text-xs text-gray-500 text-center mb-2 font-bold">✨ ごほうびスタンプをはろう！</p>
-      <div className="flex justify-center gap-4">
-        {emojis.map((e, i) => (
-          <div
-            key={i}
-            style={{
-              width: 56,
-              height: 56,
-              border: '2px dashed #d1d5db',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 10,
-              color: '#9ca3af',
-              flexDirection: 'column',
-            }}
+    <div
+      className="stamp-rally-area mt-4 pt-3"
+      style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}
+    >
+      <div
+        className="rounded-2xl px-4 py-3"
+        style={{
+          border: `2px solid ${style.border}`,
+          background: style.bg,
+        }}
+      >
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <RallyDecoration theme={theme} color={style.accent} />
+          <p
+            className="text-sm font-black text-center"
+            style={{ color: style.titleColor }}
           >
-            <span style={{ fontSize: 18, opacity: 0.15 }}>{e}</span>
-          </div>
-        ))}
+            {title}
+          </p>
+          <RallyDecoration theme={theme} color={style.accent} />
+        </div>
+        {!childName && (
+          <p className="text-xs text-center mb-2 font-bold" style={{ color: style.accent }}>
+            スタンプラリー
+          </p>
+        )}
+        <p className="text-xs text-center mb-3 text-gray-500">
+          れんしゅうができたら マスにスタンプを はろう！
+        </p>
+        <div
+          className="mx-auto"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${RALLY_COLS}, 44px)`,
+            gap: 8,
+            justifyContent: 'center',
+          }}
+        >
+          {Array.from({ length: RALLY_CELL_COUNT }).map((_, i) => (
+            <div
+              key={i}
+              className="stamp-rally-cell relative"
+              style={{ borderColor: style.cellBorder }}
+            >
+              <span
+                className="absolute top-0.5 left-1 text-[9px] font-bold leading-none"
+                style={{ color: style.accent, opacity: 0.7 }}
+              >
+                {i + 1}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-center gap-3 mt-2 opacity-70">
+          <RallyDecoration theme={theme} color={style.accent} />
+          <RallyDecoration theme={theme} color={style.accent} />
+          <RallyDecoration theme={theme} color={style.accent} />
+        </div>
       </div>
     </div>
   );
@@ -135,14 +278,15 @@ const ProblemCard: React.FC<{
   kanji: KanjiEntry;
   settings: PrintSettings;
 }> = ({ number, kanji, settings }) => {
-  const { problemType, theme, showDifficultyBadge } = settings;
+  const { problemType, theme, showDifficultyBadge, strokeOrderKanjiIds } = settings;
+  const showStrokeOrder = strokeOrderKanjiIds.includes(kanji.id);
   const diff = difficultyConfig[kanji.difficulty];
   const traceColor = themeTraceColor[theme];
   const accentClass = themeAccent[theme];
 
   return (
     <div
-      className={`rounded-2xl border-2 p-4 ${accentClass} relative overflow-hidden`}
+      className={`rounded-2xl border-2 p-3 print-problem-card ${accentClass} relative overflow-hidden`}
       style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}
     >
       {/* Problem number */}
@@ -168,39 +312,49 @@ const ProblemCard: React.FC<{
 
       {/* Problem content */}
       {problemType === 'trace' && (
-        <div className="flex items-start gap-4">
-          {/* Trace kanji */}
-          <div className="shrink-0">
-            <p className="text-xs text-gray-500 mb-1 text-center">なぞってみよう</p>
-            <div
-              className="w-20 h-20 flex items-center justify-center rounded-xl border-2 border-dashed"
-              style={{ borderColor: traceColor }}
-            >
-              <span
-                className="font-black select-none"
-                style={{ fontSize: 56, color: traceColor, lineHeight: 1 }}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start gap-4 flex-wrap">
+            {showStrokeOrder && (
+              <div className="shrink-0 flex flex-col items-center">
+                <p className="text-xs text-gray-500 mb-1 text-center">かきじゅん</p>
+                <StrokeGuide kanji={kanji.kanji} size={STROKE_GUIDE_SIZE} />
+              </div>
+            )}
+            <div className="shrink-0">
+              <p className="text-xs text-gray-500 mb-1 text-center">なぞってみよう</p>
+              <div
+                className="flex items-center justify-center rounded-xl border-2 border-dashed"
+                style={{
+                  width: TRACE_BOX_SIZE,
+                  height: TRACE_BOX_SIZE,
+                  borderColor: traceColor,
+                }}
               >
-                {kanji.kanji}
-              </span>
+                <span
+                  className="font-black select-none trace-kanji"
+                  style={{ fontSize: TRACE_FONT_SIZE, color: traceColor, lineHeight: 1 }}
+                >
+                  {kanji.kanji}
+                </span>
+              </div>
+              <p className="text-xs text-center mt-1" style={{ color: traceColor }}>
+                {kanji.reading}
+              </p>
             </div>
-            <p className="text-xs text-center mt-1" style={{ color: traceColor }}>
-              {kanji.reading}
-            </p>
           </div>
-          {/* Write boxes */}
           <div>
             <p className="text-xs text-gray-500 mb-1">じぶんで書いてみよう</p>
-            <WritingCells count={4} borderColor={traceColor} />
+            <WritingCells count={3} borderColor={traceColor} layout="row" />
           </div>
         </div>
       )}
 
       {problemType === 'reading' && (
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col gap-3">
           <div className="shrink-0">
             <p className="text-xs text-gray-500 mb-1 text-center">よみがな</p>
             <div
-              className="px-4 py-3 rounded-xl border-2 font-bold text-xl text-gray-700"
+              className="inline-block px-5 py-3 rounded-xl border-2 font-bold text-2xl text-gray-700"
               style={{ borderColor: traceColor, background: 'white' }}
             >
               {kanji.reading}
@@ -231,9 +385,10 @@ const ProblemCard: React.FC<{
                         <span
                           className="inline-block mx-1 align-bottom"
                           style={{
-                            width: 28, height: 28,
+                            width: FILL_BLANK_SIZE,
+                            height: FILL_BLANK_SIZE,
                             border: `2px solid ${traceColor}`,
-                            borderRadius: 4,
+                            borderRadius: 6,
                             verticalAlign: 'middle',
                           }}
                         />
@@ -253,7 +408,7 @@ const ProblemCard: React.FC<{
   );
 };
 
-export const PrintPreview: React.FC<Props> = ({ settings, kanjiList }) => {
+export const PrintPreview: React.FC<Props> = ({ settings, kanjiList, printMode = false }) => {
   const { childName, theme, problemCount, selectedKanjiIds, randomize } = settings;
 
   const problems = useMemo(() => {
@@ -276,12 +431,22 @@ export const PrintPreview: React.FC<Props> = ({ settings, kanjiList }) => {
   });
 
   return (
-    <div className="no-print">
-      <h2 className="text-xl font-black text-gray-700 mb-3 flex items-center gap-2">
-        <span>👀</span> プレビュー
-      </h2>
-      {/* A4 preview wrapper */}
-      <div className="overflow-auto">
+    <div>
+      {!printMode && (
+        <div className="no-print mb-3">
+          <h2 className="text-xl font-black text-gray-700 flex items-center gap-2">
+            <span>👀</span> プレビュー
+          </h2>
+          {settings.showStampRally && (
+            <p className="text-sm text-orange-600 font-bold mt-1 flex items-center gap-1">
+              <span>👇</span>
+              スタンプラリー欄は プリントの いちばん下に あります。下まで スクロールして ね！
+            </p>
+          )}
+        </div>
+      )}
+      {/* A4 preview / print wrapper */}
+      <div className={printMode ? undefined : 'overflow-auto'}>
         <div
           id="print-area"
           style={{
@@ -334,8 +499,14 @@ export const PrintPreview: React.FC<Props> = ({ settings, kanjiList }) => {
             </div>
           </div>
 
-          {/* Problems */}
-          <div className="grid grid-cols-1 gap-4" style={{ gridTemplateColumns: problems.length <= 4 ? '1fr 1fr' : '1fr 1fr' }}>
+          {/* Problems — trace uses 1 column; reading/fill use 2 columns when ≤4 problems */}
+          <div
+            className="grid gap-3"
+            style={{
+              gridTemplateColumns:
+                settings.problemType === 'trace' || problems.length > 4 ? '1fr' : '1fr 1fr',
+            }}
+          >
             {problems.map((k, i) => (
               <ProblemCard
                 key={k.id}
@@ -346,8 +517,10 @@ export const PrintPreview: React.FC<Props> = ({ settings, kanjiList }) => {
             ))}
           </div>
 
-          {/* Stamp area */}
-          {settings.showStampArea && <StampArea theme={theme} />}
+          {/* Stamp rally area */}
+          {settings.showStampRally && (
+            <StampRallyArea theme={theme} childName={childName} />
+          )}
 
           {/* Footer */}
           <div className="mt-4 text-center">

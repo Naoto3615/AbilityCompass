@@ -25,15 +25,38 @@ export const PrintSettings: React.FC<Props> = ({ settings, kanjiList, onUpdate, 
     onUpdate({ ...settings, [key]: value });
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [strokeSearchQuery, setStrokeSearchQuery] = useState('');
+  const strokeOrderKanjiIds = settings.strokeOrderKanjiIds ?? [];
+  const isTraceMode = settings.problemType === 'trace';
 
-  const filteredKanjiList = searchQuery.trim()
-    ? kanjiList.filter(
-        (k) =>
-          k.kanji.includes(searchQuery) ||
-          k.reading.includes(searchQuery) ||
-          k.example.includes(searchQuery)
-      )
-    : kanjiList;
+  const printTargetKanji =
+    settings.selectedKanjiIds.length > 0
+      ? kanjiList.filter((k) => settings.selectedKanjiIds.includes(k.id))
+      : kanjiList;
+
+  const filterKanji = (list: KanjiEntry[], query: string) => {
+    if (!query.trim()) return list;
+    const q = query.trim().toLowerCase();
+    return list.filter(
+      (k) =>
+        k.kanji.includes(query) ||
+        k.reading.includes(query) ||
+        (k.onyomi && k.onyomi.toLowerCase().includes(q)) ||
+        (k.kunyomi && k.kunyomi.includes(query)) ||
+        k.example.includes(query)
+    );
+  };
+
+  const filteredKanjiList = filterKanji(kanjiList, searchQuery);
+  const filteredStrokeKanjiList = filterKanji(printTargetKanji, strokeSearchQuery);
+
+  const toggleStrokeOrder = (id: string) => {
+    const selected = strokeOrderKanjiIds.includes(id);
+    const ids = selected
+      ? strokeOrderKanjiIds.filter((i) => i !== id)
+      : [...strokeOrderKanjiIds, id];
+    set('strokeOrderKanjiIds', ids);
+  };
 
   return (
     <div className="no-print space-y-4">
@@ -164,7 +187,7 @@ export const PrintSettings: React.FC<Props> = ({ settings, kanjiList, onUpdate, 
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-300 text-base pointer-events-none">🔍</span>
           <input
             type="text"
-            placeholder="漢字やよみがなで さがす"
+            placeholder="漢字・音読み・訓読みで さがす"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-2xl border-2 border-pink-200 pl-9 pr-9 py-2 text-sm font-bold focus:outline-none focus:border-pink-400 placeholder-pink-200 bg-pink-50 transition-colors"
@@ -219,6 +242,102 @@ export const PrintSettings: React.FC<Props> = ({ settings, kanjiList, onUpdate, 
         </p>
       </div>
 
+      {/* Stroke order selection (trace mode only) */}
+      {isTraceMode && (
+        <div className="bg-white rounded-3xl shadow-lg border-2 border-teal-200 p-6">
+          <h2 className="text-xl font-black text-teal-600 mb-1 flex items-center gap-2">
+            <span>✍️</span> かきじゅんを ひょうじする かんじ
+          </h2>
+          <p className="text-xs text-gray-500 mb-3">
+            えらんだ漢字だけ、書き順ガイドが表示されます
+          </p>
+
+          <div className="flex gap-2 mb-3 flex-wrap">
+            <button
+              onClick={() =>
+                set(
+                  'strokeOrderKanjiIds',
+                  printTargetKanji.filter((k) => k.difficulty === 'challenge').map((k) => k.id)
+                )
+              }
+              className="text-xs px-3 py-1.5 rounded-full bg-red-100 text-red-600 font-bold hover:bg-red-200 transition-colors"
+            >
+              🔥 むずかしさ チャレンジ のみ
+            </button>
+            <button
+              onClick={() => set('strokeOrderKanjiIds', printTargetKanji.map((k) => k.id))}
+              className="text-xs px-3 py-1.5 rounded-full bg-teal-100 text-teal-600 font-bold hover:bg-teal-200 transition-colors"
+            >
+              えらんだ かんじすべて
+            </button>
+            <button
+              onClick={() => set('strokeOrderKanjiIds', [])}
+              className="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 transition-colors"
+            >
+              すべて けす
+            </button>
+          </div>
+
+          <div className="relative mb-3">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-teal-300 text-base pointer-events-none">🔍</span>
+            <input
+              type="text"
+              placeholder="漢字・音読み・訓読みで さがす"
+              value={strokeSearchQuery}
+              onChange={(e) => setStrokeSearchQuery(e.target.value)}
+              className="w-full rounded-2xl border-2 border-teal-200 pl-9 pr-9 py-2 text-sm font-bold focus:outline-none focus:border-teal-400 placeholder-teal-200 bg-teal-50 transition-colors"
+            />
+            {strokeSearchQuery && (
+              <button
+                onClick={() => setStrokeSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-300 hover:text-teal-500 transition-colors text-lg leading-none"
+                aria-label="検索をクリア"
+              >
+                ×
+              </button>
+            )}
+          </div>
+
+          <div className="max-h-48 overflow-y-auto">
+            {filteredStrokeKanjiList.length === 0 ? (
+              <p className="text-center text-teal-400 font-bold py-6 text-sm">
+                🔍 みつかりませんでした
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {filteredStrokeKanjiList.map((k) => {
+                  const selected = strokeOrderKanjiIds.includes(k.id);
+                  return (
+                    <button
+                      key={k.id}
+                      onClick={() => toggleStrokeOrder(k.id)}
+                      className={`relative w-11 h-11 rounded-xl text-xl font-black transition-all border-2 ${
+                        selected
+                          ? 'bg-teal-400 text-white border-teal-500 shadow-md scale-110'
+                          : 'bg-white text-gray-700 border-gray-200 hover:border-teal-300 hover:bg-teal-50'
+                      }`}
+                      title={`${k.kanji}（${k.reading}）`}
+                    >
+                      {selected && (
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-teal-500 rounded-full text-white text-[10px] flex items-center justify-center leading-none">
+                          ✓
+                        </span>
+                      )}
+                      {k.kanji}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          <p className="text-xs text-gray-400 mt-2">
+            {strokeOrderKanjiIds.length > 0
+              ? `${strokeOrderKanjiIds.length}字に書き順を表示`
+              : '書き順なし（なぞり文字のみ）'}
+          </p>
+        </div>
+      )}
+
       {/* Options */}
       <div className="bg-white rounded-3xl shadow-lg border-2 border-orange-200 p-6">
         <h2 className="text-xl font-black text-orange-600 mb-4 flex items-center gap-2">
@@ -227,13 +346,13 @@ export const PrintSettings: React.FC<Props> = ({ settings, kanjiList, onUpdate, 
         <div className="space-y-3">
           <label className="flex items-center gap-3 cursor-pointer group">
             <div
-              onClick={() => set('showStampArea', !settings.showStampArea)}
-              className={`w-12 h-6 rounded-full transition-colors ${settings.showStampArea ? 'bg-orange-400' : 'bg-gray-200'}`}
+              onClick={() => set('showStampRally', !settings.showStampRally)}
+              className={`w-12 h-6 rounded-full transition-colors ${settings.showStampRally ? 'bg-orange-400' : 'bg-gray-200'}`}
             >
-              <div className={`w-5 h-5 bg-white rounded-full shadow mt-0.5 transition-transform ${settings.showStampArea ? 'translate-x-6.5' : 'translate-x-0.5'}`} />
+              <div className={`w-5 h-5 bg-white rounded-full shadow mt-0.5 transition-transform ${settings.showStampRally ? 'translate-x-6.5' : 'translate-x-0.5'}`} />
             </div>
             <span className="text-sm font-bold text-gray-700 group-hover:text-orange-500 transition-colors">
-              🌟 ごほうびスタンプ欄を印刷する
+              スタンプラリー欄を いれる
             </span>
           </label>
           <label className="flex items-center gap-3 cursor-pointer group">

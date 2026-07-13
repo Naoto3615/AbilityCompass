@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>東濃信用金庫様 ご提案資料 | ステップアップナビ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f172a;
+      --accent1: #10b981;
+      --accent2: #3b82f6;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --card-bg: rgba(255,255,255,0.05);
+      --card-border: rgba(255,255,255,0.1);
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      font-family: 'Noto Sans JP', sans-serif;
+      color: var(--text);
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ─── Viewport scaler ─── */
+    #scaler {
+      position: fixed;
+      top: 0; left: 0;
+      width: 1280px; height: 720px;
+      transform-origin: top left;
+    }
+
+    /* ─── Slides ─── */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 80px;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      background: var(--bg);
+    }
+    .slide.active {
+      display: flex;
+    }
+    .slide.visible {
+      opacity: 1;
+    }
+
+    /* ─── Common typography ─── */
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 5px 16px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .slide-title {
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1.25;
+      text-align: center;
+      background: linear-gradient(135deg, #fff 30%, var(--accent1));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+    .slide-subtitle {
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .slide-heading {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent1);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .slide-body {
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.8;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 820px;
+    }
+
+    /* ─── Cards grid ─── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .cards.two-col { grid-template-columns: repeat(2, 1fr); }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .card-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+    .card-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent1);
+      margin-bottom: 6px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ─── Bullet list ─── */
+    .bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 8px;
+      width: 100%;
+      max-width: 700px;
+    }
+    .bullets li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .bullets li::before {
+      content: '✦';
+      color: var(--accent1);
+      flex-shrink: 0;
+      margin-top: 2px;
+      font-size: 14px;
+    }
+
+    /* ─── Highlight box ─── */
+    .highlight-box {
+      background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(59,130,246,0.15));
+      border: 1px solid rgba(16,185,129,0.4);
+      border-radius: 16px;
+      padding: 20px 32px;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--accent1);
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    /* ─── Slide 1 specific ─── */
+    .cover-orgs {
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 2;
+    }
+    .cover-logo {
+      font-size: 52px;
+      margin-bottom: 16px;
+    }
+    .cover-line {
+      width: 80px; height: 3px;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      border-radius: 2px;
+      margin: 16px auto;
+    }
+
+    /* ─── Slide 8 specific ─── */
+    .proposal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+      margin-top: 16px;
+    }
+    .proposal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px 24px;
+    }
+    .proposal-card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--accent1);
+      margin-bottom: 12px;
+    }
+    .proposal-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .big-num {
+      font-size: 40px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+      text-align: center;
+      margin: 8px 0;
+    }
+
+    /* ─── Slide 9 specific ─── */
+    .closing-quote {
+      font-size: 32px;
+      font-weight: 900;
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .closing-body {
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.9;
+      max-width: 760px;
+    }
+    .closing-name {
+      margin-top: 36px;
+      font-size: 15px;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 2;
+    }
+
+    /* ─── Decorative background elements ─── */
+    .deco {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .deco-1 { width: 400px; height: 400px; background: rgba(16,185,129,0.07); top: -100px; right: -100px; }
+    .deco-2 { width: 300px; height: 300px; background: rgba(59,130,246,0.07); bottom: -80px; left: -80px; }
+
+    .slide-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* ─── Navigation ─── */
+    #nav {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 100;
+    }
+    .nav-btn {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.1s;
+      backdrop-filter: blur(8px);
+    }
+    .nav-btn:hover { background: rgba(16,185,129,0.3); transform: scale(1.08); }
+    .nav-btn:active { transform: scale(0.95); }
+    #slide-counter {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 48px;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── Dot indicators ─── */
+    #dots {
+      position: fixed;
+      bottom: 82px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 100;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .dot.active {
+      background: var(--accent1);
+      transform: scale(1.4);
+    }
+
+    /* ─── Speech controls ─── */
+    #speech-ui {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .speech-btn {
+      border: none;
+      border-radius: 24px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Noto Sans JP', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    #btn-start {
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      color: #fff;
+      display: flex;
+    }
+    #btn-pause { background: rgba(255,255,255,0.12); color: #fff; display: none; }
+    #btn-resume { background: rgba(255,255,255,0.12); color: #fff; display: none; }
+    #btn-stop { background: rgba(239,68,68,0.25); color: #fca5a5; display: none; }
+    #speech-status {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent1);
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+    .pulse {
+      width: 8px; height: 8px;
+      background: var(--accent1);
+      border-radius: 50%;
+      animation: pulse-anim 1s infinite;
+    }
+    @keyframes pulse-anim {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* ─── Progress bar ─── */
+    #progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      z-index: 200;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div id="progress"></div>
+
+<!-- Audio elements for each slide (MP3 narrations) -->
+<audio id="audio-1" src="narration_audio/slide_01.mp3" preload="auto"></audio>
+<audio id="audio-2" src="narration_audio/slide_02.mp3" preload="auto"></audio>
+<audio id="audio-3" src="narration_audio/slide_03.mp3" preload="auto"></audio>
+<audio id="audio-4" src="narration_audio/slide_04.mp3" preload="auto"></audio>
+<audio id="audio-5" src="narration_audio/slide_05.mp3" preload="auto"></audio>
+<audio id="audio-6" src="narration_audio/slide_06.mp3" preload="auto"></audio>
+<audio id="audio-7" src="narration_audio/slide_07.mp3" preload="auto"></audio>
+<audio id="audio-8" src="narration_audio/slide_08.mp3" preload="auto"></audio>
+<audio id="audio-9" src="narration_audio/slide_09.mp3" preload="auto"></audio>
+
+<!-- Speech controls -->
+<div id="speech-ui">
+  <div id="speech-status"><div class="pulse"></div> 読み上げ中</div>
+  <button class="speech-btn" id="btn-start">🔊 クリックして開始</button>
+  <button class="speech-btn" id="btn-pause">⏸ 一時停止</button>
+  <button class="speech-btn" id="btn-resume">▶ 再開</button>
+  <button class="speech-btn" id="btn-stop">⏹ 停止</button>
+</div>
+
+<!-- Slide viewport scaler -->
+<div id="scaler">
+
+  <!-- ═══════════════════════════════════════════
+       Slide 1 – 表紙
+  ═══════════════════════════════════════════ -->
+  <div class="slide active" data-index="0"
+    data-narration="本日はお時間をいただきありがとうございます。私は「ステップアップナビ」というAIを活用した福祉支援アプリを開発しております、廣瀬と申します。多治見から、地域の課題をテクノロジーで解決する取り組みを始めております。本日は東濃信用金庫様にご支援のご相談にまいりました。どうぞよろしくお願いいたします。">
+    <div class="deco deco-1"></div>
+    <div class="deco deco-2"></div>
+    <div class="slide-inner">
+      <div class="cover-logo">🌱</div>
+      <div class="badge">東濃信用金庫様 ご提案資料</div>
+      <div class="slide-title">AI × 福祉 × 教育</div>
+      <div class="slide-subtitle">多治見から始まる、地域共生社会のイノベーション</div>
+      <div class="cover-line"></div>
+      <div class="cover-orgs">
+        特定非営利活動法人 思いやりの糸 / HIローズ<br />
+        代表　廣瀬 豊
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       Slide 2 – 開発の背景
+  ═══════════════════════════════════════════ -->
+  <div class="slide" data-index="1"
+    data-narration="このアプリを作ろうと思ったのは、私自身が障がいを持つ娘の父親だからです。既存の支援ツールは、現場の当事者目線が欠けていることが多い。だからこそ、使う人の気持ちが分かるエンジニアが作るべきだと感じました。7月から9月の3ヶ月間、失業給付を活用しながら、この開発にフルコミットする覚悟です。コアとなるプログラムはすでに60パーセント完成しており、残りの仕上げに向けて資金が必要な状況です。">
+    <div class="deco deco-1"></div>
+    <div class="deco deco-2"></div>
+    <div class="slide-inner">
+      <div class="slide-title">開発の背景とビジョン</div>
+      <div class="slide-heading">「愛」と「現場」から生まれた技術</div>
+      <div class="slide-body">
+        既存システムにはない、障がいを持つ当事者の家族（お父さんエンジニア）が開発するからこそ到達できる<br />
+        使いやすさと自立支援を目指します。<br />
+        7月〜9月の3ヶ月間、フルコミットで開発します。
+      </div>
+      <div class="highlight-box">⚡ 60% コアプログラム完成済み</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       Slide 3 – 区分概要
+  ═══════════════════════════════════════════ -->
+  <div class="slide" data-index="2"
+    data-narration="このアプリは、大きく4つの対象に向けたプログラムで構成されています。一つ目は障がいを持つ本人とそのご家族。二つ目は福祉事業所の支援員・職員の方々。三つ目は発達に課題のあるお子さんとその保護者。四つ目は学校や行政機関です。それぞれの立場に合わせたAI機能を提供することで、地域全体の支援力を高めることを目指しています。">
+    <div class="deco deco-1"></div>
+    <div class="deco deco-2"></div>
+    <div class="slide-inner">
+      <div class="slide-title">目的・対象に応じた<br />AIプログラムの区分分け</div>
+      <div class="cards" style="margin-top:28px;">
+        <div class="card">
+          <div class="card-icon">🧑</div>
+          <div class="card-label">区分①</div>
+          <div class="card-title">本人・家族</div>
+          <div class="card-desc">QOL向上・自立支援</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🏢</div>
+          <div class="card-label">区分②</div>
+          <div class="card-title">福祉事業所</div>
+          <div class="card-desc">現場DX・業務効率化</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">👦</div>
+          <div class="card-label">区分③</div>
+          <div class="card-title">児童・保護者</div>
+          <div class="card-desc">早期自己成長支援</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🏛️</div>
+          <div class="card-label">区分④</div>
+          <div class="card-title">教育・行政</div>
+          <div class="card-desc">地域モデル構築</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       Slide 4 – 区分①
+  ═══════════════════════════════════════════ -->
+  <div class="slide" data-index="3"
+    data-narration="区分①は、軽度知的障害などを持つ大人の方とそのご家族向けです。AIがその日の体調や気分を察知し、無理のない自己トレーニングメニューを提案します。小さな成功体験を積み重ねることで自信を育み、就労への第一歩を後押しします。また、本人のできた！という記録をリアルタイムで可視化することで、ご家族の不安を安心に変えます。">
+    <div class="deco deco-1"></div>
+    <div class="deco deco-2"></div>
+    <div class="slide-inner">
+      <div class="badge">区分① 大人向け</div>
+      <div class="slide-title">障がい者本人・ご家族向け<br />プログラム</div>
+      <div class="slide-heading">「我慢する毎日から、自分で未来を選ぶ毎日へ」</div>
+      <ul class="bullets">
+        <li>AIが体調・気分を察知し、最適なトレーニングをその日に合わせて提案</li>
+        <li>「できた！」をリアルタイムで視覚化し、ご家族の安心感を高める</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       Slide 5 – 区分②
+  ═══════════════════════════════════════════ -->
+  <div class="slide" data-index="4"
+    data-narration="区分②は、福祉事業所で働く支援員・職員の方々向けです。現場では日々の支援記録や報告書作成に多くの時間が取られています。AIが音声入力や日々のデータをもとに、これらの書類を自動作成します。残業を大幅に減らし、職員が子どもたちと向き合う時間を最大化することが目標です。また、AIによる行動データ分析で、より質の高い支援計画の策定をサポートします。">
+    <div class="deco deco-1"></div>
+    <div class="deco deco-2"></div>
+    <div class="slide-inner">
+      <div class="badge">区分② 福祉事業所向け</div>
+      <div class="slide-title">福祉事業所・職員向け<br />プログラム</div>
+      <div class="slide-heading">「事務作業をゼロにして、100%の愛を子どもたちへ」</div>
+      <ul class="bullets">
+        <li>音声入力 ＋ AIで支援記録・報告書を自動作成し、残業を大幅削減</li>
+        <li>行動データ分析で、質の高い個別支援計画の策定をサポート</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       Slide 6 – 区分③
+  ═══════════════════════════════════════════ -->
+  <div class="slide" data-index="5"
+    data-narration="区分③は、発達に特性のあるお子さんとその保護者向けです。ゲーム感覚のミッションや対話を通じて、子ども自身が自分の好きと得意を自然に見つけていきます。親御さんが気づいていなかった才能が見つかることもあります。また、AIが日々の記録から学習し、保護者に今日試してみてほしいことをそっとアドバイスします。">
+    <div class="deco deco-1"></div>
+    <div class="deco deco-2"></div>
+    <div class="slide-inner">
+      <div class="badge">区分③ 児童・保護者向け</div>
+      <div class="slide-title">児童・保護者向け<br />プログラム</div>
+      <div class="slide-heading">「遊びながら、自分の『好き』と『得意』を見つける旅へ」</div>
+      <ul class="bullets">
+        <li>ゲーム感覚のミッションで、才能と強みを自然に発見・言語化</li>
+        <li>AIが日々の記録から学習し、保護者へそっとアドバイスを届ける</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       Slide 7 – 区分④
+  ═══════════════════════════════════════════ -->
+  <div class="slide" data-index="6"
+    data-narration="区分④は、学校や行政機関向けです。個々の支援データを匿名化してダッシュボードで一元管理し、地域全体の支援状況を可視化します。これにより、感覚ではなくデータで語れる福祉政策の立案が可能になります。そして、多治見で実証されたモデルをパッケージ化し、全国の他自治体へ展開することを目指します。東濃信用金庫様との連携実績は、他自治体への展開における大きな説得力になると考えています。">
+    <div class="deco deco-1"></div>
+    <div class="deco deco-2"></div>
+    <div class="slide-inner">
+      <div class="badge">区分④ 教育・行政向け</div>
+      <div class="slide-title">教育機関・行政向け<br />プログラム</div>
+      <div class="slide-heading">「データで語る、多治見モデルを全国へ」</div>
+      <ul class="bullets">
+        <li>匿名化データをダッシュボードで一元管理、地域全体の支援を可視化</li>
+        <li>多治見モデルをパッケージ化し、全国他自治体へのライセンス提供へ</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       Slide 8 – 東濃信用金庫へのご提案
+  ═══════════════════════════════════════════ -->
+  <div class="slide" data-index="7"
+    data-narration="ここで、東濃信用金庫様への具体的なご提案です。Readyforには、信用金庫がパートナーとして参画することで、クラウドファンディングの手数料が無料になる制度があります。通常、目標金額の8パーセントが手数料としてかかります。300万円の目標であれば、約24万円です。東濃信用金庫様にパートナーとしてご参画いただければ、この24万円が丸ごとプロジェクトに活きることになります。地域の信用金庫として福祉DXを支援するという、社会貢献とPRを兼ねた取り組みになります。">
+    <div class="deco deco-1"></div>
+    <div class="deco deco-2"></div>
+    <div class="slide-inner">
+      <div class="badge">東濃信用金庫様へのご提案</div>
+      <div class="slide-title">地域の未来を、一緒に作りませんか</div>
+      <div class="proposal-grid">
+        <div class="proposal-card">
+          <h3>🤝 スポンサー参画でReadyfor手数料が無料に</h3>
+          <p>信用金庫がパートナーとして参画することで、Readyforのクラウドファンディング手数料（通常8%）が<strong style="color:#f8fafc;">無料</strong>になる制度があります。</p>
+        </div>
+        <div class="proposal-card">
+          <h3>💰 削減効果</h3>
+          <p>300万円目標の場合</p>
+          <span class="big-num">約 24万円 削減</span>
+          <p style="font-size:13px;margin-top:4px;">その分がプロジェクトに丸ごと活きます。</p>
+        </div>
+        <div class="proposal-card">
+          <h3>🌟 社会貢献 × PR効果</h3>
+          <p>地域の信用金庫として福祉DXを支援するという、社会貢献とブランド価値向上を同時に実現します。</p>
+        </div>
+        <div class="proposal-card">
+          <h3>📍 地域連携モデルの確立</h3>
+          <p>東濃信用金庫様との連携実績が、他自治体・他信用金庫への展開における強力な説得材料となります。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       Slide 9 – 締めくくり
+  ═══════════════════════════════════════════ -->
+  <div class="slide" data-index="8"
+    data-narration="最後に、一言お伝えさせてください。これは一人の父が、娘のために始めたプロジェクトです。しかし、このアプリが完成すれば、多治見だけでなく全国の何万人もの方の自立を支えるインフラになり得ます。東濃信用金庫様にも、この共犯者になっていただけませんか。ぜひ一度、詳しいお話しを聞いていただけますと幸いです。本日はありがとうございました。">
+    <div class="deco deco-1"></div>
+    <div class="deco deco-2"></div>
+    <div class="slide-inner">
+      <div class="cover-logo">🌸</div>
+      <div class="closing-quote">「共犯者」になってくれませんか？</div>
+      <div class="closing-body">
+        一人の父の愛が、<br />
+        何万人の「自立」を支えるインフラに変わる
+      </div>
+      <div class="cover-line"></div>
+      <div class="closing-name">
+        特定非営利活動法人 思いやりの糸 / HIローズ<br />
+        代表　廣瀬 豊
+      </div>
+    </div>
+  </div>
+
+</div><!-- /scaler -->
+
+<!-- Navigation -->
+<div id="nav">
+  <button class="nav-btn" id="btn-prev" aria-label="前のスライド">‹</button>
+  <span id="slide-counter">1 / 9</span>
+  <button class="nav-btn" id="btn-next" aria-label="次のスライド">›</button>
+</div>
+
+<!-- Dot indicators -->
+<div id="dots"></div>
+
+<script>
+  /* ─── State ─── */
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  let audioEnabled = false;
+
+  /* ─── Scaler ─── */
+  const scaler = document.getElementById('scaler');
+  function rescale() {
+    const sw = window.innerWidth, sh = window.innerHeight;
+    const scale = Math.min(sw / 1280, sh / 720);
+    const ox = (sw - 1280 * scale) / 2;
+    const oy = (sh - 720 * scale) / 2;
+    scaler.style.transform = `translate(${ox}px, ${oy}px) scale(${scale})`;
+  }
+  rescale();
+  window.addEventListener('resize', rescale);
+
+  /* ─── Dots ─── */
+  const dotsEl = document.getElementById('dots');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  });
+
+  /* ─── Progress ─── */
+  const progressEl = document.getElementById('progress');
+  function updateProgress() {
+    progressEl.style.width = ((current + 1) / total * 100) + '%';
+  }
+
+  /* ─── Audio helpers ─── */
+  const btnStart  = document.getElementById('btn-start');
+  const btnPause  = document.getElementById('btn-pause');
+  const btnResume = document.getElementById('btn-resume');
+  const btnStop   = document.getElementById('btn-stop');
+  const statusEl  = document.getElementById('speech-status');
+
+  function getAudio(slideIdx) {
+    return document.getElementById('audio-' + (slideIdx + 1));
+  }
+
+  function stopAllAudio() {
+    for (let i = 1; i <= 9; i++) {
+      const a = document.getElementById('audio-' + i);
+      if (a) { a.pause(); a.currentTime = 0; }
+    }
+  }
+
+  function playCurrent() {
+    stopAllAudio();
+    const audio = getAudio(current);
+    if (!audio) return;
+    audio.play().catch(() => {});
+    statusEl.style.display = 'flex';
+    btnPause.style.display = 'flex';
+    btnStop.style.display = 'flex';
+    btnResume.style.display = 'none';
+
+    audio.onended = () => {
+      statusEl.style.display = 'none';
+      btnPause.style.display = 'none';
+      btnResume.style.display = 'none';
+      btnStop.style.display = 'none';
+    };
+  }
+
+  /* ─── Slide transition ─── */
+  function goTo(idx) {
+    if (idx < 0 || idx >= total) return;
+
+    stopAllAudio();
+
+    const prev = current;
+    slides[prev].classList.remove('visible');
+    setTimeout(() => { slides[prev].classList.remove('active'); }, 350);
+
+    current = idx;
+    slides[current].classList.add('active');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { slides[current].classList.add('visible'); });
+    });
+
+    document.getElementById('slide-counter').textContent = `${current + 1} / ${total}`;
+    document.querySelectorAll('.dot').forEach((d, i) =>
+      d.classList.toggle('active', i === current));
+    updateProgress();
+
+    if (audioEnabled) {
+      playCurrent();
+    }
+  }
+
+  /* ─── Init first slide ─── */
+  slides[0].classList.add('active');
+  requestAnimationFrame(() => { requestAnimationFrame(() => { slides[0].classList.add('visible'); }); });
+  updateProgress();
+
+  /* ─── Keyboard navigation ─── */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1);
+    if (e.key === ' ') {
+      e.preventDefault();
+      const audio = getAudio(current);
+      if (!audio) return;
+      if (!audio.paused) {
+        audio.pause();
+        statusEl.style.display = 'none';
+        btnPause.style.display = 'none';
+        btnResume.style.display = 'flex';
+      } else if (audio.currentTime > 0) {
+        audio.play().catch(() => {});
+        statusEl.style.display = 'flex';
+        btnPause.style.display = 'flex';
+        btnResume.style.display = 'none';
+      }
+    }
+  });
+  document.getElementById('btn-prev').addEventListener('click', () => goTo(current - 1));
+  document.getElementById('btn-next').addEventListener('click', () => goTo(current + 1));
+
+  /* ─── Audio control buttons ─── */
+  btnStart.addEventListener('click', () => {
+    audioEnabled = true;
+    btnStart.style.display = 'none';
+    playCurrent();
+  });
+
+  btnPause.addEventListener('click', () => {
+    const audio = getAudio(current);
+    if (audio) audio.pause();
+    statusEl.style.display = 'none';
+    btnPause.style.display = 'none';
+    btnResume.style.display = 'flex';
+  });
+
+  btnResume.addEventListener('click', () => {
+    const audio = getAudio(current);
+    if (audio) audio.play().catch(() => {});
+    statusEl.style.display = 'flex';
+    btnPause.style.display = 'flex';
+    btnResume.style.display = 'none';
+  });
+
+  btnStop.addEventListener('click', () => {
+    stopAllAudio();
+    audioEnabled = false;
+    statusEl.style.display = 'none';
+    btnPause.style.display = 'none';
+    btnResume.style.display = 'none';
+    btnStop.style.display = 'none';
+    btnStart.style.display = 'flex';
+  });
+</script>
+</body>
+</html>

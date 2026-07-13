@@ -13,18 +13,44 @@ const defaultSettings: PrintSettings = {
   problemType: 'trace',
   problemCount: 5,
   theme: 'stars',
-  showStampArea: true,
+  showStampRally: true,
   showDifficultyBadge: true,
   selectedKanjiIds: [],
+  strokeOrderKanjiIds: [],
   randomize: true,
 };
 
 const SETTINGS_KEY = 'kanji-app-settings';
 
+const VALID_PROBLEM_TYPES = new Set<PrintSettings['problemType']>(['trace', 'reading', 'fill']);
+
+function normalizeSettings(
+  raw: Partial<PrintSettings> & { showStampArea?: boolean },
+): PrintSettings {
+  const migrated = { ...raw };
+  if (migrated.showStampRally === undefined && migrated.showStampArea !== undefined) {
+    migrated.showStampRally = migrated.showStampArea;
+  }
+  delete migrated.showStampArea;
+
+  return {
+    ...defaultSettings,
+    ...migrated,
+    problemType:
+      migrated.problemType && VALID_PROBLEM_TYPES.has(migrated.problemType)
+        ? migrated.problemType
+        : defaultSettings.problemType,
+    selectedKanjiIds: Array.isArray(migrated.selectedKanjiIds) ? migrated.selectedKanjiIds : [],
+    strokeOrderKanjiIds: Array.isArray(migrated.strokeOrderKanjiIds)
+      ? migrated.strokeOrderKanjiIds
+      : [],
+  };
+}
+
 function loadSettings(): PrintSettings {
   try {
     const s = localStorage.getItem(SETTINGS_KEY);
-    if (s) return { ...defaultSettings, ...JSON.parse(s) };
+    if (s) return normalizeSettings(JSON.parse(s));
   } catch { /* ignore */ }
   return defaultSettings;
 }
@@ -62,7 +88,7 @@ export default function App() {
 
       {/* Print-only content (hidden on screen, shown on print) */}
       <div className="hidden print:block">
-        <PrintPreview settings={settings} kanjiList={kanjiList} />
+        <PrintPreview settings={settings} kanjiList={kanjiList} printMode />
       </div>
 
       {/* Main UI (hidden on print) */}
