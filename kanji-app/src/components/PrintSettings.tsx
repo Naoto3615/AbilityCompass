@@ -140,23 +140,24 @@ export const PrintSettings: React.FC<Props> = ({ settings, kanjiList, onUpdate, 
         <h2 className="text-xl font-black text-blue-600 mb-4 flex items-center gap-2">
           <span>🔢</span> もんだいのかず
         </h2>
-        <div className="flex items-center gap-4">
-          <input
-            type="range"
-            min={3}
-            max={8}
-            value={settings.problemCount}
-            onChange={(e) => set('problemCount', Number(e.target.value))}
-            className="flex-1 accent-pink-400"
-          />
-          <span className="text-3xl font-black text-pink-500 w-16 text-center">
-            {settings.problemCount}<span className="text-lg">もん</span>
-          </span>
+        <div className="flex flex-wrap gap-2 justify-center">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+            <button
+              key={n}
+              onClick={() => set('problemCount', n)}
+              className={`w-12 h-12 rounded-2xl font-black text-lg transition-all border-2 ${
+                settings.problemCount === n
+                  ? 'bg-pink-400 text-white border-pink-400 shadow-md scale-110'
+                  : 'bg-white text-pink-400 border-pink-200 hover:border-pink-400 hover:bg-pink-50'
+              }`}
+            >
+              {n}
+            </button>
+          ))}
         </div>
-        <div className="flex justify-between text-xs text-gray-400 px-1 mt-1">
-          <span>3もん</span>
-          <span>8もん</span>
-        </div>
+        <p className="text-xs text-gray-400 text-center mt-3">
+          えらんだかず: <span className="font-bold text-pink-500">{settings.problemCount}もん</span>
+        </p>
       </div>
 
       {/* Kanji selection */}
