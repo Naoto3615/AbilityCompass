@@ -76,7 +76,7 @@ const WRITING_CELL_SIZE = TRACE_BOX_SIZE;
 const TRACE_BOX_SIZE = 160;
 const TRACE_FONT_SIZE = 112;
 const STROKE_GUIDE_SIZE = TRACE_BOX_SIZE;
-const FILL_BLANK_SIZE = 56;
+const FILL_BLANK_SIZE = 64; // inline □ in example sentence (kept compact)
 
 const writingCellBorder = (borderColor: string) =>
   borderColor === '#c4b5fd' ? '#a5b4fc' : borderColor === '#f9a8d4' ? '#f472b6' : '#67e8f9';
