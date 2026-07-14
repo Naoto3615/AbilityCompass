@@ -72,7 +72,7 @@ const difficultyConfig: Record<Difficulty, { label: string; color: string; emoji
 };
 
 // Print layout sizes (~2× previous values)
-const WRITING_CELL_SIZE = 100;
+const WRITING_CELL_SIZE = TRACE_BOX_SIZE;
 const TRACE_BOX_SIZE = 160;
 const TRACE_FONT_SIZE = 112;
 const STROKE_GUIDE_SIZE = TRACE_BOX_SIZE;
