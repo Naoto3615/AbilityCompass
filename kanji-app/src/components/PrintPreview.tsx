@@ -75,7 +75,7 @@ const difficultyConfig: Record<Difficulty, { label: string; color: string; emoji
 const WRITING_CELL_SIZE = 100;
 const TRACE_BOX_SIZE = 160;
 const TRACE_FONT_SIZE = 112;
-const STROKE_GUIDE_SIZE = 140;
+const STROKE_GUIDE_SIZE = TRACE_BOX_SIZE;
 const FILL_BLANK_SIZE = 56;
 
 const writingCellBorder = (borderColor: string) =>
