@@ -97,14 +97,33 @@ const WritingCells: React.FC<{
 
   const cell = (i: number) => (
     <div key={i} className="relative" style={cellStyle}>
-      <div style={{
-        position: 'absolute', top: 0, left: '50%', width: 1, height: '100%',
-        background: '#e5e7eb', transform: 'translateX(-50%)',
-      }} />
-      <div style={{
-        position: 'absolute', top: '50%', left: 0, width: '100%', height: 1,
-        background: '#e5e7eb', transform: 'translateY(-50%)',
-      }} />
+      {/* Dotted cross guide lines */}
+      <svg
+        width={WRITING_CELL_SIZE}
+        height={WRITING_CELL_SIZE}
+        style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
+      >
+        {/* Vertical center line */}
+        <line
+          x1={WRITING_CELL_SIZE / 2}
+          y1={4}
+          x2={WRITING_CELL_SIZE / 2}
+          y2={WRITING_CELL_SIZE - 4}
+          stroke="#d1d5db"
+          strokeWidth={1}
+          strokeDasharray="3 3"
+        />
+        {/* Horizontal center line */}
+        <line
+          x1={4}
+          y1={WRITING_CELL_SIZE / 2}
+          x2={WRITING_CELL_SIZE - 4}
+          y2={WRITING_CELL_SIZE / 2}
+          stroke="#d1d5db"
+          strokeWidth={1}
+          strokeDasharray="3 3"
+        />
+      </svg>
     </div>
   );
 
