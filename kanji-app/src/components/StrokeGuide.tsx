@@ -559,8 +559,8 @@ export const StrokeGuide: React.FC<Props> = ({ kanji, size = 96 }) => {
           const dx = label.startX - label.labelX;
           const dy = label.startY - label.labelY;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          // Only draw leader if circle is meaningfully offset from the start point
-          if (dist < label.radius + 1.5) return null;
+          // Only draw leader if circle is visibly offset from the start point
+          if (dist < 2) return null;
           // Stop the line at the edge of the circle so it doesn't overlap
           const ux = dx / dist;
           const uy = dy / dist;
