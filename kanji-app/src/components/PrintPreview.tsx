@@ -388,35 +388,41 @@ const ProblemCard: React.FC<{
 
       {problemType === 'fill' && (
         <div>
-          <p className="text-xs text-gray-500 mb-2">□に漢字を書こう！</p>
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="text-lg font-bold text-gray-700">
-              {kanji.example.replace(kanji.kanji, '')}の□に入る漢字は？
-            </div>
-          </div>
-          <div className="flex items-center gap-2 mt-2">
-            <p className="text-base font-bold text-gray-600">
-              {kanji.example.includes(kanji.kanji)
-                ? kanji.example.split(kanji.kanji).map((part, i, arr) => (
-                    <React.Fragment key={i}>
-                      {part}
-                      {i < arr.length - 1 && (
-                        <span
-                          className="inline-block mx-1 align-bottom"
-                          style={{
-                            width: FILL_BLANK_SIZE,
-                            height: FILL_BLANK_SIZE,
-                            border: `2px solid ${traceColor}`,
-                            borderRadius: 6,
-                            verticalAlign: 'middle',
-                          }}
-                        />
-                      )}
-                    </React.Fragment>
-                  ))
-                : kanji.example}
-            </p>
-          </div>
+          <p className="text-xs text-gray-500 mb-2">□に あてはまる 漢字を 書こう！</p>
+          <p className="text-base font-bold text-gray-600 leading-relaxed">
+            {kanji.example.includes(kanji.kanji)
+              ? kanji.example.split(kanji.kanji).map((part, i, arr) => (
+                  <React.Fragment key={i}>
+                    {part}
+                    {i < arr.length - 1 && (
+                      <span
+                        className="inline-block mx-1 align-bottom"
+                        style={{
+                          width: FILL_BLANK_SIZE,
+                          height: FILL_BLANK_SIZE,
+                          border: `2px solid ${traceColor}`,
+                          borderRadius: 6,
+                          verticalAlign: 'middle',
+                        }}
+                      />
+                    )}
+                  </React.Fragment>
+                ))
+              : (
+                <>
+                  <span className="inline-block mx-1 align-bottom"
+                    style={{
+                      width: FILL_BLANK_SIZE,
+                      height: FILL_BLANK_SIZE,
+                      border: `2px solid ${traceColor}`,
+                      borderRadius: 6,
+                      verticalAlign: 'middle',
+                    }}
+                  />
+                  {kanji.example}
+                </>
+              )}
+          </p>
           <p className="text-xs text-gray-400 mt-1">（{kanji.exampleReading}）</p>
           <div className="mt-2">
             <WritingCells count={3} borderColor={traceColor} />
