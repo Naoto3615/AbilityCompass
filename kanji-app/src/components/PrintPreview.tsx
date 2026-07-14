@@ -459,7 +459,7 @@ export const PrintPreview: React.FC<Props> = ({ settings, kanjiList, printMode =
           {settings.showStampRally && (
             <p className="text-sm text-orange-600 font-bold mt-1 flex items-center gap-1">
               <span>👇</span>
-              スタンプラリー欄は プリントの いちばん下に あります。下まで スクロールして ね！
+              スタンプラリー欄は プリントの いちばん下に あります。
             </p>
           )}
         </div>
