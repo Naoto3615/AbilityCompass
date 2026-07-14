@@ -554,31 +554,67 @@ export const StrokeGuide: React.FC<Props> = ({ kanji, size = 96 }) => {
           );
         })}
 
-        {/* 3. Numbered circles — white fill, red border, near stroke starts */}
-        {labelLayouts.map((label) => (
-          <g key={`num-${label.strokeIndex}`} className="stroke-guide-label">
-            <circle
-              cx={label.labelX}
-              cy={label.labelY}
-              r={label.radius}
-              fill="#fff"
+        {/* 3. Dotted leader lines — from numbered circle to stroke start point */}
+        {labelLayouts.map((label) => {
+          const dx = label.startX - label.labelX;
+          const dy = label.startY - label.labelY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          // Only draw leader if circle is meaningfully offset from the start point
+          if (dist < label.radius + 1.5) return null;
+          // Stop the line at the edge of the circle so it doesn't overlap
+          const ux = dx / dist;
+          const uy = dy / dist;
+          const x1 = label.labelX + ux * (label.radius + 0.5);
+          const y1 = label.labelY + uy * (label.radius + 0.5);
+          // Stop the line a couple px before the stroke start (small gap)
+          const x2 = label.startX - ux * 2;
+          const y2 = label.startY - uy * 2;
+          return (
+            <line
+              key={`leader-${label.strokeIndex}`}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
               stroke={ARROW_COLOR}
-              strokeWidth={0.8}
+              strokeWidth={0.7}
+              strokeDasharray="1.8 1.8"
+              strokeLinecap="round"
+              opacity={0.7}
+              className="stroke-guide-leader"
             />
-            <text
-              x={label.labelX}
-              y={label.labelY}
-              textAnchor="middle"
-              dominantBaseline="central"
-              fontSize={fontSize}
-              fontWeight="bold"
-              fill={ARROW_COLOR}
-              style={{ fontFamily: 'sans-serif', userSelect: 'none' }}
-            >
-              {label.strokeIndex + 1}
-            </text>
-          </g>
-        ))}
+          );
+        })}
+
+        {/* 4. Numbered circles — white fill, red border, near stroke starts */}
+        {/* Stroke 0 (first stroke) gets a filled red circle with white text to stand out */}
+        {labelLayouts.map((label) => {
+          const isFirst = label.strokeIndex === 0;
+          return (
+            <g key={`num-${label.strokeIndex}`} className="stroke-guide-label">
+              <circle
+                cx={label.labelX}
+                cy={label.labelY}
+                r={isFirst ? label.radius * 1.15 : label.radius}
+                fill={isFirst ? ARROW_COLOR : '#fff'}
+                stroke={ARROW_COLOR}
+                strokeWidth={isFirst ? 0 : 0.8}
+              />
+              <text
+                x={label.labelX}
+                y={label.labelY}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fontSize={fontSize}
+                fontWeight="bold"
+                fill={isFirst ? '#fff' : ARROW_COLOR}
+                style={{ fontFamily: 'sans-serif', userSelect: 'none' }}
+              >
+                {label.strokeIndex + 1}
+              </text>
+            </g>
+          );
+        })}
       </svg>
 
       {showSequence && (
