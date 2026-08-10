@@ -30,4 +30,6 @@ urlpatterns = [
     path('roadmap/', include('roadmap.urls')),
     path('accounts/', include('accounts.urls')),
     path('daily/', include('daily.urls')),
+    path('daycare/', include('daycare.urls')),
+    path('rag/', include('rag.urls')),
 ]

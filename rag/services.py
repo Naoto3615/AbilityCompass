@@ -1,9 +1,20 @@
 import json
 import numpy as np
-from openai import OpenAI
 from django.conf import settings
 
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+_client = None
+
+
+def _get_client():
+    """OpenAIクライアントを遅延初期化（APIキー未設定時のエラーを防ぐ）"""
+    global _client
+    if _client is None:
+        from openai import OpenAI
+        api_key = getattr(settings, 'OPENAI_API_KEY', None)
+        if not api_key:
+            return None
+        _client = OpenAI(api_key=api_key)
+    return _client
 
 EMOTION_LABELS = {5: 'とてもよい', 4: 'まあまあ', 3: 'ふつう', 2: 'すこしつらい', 1: 'とてもつらい'}
 HEALTH_LABELS = {3: 'からだがよい', 2: 'ふつう', 1: 'つらい'}
@@ -12,7 +23,10 @@ HEALTH_LABELS = {3: 'からだがよい', 2: 'ふつう', 1: 'つらい'}
 def get_embedding(text: str) -> list:
     """テキストの埋め込みベクトルを取得する"""
     try:
-        response = client.embeddings.create(
+        c = _get_client()
+        if not c:
+            return []
+        response = c.embeddings.create(
             model="text-embedding-3-small",
             input=text
         )
@@ -120,7 +134,10 @@ def generate_rag_advice_for_child(child, query: str) -> dict:
     )
 
     try:
-        response = client.chat.completions.create(
+        c = _get_client()
+        if not c:
+            raise Exception("API key not configured")
+        response = c.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -199,7 +216,10 @@ def generate_rag_advice_for_user(user_profile, query: str) -> dict:
     )
 
     try:
-        response = client.chat.completions.create(
+        c = _get_client()
+        if not c:
+            raise Exception("API key not configured")
+        response = c.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
