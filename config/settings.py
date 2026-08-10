@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'roadmap',
     'accounts',
     'daily',
+    'daycare',
+    'rag',
 ]
 
 MIDDLEWARE = [

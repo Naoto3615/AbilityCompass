@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load text_mode %}
+
+{% block title %}{{ role }}{% t "として登録" "としてとうろく" %}{% endblock %}
+
+{% block content %}
+<div class="fade-in max-w-lg mx-auto">
+  <h1 class="text-2xl font-bold text-gray-800 mb-2">
+    🏫 {{ role }}{% t "として登録する" "としてとうろくする" %}
+  </h1>
+  <p class="text-gray-500 text-sm mb-6">
+    {% t "放課後デイサービスの" "ほうかごでいさーびすの" %}{{ role }}{% t "用アカウントを作成します。" "ようあかうんとをさくせいします。" %}
+  </p>
+
+  <div class="card">
+    <form method="post">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="mb-4">
+          <label class="block text-gray-700 font-medium mb-1">{{ field.label }}</label>
+          <input
+            type="{{ field.field.widget.input_type }}"
+            name="{{ field.html_name }}"
+            id="{{ field.id_for_label }}"
+            {% if field.value %}value="{{ field.value }}"{% endif %}
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            {% if field.field.required %}required{% endif %}
+          >
+          {% if field.errors %}
+            {% for error in field.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+            {% endfor %}
+          {% endif %}
+          {% if field.help_text %}
+            <p class="text-gray-400 text-xs mt-1">{{ field.help_text }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <button type="submit" class="btn-main btn-green w-full mt-2" style="min-height:2.8rem; font-size:1rem;">
+        {{ role }}{% t "として登録する" "としてとうろくする" %}
+      </button>
+    </form>
+
+    <div class="mt-4 text-center text-sm text-gray-400">
+      {% t "すでにアカウントをお持ちの方は" "すでにあかうんとをおもちのかたは" %}
+      <a href="/accounts/login/" class="text-blue-500 hover:underline">{% t "ログイン" "ろぐいん" %}</a>
+    </div>
+  </div>
+
+  <div class="mt-4 text-center text-sm text-gray-400">
+    <a href="/daycare/staff/signup/" class="hover:underline mr-4">{% t "支援員として登録" "しえんいんとしてとうろく" %}</a>
+    <a href="/daycare/parent/signup/" class="hover:underline">{% t "保護者として登録" "ほごしゃとしてとうろく" %}</a>
+  </div>
+</div>
+{% endblock %}

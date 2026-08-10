@@ -6,6 +6,15 @@ from django.shortcuts import render, redirect
 
 class HomeView(View):
     def get(self, request):
+        if request.user.is_authenticated:
+            if hasattr(request.user, 'user_profile'):
+                if request.user.user_profile.user_type == 'child':
+                    return redirect('daily:child_dashboard')
+                return redirect('daily:dashboard')
+            elif hasattr(request.user, 'staff_profile'):
+                return redirect('daycare:staff_dashboard')
+            elif hasattr(request.user, 'parent_profile'):
+                return redirect('daycare:parent_dashboard')
         return render(request, 'home.html')
 
 
@@ -23,4 +32,6 @@ urlpatterns = [
     path('roadmap/', include('roadmap.urls')),
     path('accounts/', include('accounts.urls')),
     path('daily/', include('daily.urls')),
+    path('daycare/', include('daycare.urls')),
+    path('rag/', include('rag.urls')),
 ]

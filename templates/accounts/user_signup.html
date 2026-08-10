@@ -27,6 +27,66 @@
   <form method="post" class="space-y-5">
     {% csrf_token %}
 
+    <!-- 利用者種別 -->
+    <div class="mb-6">
+      <label class="block font-bold text-gray-700 mb-3">
+        {% t "あなたはどちらですか？" "あなたは どちらですか？" %} <span class="text-red-500">*</span>
+      </label>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="cursor-pointer">
+          <input type="radio" name="user_type" value="adult" class="hidden peer" checked>
+          <div class="peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500
+                      border-2 border-gray-200 rounded-xl p-4 text-center hover:border-green-300 transition-colors">
+            <div class="text-3xl mb-1">💼</div>
+            <div class="font-bold text-sm">{% t "就労を目指す大人" "しゅうろうを めざす おとな" %}</div>
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="user_type" value="child" class="hidden peer" id="radio-child">
+          <div class="peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500
+                      border-2 border-gray-200 rounded-xl p-4 text-center hover:border-blue-300 transition-colors">
+            <div class="text-3xl mb-1">🎒</div>
+            <div class="font-bold text-sm">{% t "児童（小中高生）" "じどう（しょうちゅうこうせい）" %}</div>
+          </div>
+        </label>
+      </div>
+      {% if form.user_type.errors %}
+        {% for e in form.user_type.errors %}<p class="text-red-500 text-sm mt-1">{{ e }}</p>{% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- 学年選択（児童選択時のみ表示） -->
+    <div id="grade-section" class="mb-6 hidden">
+      <label class="block font-bold text-gray-700 mb-2">
+        {% t "学年を選んでください" "がくねんを えらんでください" %} <span class="text-red-500">*</span>
+      </label>
+      <select name="grade" id="id_grade"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-400 bg-white">
+        <option value="">-- {% t "選択してください" "せんたくしてください" %} --</option>
+        <option value="elementary_low">{% t "小学生（低学年）1〜3年生" "しょうがくせい（ていがくねん）1〜3ねんせい" %}</option>
+        <option value="elementary_high">{% t "小学生（高学年）4〜6年生" "しょうがくせい（こうがくねん）4〜6ねんせい" %}</option>
+        <option value="junior_high">{% t "中学生" "ちゅうがくせい" %}</option>
+        <option value="high_school">{% t "高校生" "こうこうせい" %}</option>
+      </select>
+      {% if form.grade.errors %}
+        {% for e in form.grade.errors %}<p class="text-red-500 text-sm mt-1">{{ e }}</p>{% endfor %}
+      {% endif %}
+    </div>
+
+    <script>
+      document.querySelectorAll('input[name="user_type"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+          const gradeSection = document.getElementById('grade-section');
+          if (radio.value === 'child' && radio.checked) {
+            gradeSection.classList.remove('hidden');
+          } else if (radio.value !== 'child') {
+            gradeSection.classList.add('hidden');
+            document.getElementById('id_grade').value = '';
+          }
+        });
+      });
+    </script>
+
     <div>
       <label class="block font-bold text-gray-700 mb-2">👤 {% t "ニックネーム" "にっくねーむ" %}</label>
       {{ form.nickname }}

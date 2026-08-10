@@ -1,6 +1,5 @@
 import random
 from django.conf import settings
-from roadmap.services import resolve_data
 
 
 JOB_TYPE_LABELS = {
@@ -181,71 +180,3 @@ def _fallback_avatar_response(user_message: str, profile, text_mode: str = 'hira
     }
     options = defaults.get(text_mode, defaults['hiragana'])
     return random.choice(options)
-
-
-def get_supporter_advice(user_profile, daily_records, text_mode: str = 'hiragana') -> str:
-    """支援者向けAIアドバイスを生成（フォールバックあり）"""
-    try:
-        from openai import OpenAI
-        client = OpenAI(api_key=settings.OPENAI_API_KEY)
-
-        records_text = ""
-        for r in daily_records[:7]:
-            records_text += (
-                f"- {r.date}: きもち「{r.get_emotion_label()}」, "
-                f"からだ「{r.get_health_label()}」\n"
-                f"  できたこと：{r.did_well[:30] if r.did_well else '（記録なし）'}\n"
-            )
-
-        prompt = f"""就労支援の支援者として、以下の利用者の1週間の記録を見てアドバイスをください。
-やさしい言葉で、支援者に向けた具体的なアドバイスを2〜3文で。
-
-利用者ニックネーム: {user_profile.nickname}
-記録:
-{records_text if records_text else '（記録なし）'}
-
-アドバイス:"""
-
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.7,
-            max_tokens=200,
-        )
-        return response.choices[0].message.content.strip()
-
-    except Exception:
-        if not daily_records:
-            return resolve_data(
-                {
-                    "kanji": "まだ記録がありません。利用者に日々の記録をつけるよう声かけしてみましょう。",
-                    "hiragana": "まだ きろくが ありません。りようしゃに ひびの きろくを つけるよう こえかけして みましょう。",
-                },
-                text_mode,
-            )
-
-        latest = daily_records[-1]
-        if latest.emotion_stamp >= 4:
-            return resolve_data(
-                {
-                    "kanji": "最近きもちが安定しているようです！この調子を応援しながら、次のステップへの声かけをしてみましょう。",
-                    "hiragana": "さいきん きもちが あんていして いるようです！この ちょうしを おうえんしながら、つぎの ステップへの こえかけを してみましょう。",
-                },
-                text_mode,
-            )
-        elif latest.emotion_stamp <= 2:
-            return resolve_data(
-                {
-                    "kanji": "最近つらそうな日が続いています。ゆっくり話を聞く時間をとりましょう。焦らず寄り添うことが大切です。",
-                    "hiragana": "さいきん つらそうな ひが つづいています。ゆっくり はなしを きく じかんを とりましょう。あせらず よりそうことが たいせつです。",
-                },
-                text_mode,
-            )
-        else:
-            return resolve_data(
-                {
-                    "kanji": "記録が続いています！毎日記録できていることを褒めてあげましょう。小さな成功体験の積み重ねが大切です。",
-                    "hiragana": "きろくが つづいています！まいにち きろくできていることを ほめてあげましょう。ちいさな せいこうたいけんの つみかさねが たいせつです。",
-                },
-                text_mode,
-            )

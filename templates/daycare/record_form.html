@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load text_mode %}
+
+{% block title %}{% t "支援記録を入力" "しえんきろくをにゅうりょく" %} — {{ child.nickname }}{% endblock %}
+
+{% block content %}
+<div class="fade-in max-w-lg mx-auto">
+  <a href="{% url 'daycare:child_detail' child.id %}" class="text-sm text-gray-400 hover:text-gray-600">← {{ child.nickname }} {% t "に戻る" "にもどる" %}</a>
+
+  <h1 class="text-2xl font-bold text-gray-800 mt-2 mb-6">
+    ✏️ {% t "支援記録を書く" "しえんきろくをかく" %}
+  </h1>
+
+  <div class="card">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-1">
+          📅 {% t "日付" "ひづけ" %} <span class="text-red-500">*</span>
+        </label>
+        {{ form.date }}
+        {% if form.date.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.date.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-1">
+          📝 {% t "支援内容" "しえんないよう" %} <span class="text-red-500">*</span>
+        </label>
+        {{ form.content }}
+        {% if form.content.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.content.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-1">
+          ⭐ {% t "今日のできた！" "きょうのできた！" %}（{% t "任意" "にんい" %}）
+        </label>
+        {{ form.achievement }}
+        {% if form.achievement.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.achievement.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="mb-6 flex items-center gap-2">
+        {{ form.share_with_parent }}
+        <label class="text-gray-700 cursor-pointer">
+          👨‍👩‍👧 {% t "保護者に共有する" "ほごしゃにきょうゆうする" %}
+        </label>
+      </div>
+
+      <div class="flex gap-3">
+        <button type="submit" class="btn-main btn-green flex-1" style="min-height:2.8rem; font-size:1rem;">
+          {% t "保存する" "ほぞんする" %}
+        </button>
+        <a href="{% url 'daycare:child_detail' child.id %}" class="btn-main bg-gray-100 text-gray-700 hover:bg-gray-200 flex-1" style="min-height:2.8rem; font-size:1rem;">
+          {% t "キャンセル" "きゃんせる" %}
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

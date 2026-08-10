@@ -1,0 +1,36 @@
+{% load text_mode %}
+<!-- 支援員・保護者両方で使える子どもカードコンポーネント -->
+<!-- 使用例: {% include "daycare/components/child_card.html" with child=item.child is_staff=True %} -->
+<div class="child-card card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <p class="text-xl font-bold text-gray-800">👦 {{ child.nickname }}</p>
+    {% if child.notes %}
+      <p class="text-sm text-gray-500 mt-1">{{ child.notes }}</p>
+    {% endif %}
+  </div>
+  <div class="flex gap-2 flex-wrap">
+    {% if is_staff %}
+      <a href="{% url 'daycare:child_detail' child.id %}"
+         class="btn-main btn-orange text-sm"
+         style="min-height:2.2rem; padding:0.4rem 1rem; font-size:0.9rem;">
+        📋 {% t "詳細・記録" "しょうさい・きろく" %}
+      </a>
+      <a href="{% url 'daycare:record_add' child.id %}"
+         class="btn-main btn-green text-sm"
+         style="min-height:2.2rem; padding:0.4rem 1rem; font-size:0.9rem;">
+        ✏️ {% t "今日の記録" "きょうのきろく" %}
+      </a>
+      <a href="{% url 'daycare:child_growth' child.id %}"
+         class="btn-main text-sm"
+         style="min-height:2.2rem; padding:0.4rem 1rem; font-size:0.9rem; background:#8b5cf6; color:white;">
+        📈 {% t "発達グラフ" "はったつぐらふ" %}
+      </a>
+    {% else %}
+      <a href="{% url 'daycare:child_growth' child.id %}"
+         class="btn-main text-sm"
+         style="min-height:2.2rem; padding:0.4rem 1rem; font-size:0.9rem; background:#8b5cf6; color:white;">
+        📈 {% t "発達の記録を見る" "はったつのきろくをみる" %}
+      </a>
+    {% endif %}
+  </div>
+</div>

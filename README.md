@@ -66,6 +66,16 @@ Railway のプロジェクト → **Variables** タブで以下を設定：
 - ビルドコマンド（`collectstatic` / `migrate`）が正常終了したらデプロイ完了
 - 表示される URL（`*.up.railway.app`）にアクセスして動作確認
 
+### 放課後デイ機能のmigrate
+
+Railway環境では以下のコマンドを実行：
+
+```bash
+python manage.py migrate daycare
+```
+
+> 初回デプロイ時は `python manage.py migrate`（全アプリ一括）でも問題ありません。
+
 ---
 
 ## ローカル開発の起動方法

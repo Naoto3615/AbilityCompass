@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load text_mode %}
+
+{% block title %}{% t "児童を登録する" "じどうをとうろくする" %}{% endblock %}
+
+{% block content %}
+<div class="fade-in max-w-lg mx-auto">
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">👦 {{ title }}</h1>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 p-3 rounded-lg bg-green-100 text-green-700">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="card">
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-1">
+          {% t "ニックネーム" "にっくねーむ" %} <span class="text-red-500">*</span>
+        </label>
+        {{ form.nickname }}
+        {% if form.nickname.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.nickname.errors.0 }}</p>
+        {% endif %}
+      </div>
+      <div class="mb-6">
+        <label class="block text-gray-700 font-medium mb-1">
+          {% t "特記事項" "とっきじこう" %}（{% t "任意" "にんい" %}）
+        </label>
+        {{ form.notes }}
+        {% if form.notes.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.notes.errors.0 }}</p>
+        {% endif %}
+      </div>
+      <div class="flex gap-3">
+        <button type="submit" class="btn-main btn-green flex-1" style="min-height:2.8rem; font-size:1rem;">
+          {% t "登録する" "とうろくする" %}
+        </button>
+        <a href="{% url 'daycare:staff_dashboard' %}" class="btn-main bg-gray-100 text-gray-700 hover:bg-gray-200 flex-1" style="min-height:2.8rem; font-size:1rem;">
+          {% t "キャンセル" "きゃんせる" %}
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

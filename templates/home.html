@@ -2,142 +2,272 @@
 {% load text_mode %}
 {% block title %}{% t "ステップアップナビ — はたらく一歩を、いっしょに" "すてっぷあっぷなび — はたらく いっぽを、いっしょに" %}{% endblock %}
 
+{% block extra_head %}
+<style>
+  /* Hero */
+  .hero-section { animation: heroFadeIn 0.8s ease-out; }
+  @keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Plant growth animation */
+  @keyframes plantCycle {
+    0%,30%  { content: "🌱"; }
+    31%,60% { content: "🌿"; }
+    61%,100%{ content: "🌳"; }
+  }
+  .plant-emoji { display: inline-block; animation: plantBounce 2s ease-in-out infinite; font-size: 5rem; }
+  @keyframes plantBounce {
+    0%,100% { transform: translateY(0) scale(1); }
+    50%     { transform: translateY(-8px) scale(1.08); }
+  }
+
+  /* Service cards */
+  .service-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+  .service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  }
+
+  /* Feature icons */
+  .feature-icon {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 12px;
+  }
+
+  /* Testimonial cards */
+  .testimonial-card {
+    border-left: 4px solid #10b981;
+    background: #f0fdf4;
+    padding: 16px 20px;
+    border-radius: 0 12px 12px 0;
+    margin-bottom: 12px;
+  }
+
+  /* CTA section animation */
+  .cta-btn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+
+  /* Staggered fade-in */
+  .fade-in-1 { animation: heroFadeIn 0.6s ease-out 0.1s both; }
+  .fade-in-2 { animation: heroFadeIn 0.6s ease-out 0.2s both; }
+  .fade-in-3 { animation: heroFadeIn 0.6s ease-out 0.3s both; }
+  .fade-in-4 { animation: heroFadeIn 0.6s ease-out 0.4s both; }
+  .fade-in-5 { animation: heroFadeIn 0.6s ease-out 0.5s both; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="text-center mb-10 fade-in">
-  <div class="text-6xl mb-4">🌱</div>
-  <h1 class="text-3xl font-bold text-green-700 mb-3">{% t "ステップアップナビ" "すてっぷあっぷなび" %}</h1>
-  <p class="text-xl text-gray-600 mb-2">{% t "はたらく　一歩（いっぽ）を、いっしょに。" "はたらく　いっぽを、いっしょに。" %}</p>
-  <p class="text-gray-500 text-base">{% t "あなたの「つよみ」を見つけて、" "あなたの「つよみ」を みつけて、" %}<br>{% t "しごとに向けて　少しずつ　成長しよう！" "しごとに むけて　すこしずつ　せいちょうしよう！" %}</p>
-</div>
 
-<div class="grid grid-cols-1 gap-5 mb-10 fade-in" style="animation-delay:0.1s">
-  <a href="/diagnosis/" class="card flex items-center gap-5 hover:shadow-lg transition-shadow no-underline group">
-    <div class="text-5xl group-hover:scale-110 transition-transform">🔍</div>
-    <div class="flex-1">
-      <h2 class="text-xl font-bold text-green-700 mb-1">① {% t "特性診断" "とくちょう しんだん" %}</h2>
-      <p class="text-gray-600 text-base">{% t "簡単な　質問に　答えると、" "かんたんな　しつもんに　こたえると、" %}<br>{% t "あなたに　向いている　仕事が　わかります！" "あなたに　むいている　しごとが　わかります！" %}</p>
-    </div>
-    <div class="text-green-400 text-2xl">→</div>
-  </a>
+<!-- ===== Section 1: Hero ===== -->
+<div class="hero-section relative overflow-hidden rounded-2xl mb-8"
+     style="background: linear-gradient(135deg, #10b981 0%, #059669 50%, #3b82f6 100%); min-height: 280px;">
+  <!-- Decorative circles -->
+  <div style="position:absolute; top:-50px; right:-50px; width:220px; height:220px;
+              background:rgba(255,255,255,0.1); border-radius:50%;"></div>
+  <div style="position:absolute; bottom:-40px; left:-40px; width:180px; height:180px;
+              background:rgba(255,255,255,0.08); border-radius:50%;"></div>
+  <div style="position:absolute; top:40px; left:20px; width:80px; height:80px;
+              background:rgba(255,255,255,0.06); border-radius:50%;"></div>
 
-  <a href="/roadmap/" class="card flex items-center gap-5 hover:shadow-lg transition-shadow no-underline group">
-    <div class="text-5xl group-hover:scale-110 transition-transform">🗺️</div>
-    <div class="flex-1">
-      <h2 class="text-xl font-bold text-blue-700 mb-1">② {% t "成長ロードマップ" "せいちょう ろーどまっぷ" %}</h2>
-      <p class="text-gray-600 text-base">{% t "仕事に向けた　3ステップを" "しごとに むけた　3ステップを" %}<br>{% t "いっしょに　進もう！" "いっしょに　すすもう！" %}</p>
-    </div>
-    <div class="text-blue-400 text-2xl">→</div>
-  </a>
+  <div class="relative z-10 text-center text-white px-6 py-10">
+    <div id="plant-hero" class="plant-emoji mb-3">🌱</div>
+    <h1 class="text-4xl font-black mb-3 tracking-tight">{% t "ステップアップナビ" "すてっぷあっぷなび" %}</h1>
+    <p class="text-xl mb-2 text-green-100 font-semibold">{% t "はたらく一歩を、いっしょに。" "はたらく いっぽを、いっしょに。" %}</p>
+    <p class="text-sm text-green-200 mb-8">{% t "あなたの「つよみ」を見つけて、少しずつ成長しよう！" "あなたの「つよみ」を みつけて、すこしずつ せいちょうしよう！" %}</p>
 
-  {% if request.user.is_authenticated and request.user.user_profile %}
-  <a href="/daily/" class="card flex items-center gap-5 hover:shadow-lg transition-shadow no-underline group">
-    <div class="text-5xl group-hover:scale-110 transition-transform">📒</div>
-    <div class="flex-1">
-      <h2 class="text-xl font-bold text-orange-700 mb-1">③ {% t "日々の記録" "まいにちの きろく" %}</h2>
-      <p class="text-gray-600 text-base">{% t "今日　できたことを　記録して" "きょう　できたことを　きろくして" %}<br>{% t "毎日　少しずつ　前へ！" "まいにち　すこしずつ　まえへ！" %}</p>
-    </div>
-    <div class="text-orange-400 text-2xl">→</div>
-  </a>
-  {% else %}
-  <div class="card flex items-center gap-5 opacity-60">
-    <div class="text-5xl">📒</div>
-    <div class="flex-1">
-      <h2 class="text-xl font-bold text-orange-700 mb-1">③ {% t "日々の記録" "まいにちの きろく" %}</h2>
-      <p class="text-gray-600 text-base">{% t "ログインすると　今日の　記録が　できます！" "ろぐいんすると　きょうの　きろくが　できます！" %}</p>
-    </div>
-    <a href="/accounts/login/" class="btn-main btn-orange text-base px-4 py-2">{% t "ログイン" "ろぐいん" %}</a>
-  </div>
-  {% endif %}
-</div>
-
-<div class="card mb-8 fade-in" style="animation-delay:0.2s">
-  <h2 class="text-xl font-bold text-gray-700 mb-5 text-center">🌟 {% t "3ステップで　仕事を　めざそう！" "3ステップで　しごとを　めざそう！" %}</h2>
-  <div class="space-y-4">
-    <div class="flex items-start gap-4 p-4 bg-green-50 rounded-xl">
-      <span class="text-3xl">🌱</span>
-      <div>
-        <div class="font-bold text-green-700 text-lg">{% t "ステップ 1" "ステップ 1" %}</div>
-        <div class="text-gray-600">{% t "生活習慣・基本スキル" "せいかつしゅうかん・きほんスキル" %}</div>
-        <div class="text-sm text-gray-500 mt-1">{% t "時刻を守る、あいさつ、報告" "じこくを まもる、あいさつ、ほうこく" %}</div>
-      </div>
-    </div>
-    <div class="flex items-start gap-4 p-4 bg-blue-50 rounded-xl">
-      <span class="text-3xl">🔧</span>
-      <div>
-        <div class="font-bold text-blue-700 text-lg">{% t "ステップ 2" "ステップ 2" %}</div>
-        <div class="text-gray-600">{% t "作業スキル" "さぎょうスキル" %}</div>
-        <div class="text-sm text-gray-500 mt-1">{% t "指示どおりに動く、くりかえし作業の練習" "しじどおりに うごく、くりかえし さぎょうの れんしゅう" %}</div>
-      </div>
-    </div>
-    <div class="flex items-start gap-4 p-4 bg-orange-50 rounded-xl">
-      <span class="text-3xl">🚀</span>
-      <div>
-        <div class="font-bold text-orange-700 text-lg">{% t "ステップ 3" "ステップ 3" %}</div>
-        <div class="text-gray-600">{% t "就労準備" "しゅうろうじゅんび" %}</div>
-        <div class="text-sm text-gray-500 mt-1">{% t "職場体験・ジョブコーチとの連携" "しょくばたいけん・じょぶコーチとの れんけい" %}</div>
-      </div>
-    </div>
+    {% if request.user.is_authenticated %}
+      {% if request.user.staff_profile %}
+        <a href="/daycare/staff/" class="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-6 py-3 rounded-2xl text-base hover:bg-green-50 cta-btn no-underline">
+          👦 {% t "担当児童一覧へ" "たんとうじどういちらんへ" %}
+        </a>
+      {% elif request.user.parent_profile %}
+        <a href="/daycare/parent/" class="inline-flex items-center gap-2 bg-white text-blue-700 font-bold px-6 py-3 rounded-2xl text-base hover:bg-blue-50 cta-btn no-underline">
+          📖 {% t "お子さんの記録へ" "おこさんの きろくへ" %}
+        </a>
+      {% elif request.user.user_profile %}
+        <a href="/daily/" class="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-6 py-3 rounded-2xl text-base hover:bg-green-50 cta-btn no-underline">
+          📊 {% t "ダッシュボードへ" "だっしゅぼーどへ" %}
+        </a>
+      {% else %}
+        <a href="#cta" class="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-6 py-3 rounded-2xl text-base hover:bg-green-50 cta-btn no-underline">
+          🔍 {% t "診断を受ける" "しんだんを うける" %}
+        </a>
+      {% endif %}
+    {% else %}
+      <a href="#cta" class="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-8 py-3 rounded-2xl text-lg hover:bg-green-50 cta-btn no-underline">
+        🌱 {% t "はじめる" "はじめる" %} ↓
+      </a>
+    {% endif %}
   </div>
 </div>
 
-<div class="card mb-8 fade-in" style="animation-delay:0.3s">
-  <h2 class="text-xl font-bold text-gray-700 mb-4 text-center">💼 {% t "向いている　仕事を　さがそう" "むいている　しごとを　さがそう" %}</h2>
-  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-    <a href="/roadmap/agriculture/" class="text-center p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors no-underline">
-      <div class="text-3xl mb-1">🌱</div>
-      <div class="text-sm font-bold text-green-700">{% t "農業・園芸系" "のうぎょう・えんげいけい" %}</div>
-    </a>
-    <a href="/roadmap/manufacturing/" class="text-center p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors no-underline">
-      <div class="text-3xl mb-1">🔧</div>
-      <div class="text-sm font-bold text-blue-700">{% t "製造・組み立て系" "せいぞう・くみたてけい" %}</div>
-    </a>
-    <a href="/roadmap/cleaning/" class="text-center p-4 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors no-underline">
-      <div class="text-3xl mb-1">🧹</div>
-      <div class="text-sm font-bold text-sky-700">{% t "清掃・環境整備系" "せいそう・かんきょうせいびけい" %}</div>
-    </a>
-    <a href="/roadmap/food_processing/" class="text-center p-4 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors no-underline">
-      <div class="text-3xl mb-1">🍱</div>
-      <div class="text-sm font-bold text-orange-700">{% t "食品加工系" "しょくひんかこうけい" %}</div>
-    </a>
-    <a href="/roadmap/service/" class="text-center p-4 bg-pink-50 rounded-xl hover:bg-pink-100 transition-colors no-underline">
-      <div class="text-3xl mb-1">🛒</div>
-      <div class="text-sm font-bold text-pink-700">{% t "接客・販売補助系" "せっきゃく・はんばいほじょけい" %}</div>
-    </a>
-    <a href="/diagnosis/" class="text-center p-4 bg-yellow-50 rounded-xl hover:bg-yellow-100 transition-colors no-underline">
-      <div class="text-3xl mb-1">🔍</div>
-      <div class="text-sm font-bold text-yellow-700">{% t "診断で探す" "しんだんで さがす" %}</div>
-    </a>
+<!-- ===== Section 2: 2 Service Cards ===== -->
+<div id="start" class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8 fade-in-1">
+
+  <!-- 就労支援カード -->
+  <a href="#cta" class="service-card card no-underline group" style="background: linear-gradient(145deg, #f0fdf4, #dcfce7); border: 2px solid #bbf7d0;">
+    <div class="text-center mb-3">
+      <span class="text-5xl group-hover:scale-110 inline-block transition-transform">💼</span>
+    </div>
+    <h2 class="text-xl font-black text-green-700 text-center mb-2">{% t "就労支援" "しゅうろうしえん" %}</h2>
+    <p class="text-sm text-gray-600 text-center mb-4">{% t "大人の方の就労をサポートします" "おとなのかたの しゅうろうを さぽーとします" %}</p>
+    <div class="space-y-2 mb-4">
+      <div class="flex items-center gap-2 text-sm text-gray-600">
+        <span class="text-green-500">✓</span> {% t "特性診断で向いている仕事を発見" "とくせいしんだんで むいている しごとを はっけん" %}
+      </div>
+      <div class="flex items-center gap-2 text-sm text-gray-600">
+        <span class="text-green-500">✓</span> {% t "3ステップの成長ロードマップ" "3すてっぷの せいちょう ろーどまっぷ" %}
+      </div>
+      <div class="flex items-center gap-2 text-sm text-gray-600">
+        <span class="text-green-500">✓</span> {% t "毎日の記録でスキルを可視化" "まいにちの きろくで すきるを かしか" %}
+      </div>
+    </div>
+    <div class="text-center">
+      <span class="inline-flex items-center gap-1 bg-green-500 text-white font-bold px-5 py-2 rounded-xl text-sm">
+        🔍 {% t "診断を受ける" "しんだんを うける" %} →
+      </span>
+    </div>
+  </a>
+
+  <!-- 放課後デイカード -->
+  <div class="service-card card" style="background: linear-gradient(145deg, #eff6ff, #dbeafe); border: 2px solid #bfdbfe;">
+    <div class="text-center mb-3">
+      <span class="text-5xl">🏫</span>
+    </div>
+    <h2 class="text-xl font-black text-blue-700 text-center mb-2">{% t "放課後デイサービス" "ほうかごでいさーびす" %}</h2>
+    <p class="text-sm text-gray-600 text-center mb-4">{% t "支援員・保護者の方はこちら" "しえんいん・ほごしゃの かたは こちら" %}</p>
+    <div class="space-y-3">
+      <a href="/daycare/staff/signup/" class="flex items-center gap-3 p-3 bg-white rounded-xl hover:bg-green-50 transition-colors no-underline group">
+        <span class="text-2xl group-hover:scale-110 transition-transform">👩‍🏫</span>
+        <div>
+          <div class="text-sm font-bold text-green-700">{% t "支援員として登録" "しえんいんとして とうろく" %}</div>
+          <div class="text-xs text-gray-500">{% t "児童の成長を記録・管理" "じどうの せいちょうを きろく・かんり" %}</div>
+        </div>
+        <span class="ml-auto text-gray-400">→</span>
+      </a>
+      <a href="/daycare/parent/signup/" class="flex items-center gap-3 p-3 bg-white rounded-xl hover:bg-blue-50 transition-colors no-underline group">
+        <span class="text-2xl group-hover:scale-110 transition-transform">👨‍👩‍👧</span>
+        <div>
+          <div class="text-sm font-bold text-blue-700">{% t "保護者として登録" "ほごしゃとして とうろく" %}</div>
+          <div class="text-xs text-gray-500">{% t "お子さんの成長を見守れます" "おこさんの せいちょうを みまもれます" %}</div>
+        </div>
+        <span class="ml-auto text-gray-400">→</span>
+      </a>
+    </div>
   </div>
 </div>
 
+<!-- ===== Section 3: 3 Features ===== -->
+<div class="card mb-8 fade-in-2">
+  <h2 class="text-lg font-black text-gray-700 text-center mb-6">✨ {% t "3つのサポート機能" "3つの さぽーときのう" %}</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+    <div class="text-center p-4 bg-green-50 rounded-2xl">
+      <div class="feature-icon bg-green-100">🔍</div>
+      <h3 class="font-black text-green-700 mb-1 text-base">{% t "特性診断" "とくせいしんだん" %}</h3>
+      <p class="text-xs text-gray-500">{% t "簡単な質問であなたに向いている仕事がわかります" "かんたんな しつもんで あなたに むいている しごとが わかります" %}</p>
+    </div>
+
+    <div class="text-center p-4 bg-blue-50 rounded-2xl">
+      <div class="feature-icon bg-blue-100">🗺️</div>
+      <h3 class="font-black text-blue-700 mb-1 text-base">{% t "成長ロードマップ" "せいちょう ろーどまっぷ" %}</h3>
+      <p class="text-xs text-gray-500">{% t "3ステップで仕事に向けてゆっくり進めます" "3すてっぷで しごとに むけて ゆっくり すすめます" %}</p>
+    </div>
+
+    <div class="text-center p-4 bg-purple-50 rounded-2xl">
+      <div class="feature-icon bg-purple-100">🤖</div>
+      <h3 class="font-black text-purple-700 mb-1 text-base">{% t "AIサポート" "AIさぽーと" %}</h3>
+      <p class="text-xs text-gray-500">{% t "いつでもAIに相談しながら記録できます" "いつでも AIに そうだんしながら きろくできます" %}</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== Section 5: CTA (未ログイン時のみ) ===== -->
 {% if not request.user.is_authenticated %}
-<div class="card bg-gradient-to-r from-green-500 to-green-600 text-white text-center fade-in" style="animation-delay:0.4s">
-  <h2 class="text-xl font-bold mb-3">📝 {% t "無料で　使えます！" "むりょうで　つかえます！" %}</h2>
+<div id="cta" class="card mb-8 fade-in-4" style="background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%); border: 2px solid #bbf7d0;">
+  <h2 class="text-xl font-black text-gray-700 text-center mb-2">📝 {% t "無料で始めよう！" "むりょうで はじめよう！" %}</h2>
+  <p class="text-sm text-gray-500 text-center mb-6">{% t "登録後すぐ診断を受けて、あなただけのプランを作ろう！" "とうろくご すぐ しんだんを うけて、あなただけの ぷらんを つくろう！" %}</p>
 
-  <!-- 登録後のフロー -->
-  <div class="flex items-center justify-center gap-1 flex-wrap mb-5 text-sm">
-    <div class="flex flex-col items-center">
-      <span class="bg-white text-green-700 font-bold px-3 py-1 rounded-full">① {% t "とうろく" "とうろく" %}</span>
-    </div>
-    <span class="text-green-200 text-lg">→</span>
-    <div class="flex flex-col items-center">
-      <span class="bg-white text-blue-700 font-bold px-3 py-1 rounded-full">② {% t "しんだん" "しんだん" %}</span>
-    </div>
-    <span class="text-green-200 text-lg">→</span>
-    <div class="flex flex-col items-center">
-      <span class="bg-white text-purple-700 font-bold px-3 py-1 rounded-full">③ {% t "あばたー" "あばたー" %}</span>
-    </div>
-    <span class="text-green-200 text-lg">→</span>
-    <div class="flex flex-col items-center">
-      <span class="bg-white text-orange-700 font-bold px-3 py-1 rounded-full">④ {% t "まいにち きろく" "まいにち きろく" %}</span>
-    </div>
+  <!-- フロー説明 -->
+  <div class="flex items-center justify-center gap-2 flex-wrap mb-6 text-sm">
+    <span class="bg-green-100 text-green-700 font-bold px-3 py-1 rounded-full">① {% t "とうろく" "とうろく" %}</span>
+    <span class="text-gray-400">→</span>
+    <span class="bg-blue-100 text-blue-700 font-bold px-3 py-1 rounded-full">② {% t "しんだん" "しんだん" %}</span>
+    <span class="text-gray-400">→</span>
+    <span class="bg-purple-100 text-purple-700 font-bold px-3 py-1 rounded-full">③ {% t "ろーどまっぷ" "ろーどまっぷ" %}</span>
+    <span class="text-gray-400">→</span>
+    <span class="bg-orange-100 text-orange-700 font-bold px-3 py-1 rounded-full">④ {% t "まいにちきろく" "まいにちきろく" %}</span>
   </div>
 
-  <p class="mb-5 text-green-100 text-sm">{% t "登録後すぐ診断を受けて、あなただけのアバターを作ろう！" "とうろくご すぐ しんだんを うけて、あなただけの あばたーを つくろう！" %}</p>
   <div class="flex flex-col sm:flex-row gap-3 justify-center">
-    <a href="/accounts/signup/" class="btn-main bg-white text-green-700 hover:bg-green-50">🌱 {% t "利用者登録" "りようしゃ とうろく" %}</a>
-    <a href="/accounts/signup/supporter/" class="btn-main bg-green-700 text-white hover:bg-green-800">👥 {% t "支援者登録" "しえんしゃ とうろく" %}</a>
+    <a href="/accounts/signup/"
+       class="cta-btn flex items-center justify-center gap-2 bg-green-500 text-white font-bold px-6 py-3 rounded-2xl text-base no-underline hover:bg-green-600">
+      🌱 {% t "利用者として始める" "りようしゃとして はじめる" %}
+    </a>
+    <a href="/daycare/staff/signup/"
+       class="cta-btn flex items-center justify-center gap-2 bg-blue-500 text-white font-bold px-6 py-3 rounded-2xl text-base no-underline hover:bg-blue-600">
+      👩‍🏫 {% t "支援員として登録" "しえんいんとして とうろく" %}
+    </a>
+    <a href="/daycare/parent/signup/"
+       class="cta-btn flex items-center justify-center gap-2 bg-purple-500 text-white font-bold px-6 py-3 rounded-2xl text-base no-underline hover:bg-purple-600">
+      👨‍👩‍👧 {% t "保護者として登録" "ほごしゃとして とうろく" %}
+    </a>
   </div>
 </div>
 {% endif %}
+
+<!-- ===== ログイン済み利用者向けクイックリンク ===== -->
+{% if request.user.is_authenticated and request.user.user_profile %}
+<div class="card mb-8 fade-in-2">
+  <h2 class="text-lg font-black text-gray-700 mb-4">⚡ {% t "クイックリンク" "くいっくりんく" %}</h2>
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <a href="/diagnosis/" class="text-center p-3 bg-green-50 rounded-xl hover:bg-green-100 transition-colors no-underline">
+      <div class="text-3xl mb-1">🔍</div>
+      <div class="text-xs font-bold text-green-700">{% t "診断" "しんだん" %}</div>
+    </a>
+    <a href="/roadmap/" class="text-center p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors no-underline">
+      <div class="text-3xl mb-1">🗺️</div>
+      <div class="text-xs font-bold text-blue-700">{% t "ロードマップ" "ろーどまっぷ" %}</div>
+    </a>
+    <a href="/daily/" class="text-center p-3 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors no-underline">
+      <div class="text-3xl mb-1">📒</div>
+      <div class="text-xs font-bold text-orange-700">{% t "日々の記録" "まいにちの きろく" %}</div>
+    </a>
+    <a href="/daily/chat/" class="text-center p-3 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors no-underline">
+      <div class="text-3xl mb-1">💬</div>
+      <div class="text-xs font-bold text-purple-700">{% t "AIチャット" "AIちゃっと" %}</div>
+    </a>
+  </div>
+</div>
+{% endif %}
+
+<!-- Plant cycle JS -->
+<script>
+(function() {
+  var plants = ['🌱', '🌿', '🌳'];
+  var i = 0;
+  var el = document.getElementById('plant-hero');
+  if (el) {
+    setInterval(function() {
+      i = (i + 1) % plants.length;
+      el.textContent = plants[i];
+    }, 2000);
+  }
+})();
+</script>
+
 {% endblock %}

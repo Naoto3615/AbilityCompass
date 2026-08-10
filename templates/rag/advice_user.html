@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load text_mode %}
+
+{% block title %}🤖 AIに相談する{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+
+  <!-- ヘッダー -->
+  <div class="text-center mb-6">
+    <div class="text-5xl mb-2">🤖</div>
+    <h1 class="text-2xl font-black text-gray-700 mb-1">
+      {% t "AIに相談する" "えーあいにそうだんする" %}
+    </h1>
+    <p class="text-gray-500 text-sm">
+      {% t "あなたの記録をもとに、AIがアドバイスします" "あなたのきろくをもとに、えーあいがあどばいすします" %}
+    </p>
+    {% if record_count > 0 %}
+    <p class="text-xs text-green-600 mt-1">
+      ✅ {% t "記録" "きろく" %} <strong>{{ record_count }}</strong> {% t "件をもとに分析します" "けんをもとにぶんせきします" %}
+    </p>
+    {% else %}
+    <p class="text-xs text-gray-400 mt-1">
+      📝 {% t "日常記録を増やすと、より詳しいアドバイスが受けられます" "にちじょうきろくをふやすと、よりくわしいあどばいすがうけられます" %}
+    </p>
+    {% endif %}
+  </div>
+
+  <!-- クイック質問ボタン -->
+  <div class="card mb-6">
+    <h2 class="text-base font-bold text-gray-600 mb-3">
+      💡 {% t "よくある質問（タップで入力）" "よくあるしつもん（たっぷでにゅうりょく）" %}
+    </h2>
+    <div class="grid grid-cols-2 gap-2">
+      <button type="button" onclick="setQuery('わたしに向いている仕事は何ですか？')"
+        class="text-sm bg-purple-100 text-purple-700 px-3 py-3 rounded-xl hover:bg-purple-200 font-bold transition-colors text-left leading-tight">
+        💼 {% t "向いている仕事は？" "むいているしごとは？" %}
+      </button>
+      <button type="button" onclick="setQuery('わたしの得意なことと苦手なことを教えてください。')"
+        class="text-sm bg-blue-100 text-blue-700 px-3 py-3 rounded-xl hover:bg-blue-200 font-bold transition-colors text-left leading-tight">
+        ⭐ {% t "得意・苦手を教えて" "とくい・にがてをおしえて" %}
+      </button>
+      <button type="button" onclick="setQuery('もっとうまくなるにはどうすればいいですか？')"
+        class="text-sm bg-green-100 text-green-700 px-3 py-3 rounded-xl hover:bg-green-200 font-bold transition-colors text-left leading-tight">
+        📈 {% t "もっとうまくなるには？" "もっとうまくなるには？" %}
+      </button>
+      <button type="button" onclick="setQuery('元気がないときはどうすればいいですか？')"
+        class="text-sm bg-yellow-100 text-yellow-700 px-3 py-3 rounded-xl hover:bg-yellow-200 font-bold transition-colors text-left leading-tight">
+        💛 {% t "元気がないときは？" "げんきがないときは？" %}
+      </button>
+      <button type="button" onclick="setQuery('将来の目標に向けて、今できることを教えてください。')"
+        class="text-sm bg-orange-100 text-orange-700 px-3 py-3 rounded-xl hover:bg-orange-200 font-bold transition-colors text-left leading-tight">
+        🌟 {% t "今日からできること" "きょうからできること" %}
+      </button>
+      <button type="button" onclick="setQuery('友達や周りの人とうまくコミュニケーションするコツを教えてください。')"
+        class="text-sm bg-pink-100 text-pink-700 px-3 py-3 rounded-xl hover:bg-pink-200 font-bold transition-colors text-left leading-tight">
+        🗣️ {% t "人とうまく話すには？" "ひととうまくはなすには？" %}
+      </button>
+    </div>
+  </div>
+
+  <!-- 質問フォーム -->
+  <div class="card mb-6">
+    <h2 class="text-lg font-bold text-gray-700 mb-3">
+      ✏️ {% t "AIに聞いてみよう" "えーあいにきいてみよう" %}
+    </h2>
+    <form method="post" id="advice-form">
+      {% csrf_token %}
+      <textarea
+        id="query-input"
+        name="query"
+        rows="3"
+        class="w-full border border-gray-300 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none mb-3 text-base"
+        placeholder="{% t '何でも聞いてね！例：わたしに向いている仕事は？' 'なんでもきいてね！れい：わたしにむいているしごとは？' %}"
+      >{{ query }}</textarea>
+      <button
+        type="submit"
+        id="submit-btn"
+        class="w-full bg-gradient-to-r from-purple-500 to-pink-400 text-white font-bold py-4 rounded-xl hover:from-purple-600 hover:to-pink-500 transition-all text-xl shadow-lg">
+        🤖 {% t "AIに聞く！" "えーあいにきく！" %}
+      </button>
+    </form>
+  </div>
+
+  <!-- AIアドバイス表示 -->
+  {% if advice_result %}
+  <div class="card mb-6 fade-in">
+    {% if advice_result.success %}
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-3xl">🤖</span>
+        <div>
+          <h2 class="text-lg font-bold text-gray-700">{% t "AIからのアドバイス" "えーあいからのあどばいす" %}</h2>
+          <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">GPT-4o-mini</span>
+        </div>
+      </div>
+      <div class="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4">
+        <p class="text-gray-800 leading-relaxed whitespace-pre-line text-base">{{ advice_result.advice }}</p>
+      </div>
+      {% if advice_result.record_count %}
+      <p class="text-xs text-gray-400 mt-3 text-right">
+        📊 {% t "過去" "かこ" %} {{ advice_result.record_count }} {% t "件の記録をもとに分析" "けんのきろくをもとにぶんせき" %}
+      </p>
+      {% endif %}
+
+    {% else %}
+      <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+        <p class="text-red-700 text-center">⚠️ {{ advice_result.advice }}</p>
+      </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- ナビゲーション -->
+  <div class="flex gap-3 mt-4">
+    <a href="{% url 'daily:record' %}"
+       class="flex-1 text-center bg-green-100 text-green-700 font-bold py-3 rounded-xl hover:bg-green-200 transition-colors">
+      📝 {% t "記録をつける" "きろくをつける" %}
+    </a>
+    <a href="{% url 'daily:dashboard' %}"
+       class="flex-1 text-center bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition-colors">
+      🏠 {% t "ホームに戻る" "ほーむにもどる" %}
+    </a>
+  </div>
+
+  <!-- 注意書き -->
+  <p class="text-xs text-gray-400 text-center mt-4">
+    ※ {% t "AIのアドバイスは参考情報です。詳しいことは支援員に相談してね。" "えーあいのあどばいすはさんこうじょうほうです。くわしいことはしえんいんにそうだんしてね。" %}
+  </p>
+
+</div>
+
+<script>
+function setQuery(text) {
+  document.getElementById('query-input').value = text;
+  document.getElementById('query-input').focus();
+  document.getElementById('query-input').scrollIntoView({ behavior: 'smooth' });
+}
+
+document.getElementById('advice-form').addEventListener('submit', function() {
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ AIが考えています...';
+});
+</script>
+{% endblock %}

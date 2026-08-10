@@ -4,6 +4,20 @@ from django.contrib.auth.models import User
 from .models import UserProfile, SupporterProfile
 
 
+USER_TYPE_CHOICES = [
+    ('adult', '就労を目指す大人'),
+    ('child', '児童'),
+]
+
+GRADE_CHOICES = [
+    ('', '選択してください'),
+    ('elementary_low', '小学生（低学年）'),
+    ('elementary_high', '小学生（高学年）'),
+    ('junior_high', '中学生'),
+    ('high_school', '高校生'),
+]
+
+
 class UserSignupForm(UserCreationForm):
     nickname = forms.CharField(
         label='ニックネーム',
@@ -12,6 +26,20 @@ class UserSignupForm(UserCreationForm):
             'placeholder': 'たとえば：たろう　ゆいちゃん',
             'class': 'w-full border-2 border-green-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-green-500',
         }),
+    )
+
+    user_type = forms.ChoiceField(
+        choices=USER_TYPE_CHOICES,
+        widget=forms.RadioSelect,
+        label='利用者の種別',
+        initial='adult',
+    )
+
+    grade = forms.ChoiceField(
+        choices=GRADE_CHOICES,
+        required=False,
+        label='学年区分',
+        widget=forms.Select(attrs={'class': 'form-input', 'id': 'id_grade'}),
     )
 
     class Meta:
@@ -65,12 +93,22 @@ class UserSignupForm(UserCreationForm):
                 'required': 'ぱすわーど（かくにん）を いれてください',
             })
 
+    def clean(self):
+        cleaned_data = super().clean()
+        user_type = cleaned_data.get('user_type')
+        grade = cleaned_data.get('grade')
+        if user_type == 'child' and not grade:
+            self.add_error('grade', '児童の場合は学年区分を選択してください。')
+        return cleaned_data
+
     def save(self, commit=True):
         user = super().save(commit=commit)
         if commit:
             UserProfile.objects.create(
                 user=user,
                 nickname=self.cleaned_data['nickname'],
+                user_type=self.cleaned_data.get('user_type', 'adult'),
+                grade=self.cleaned_data.get('grade', ''),
             )
         return user
 

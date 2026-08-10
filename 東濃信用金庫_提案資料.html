@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多治見モデル：AI×福祉×教育の挑戦 ｜ 東濃信用金庫様 ご提案資料</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background-color: #0f172a;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            margin: 0;
+            padding: 40px;
+            align-items: center;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: #f8fafc;
+        }
+        .slide {
+            background-color: #1e293b;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            width: 1024px;
+            height: 576px;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+        }
+        /* 東濃信用金庫スポンサー強調スライド用の青系アクセント */
+        .slide.sponsor-highlight::before {
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+        }
+        .slide.sponsor-highlight {
+            border: 1px solid rgba(59, 130, 246, 0.25);
+        }
+        h1 { font-family: 'Urbanist', sans-serif; font-size: 64px; color: #10b981; margin: 0; }
+        h2 { font-size: 36px; color: #f8fafc; margin: 0 0 20px 0; border-left: 6px solid #10b981; padding-left: 15px; }
+        h2.sponsor { border-left-color: #3b82f6; }
+        h3 { font-size: 24px; color: #10b981; margin: 0 0 15px 0; }
+        h3.sponsor { color: #60a5fa; }
+        p { font-size: 18px; line-height: 1.6; color: #cbd5e1; margin: 0 0 10px 0; }
+        ul { margin: 0; padding-left: 20px; }
+        li { font-size: 18px; line-height: 1.8; color: #cbd5e1; margin-bottom: 10px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; padding: 20px; text-align: center; }
+        .card.sponsor-card { border-color: rgba(59,130,246,0.25); background: rgba(59,130,246,0.04); }
+        .card i { font-size: 40px; color: #10b981; margin-bottom: 15px; }
+        .card.sponsor-card i { color: #60a5fa; }
+        .card h3 { font-size: 18px; margin: 0 0 10px 0; }
+        .card.sponsor-card h3 { color: #93c5fd; }
+        .card p { font-size: 15px; }
+        .highlight { font-size: 96px; font-weight: 700; color: #10b981; font-family: 'Urbanist', sans-serif; line-height: 1; }
+        .highlight.sponsor { color: #3b82f6; }
+        .badge { background: #10b981; color: #0f172a; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; display: inline-block; margin-bottom: 15px; }
+        .badge.sponsor-badge { background: #3b82f6; color: #fff; }
+        .sub-label { font-size: 16px; color: #94a3b8; margin-top: 8px; }
+        .arrow-down { font-size: 28px; color: #10b981; text-align: center; margin: 8px 0; }
+        .panel { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px 24px; }
+        .panel.before { border-color: rgba(239,68,68,0.3); }
+        .panel.after { border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.04); }
+        .panel-label { font-size: 13px; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 8px; }
+        .panel-label.before { color: #f87171; }
+        .panel-label.after { color: #10b981; }
+        .contact-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 20px 30px; display: flex; flex-direction: column; gap: 6px; }
+        .slide-number { position: absolute; bottom: 20px; right: 30px; font-size: 13px; color: #475569; font-family: 'Urbanist', sans-serif; }
+        .big-quote { font-size: 28px; color: #f8fafc; line-height: 1.6; font-weight: 700; margin: 0 0 24px 0; }
+        .divider { width: 100%; height: 1px; background: rgba(255,255,255,0.08); margin: 16px 0; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== スライド1: 表紙 ===== -->
+    <div class="slide" style="text-align: center;">
+        <span class="badge" style="background:#3b82f6; color:white;">東濃信用金庫様 ご提案資料</span>
+        <h1>AI × 福祉 × 教育</h1>
+        <p style="font-size: 24px; color: #94a3b8; margin-top: 15px;">多治見から始まる、地域共生社会のイノベーション</p>
+        <p style="margin-top: 60px; color: #10b981; font-weight: bold; font-size: 20px;">特定非営利活動法人 思いやりの糸 / HIローズ</p>
+    </div>
+
+    <!-- ===== スライド2: 開発の背景とビジョン ===== -->
+    <div class="slide">
+        <h2>開発の背景とビジョン</h2>
+        <div class="grid-2" style="align-items: center;">
+            <div>
+                <h3>「愛」と「現場」から生まれた技術</h3>
+                <p>既存のシステムにはない、障がいを持つ当事者の家族（お父さんエンジニア）が開発するからこそ到達できる、究極の使いやすさと自立支援を目指します。</p>
+                <p>7月〜9月の3ヶ月間、失業保険を活用しながらフルコミットし、娘のため、そして地域のために命がけで形にします。</p>
+            </div>
+            <div style="text-align: center;">
+                <div class="highlight">60%</div>
+                <p style="font-size: 20px; color: #10b981; font-weight: bold;">コアプログラム完成済み</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== スライド3: 目的・対象に応じたAIプログラムの区分分け ===== -->
+    <div class="slide">
+        <h2>目的・対象に応じたAIプログラムの区分分け</h2>
+        <div class="grid-4" style="margin-top: 20px;">
+            <div class="card">
+                <i class="fa-solid fa-user-heart"></i>
+                <h3 style="font-size: 18px;">①本人・家族</h3>
+                <p style="font-size: 14px;">QOLの向上と<br>将来への安心</p>
+            </div>
+            <div class="card">
+                <i class="fa-solid fa-hospital-user"></i>
+                <h3 style="font-size: 18px;">②福祉事業所</h3>
+                <p style="font-size: 14px;">現場DXによる<br>支援の質向上</p>
+            </div>
+            <div class="card">
+                <i class="fa-solid fa-child-reaching"></i>
+                <h3 style="font-size: 18px;">③児童・保護者</h3>
+                <p style="font-size: 14px;">遊びを通じた<br>早期の自己成長</p>
+            </div>
+            <div class="card">
+                <i class="fa-solid fa-landmark"></i>
+                <h3 style="font-size: 18px;">④教育・行政</h3>
+                <p style="font-size: 14px;">地域モデル確立と<br>政策的な連携</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== スライド4: 区分①大人向け ===== -->
+    <div class="slide">
+        <span class="badge">区分① 大人向け</span>
+        <h2>障がい者本人・ご家族向けプログラム</h2>
+        <h3>「我慢する毎日から、自分で未来を選ぶ毎日へ」</h3>
+        <ul>
+            <li><strong>自律的な学習支援：</strong> AIがその日の体調や気分を察知し、最適な「自己トレーニングメニュー」を提案。成功体験を積み重ね、自信を育みます。</li>
+            <li><strong>家族の不安を安心に：</strong> 本人の「できた！」をリアルタイムに視覚化。「親がいなくなってもこの子は大丈夫」と思える未来のお守りに。</li>
+        </ul>
+    </div>
+
+    <!-- ===== スライド5: 区分②福祉事業所向け ===== -->
+    <div class="slide">
+        <span class="badge">区分② 福祉事業所向け</span>
+        <h2>福祉事業所・職員向けプログラム</h2>
+        <h3>「事務作業をゼロにして、100%の愛を子どもたちへ」</h3>
+        <ul>
+            <li><strong>現場の書類仕事を自動化：</strong> 音声入力や日々のデータから、AIがプロ仕様の支援記録や報告書を秒速で自動作成。残業を大幅削減。</li>
+            <li><strong>データ駆動型の支援：</strong> 経験則だけに頼らず、AIによる客観的な行動データ分析に基づいた、より質の高い個別支援計画の策定をサポート。</li>
+        </ul>
+    </div>
+
+    <!-- ===== スライド6: 東濃信用金庫様へのご提案 ===== -->
+    <div class="slide">
+        <span class="badge" style="background:#3b82f6; color:white;">東濃信用金庫様へのご提案</span>
+        <h2 style="border-left-color: #3b82f6;">地域の未来を、一緒に作りませんか</h2>
+        <div class="grid-2" style="align-items: center;">
+            <div>
+                <h3 style="color: #3b82f6;">スポンサーとしてご参画いただくと</h3>
+                <ul>
+                    <li>Readyforクラウドファンディングの<strong>手数料（通常8%）が無料</strong>に</li>
+                    <li>300万円の目標なら → <strong>約24万円のコスト削減</strong></li>
+                    <li>多治見発・地域貢献の先進事例として信金の名前を全国に発信</li>
+                    <li>地元企業・住民・福祉事業所との信頼関係構築</li>
+                </ul>
+            </div>
+            <div style="text-align: center;">
+                <div class="highlight" style="color: #3b82f6;">¥240,000</div>
+                <p style="font-size: 20px; color: #3b82f6; font-weight: bold;">削減できる手数料</p>
+                <p style="font-size: 14px; color: #94a3b8;">目標300万円達成時の試算</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== スライド7: スポンサー参画のメリット ===== -->
+    <div class="slide">
+        <span class="badge" style="background:#3b82f6; color:white;">東濃信用金庫様限定</span>
+        <h2 style="border-left-color: #3b82f6;">スポンサー参画のメリット</h2>
+        <div class="grid-4" style="margin-top: 20px;">
+            <div class="card" style="border-color: rgba(59,130,246,0.3);">
+                <i class="fa-solid fa-trophy" style="color: #3b82f6;"></i>
+                <h3 style="font-size: 16px; color: #3b82f6;">ブランド価値</h3>
+                <p style="font-size: 13px;">地域福祉DXのパイオニアとしてメディア・SNSで発信</p>
+            </div>
+            <div class="card" style="border-color: rgba(59,130,246,0.3);">
+                <i class="fa-solid fa-handshake" style="color: #3b82f6;"></i>
+                <h3 style="font-size: 16px; color: #3b82f6;">地域連携</h3>
+                <p style="font-size: 13px;">福祉事業所・保護者・行政とのネットワーク強化</p>
+            </div>
+            <div class="card" style="border-color: rgba(59,130,246,0.3);">
+                <i class="fa-solid fa-bullhorn" style="color: #3b82f6;"></i>
+                <h3 style="font-size: 16px; color: #3b82f6;">PR効果</h3>
+                <p style="font-size: 13px;">アプリ内・クラファンページ・広報資料への信金名掲載</p>
+            </div>
+            <div class="card" style="border-color: rgba(59,130,246,0.3);">
+                <i class="fa-solid fa-seedling" style="color: #3b82f6;"></i>
+                <h3 style="font-size: 16px; color: #3b82f6;">社会貢献</h3>
+                <p style="font-size: 13px;">軽度知的障害者の就労支援というESG・CSRへの貢献</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== スライド8: Readyforパートナーシップ ===== -->
+    <div class="slide">
+        <span class="badge" style="background:#3b82f6; color:white;">制度のご説明</span>
+        <h2 style="border-left-color: #3b82f6;">Readyfor × 信用金庫パートナープログラム</h2>
+        <div class="grid-2" style="margin-top: 20px;">
+            <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 25px;">
+                <h3 style="color: #ef4444;">通常のクラウドファンディング</h3>
+                <p>手数料：目標金額の <strong style="color: #ef4444; font-size: 24px;">8%</strong></p>
+                <p>→ 300万円達成で <strong style="color: #ef4444;">約24万円</strong></p>
+                <p style="color: #94a3b8; font-size: 14px;">支援者から集まったお金の一部が手数料に</p>
+            </div>
+            <div style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); border-radius: 12px; padding: 25px;">
+                <h3 style="color: #3b82f6;">信用金庫パートナー参画後</h3>
+                <p>手数料：<strong style="color: #3b82f6; font-size: 24px;">0円（無料）</strong></p>
+                <p>→ 支援者から集まった <strong style="color: #3b82f6;">全額</strong> がプロジェクトに</p>
+                <p style="color: #94a3b8; font-size: 14px;">東濃信用金庫様が地域のCF支援信金として認知されます</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== スライド9: 締めくくり ===== -->
+    <div class="slide" style="text-align: center;">
+        <h2 style="border-left: none; text-align: center;">「共犯者」になってくれませんか？</h2>
+        <p style="font-size: 22px; color: #cbd5e1; margin-bottom: 20px;">一人の父の愛が、何万人の「自立」を支えるインフラに変わる。</p>
+        <p style="font-size: 18px; color: #10b981; margin-bottom: 30px;">まず一度、お話しを聞いていただけますか。<br>多治見の子どもたちと、はたらく大人のために。</p>
+        <div style="background: rgba(16, 185, 129, 0.1); padding: 25px; border-radius: 12px; display: inline-block; text-align: left;">
+            <p style="margin: 0; font-weight: bold; color: #f8fafc;">特定非営利活動法人 思いやりの糸 / HIローズ</p>
+            <p style="margin: 5px 0 0 0; color: #10b981;">代表 廣瀬 豊</p>
+        </div>
+    </div>
+
+
+</body>
+</html>
