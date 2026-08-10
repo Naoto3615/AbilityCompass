@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "保護者を紐付ける" "ほごしゃを ひもづける" %}{% endblock %}
+{% block content %}
+<div class="card max-w-lg mx-auto">
+  <h1 class="text-xl font-bold text-gray-700 mb-1">
+    {% t "保護者を紐付ける" "ほごしゃを ひもづける" %}
+  </h1>
+  <p class="text-sm text-gray-500 mb-6">
+    {{ child.nickname }} {% t "さんの担当保護者を追加します" "さんの たんとう ほごしゃを ついかします" %}
+  </p>
+
+  {% if available_parents %}
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- 検索ボックス -->
+    <div class="mb-4">
+      <label class="block text-sm font-bold text-gray-600 mb-1">
+        🔍 {% t "保護者を検索" "ほごしゃを けんさく" %}
+      </label>
+      <input type="text" id="search-input"
+             placeholder="{% t 'ユーザー名で検索...' 'ゆーざーめいで けんさく...' %}"
+             class="w-full border border-gray-300 rounded-xl px-4 py-2 text-base focus:outline-none focus:border-green-400"
+             autocomplete="off">
+    </div>
+
+    <!-- プルダウン -->
+    <div class="mb-4">
+      <label class="block text-sm font-bold text-gray-600 mb-1">
+        {% t "保護者を選択" "ほごしゃを せんたく" %}
+      </label>
+      <select name="parent_id" id="parent-select"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-green-400 bg-white"
+              size="6">
+        <option value="">-- {% t "選択してください" "せんたくしてください" %} --</option>
+        {% for parent in available_parents %}
+        <option value="{{ parent.id }}" data-name="{{ parent.user.username }}">
+          {{ parent.user.username }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- 選択プレビュー -->
+    <div id="selected-preview" class="mb-4 p-3 bg-green-50 rounded-xl border border-green-200 hidden">
+      <p class="text-sm text-green-700 font-bold">
+        ✅ {% t "選択中：" "せんたくちゅう：" %}<span id="selected-name"></span>
+      </p>
+    </div>
+
+    <div class="flex gap-3">
+      <button type="submit"
+              class="flex-1 bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-600 transition-colors">
+        {% t "この保護者を紐付ける" "この ほごしゃを ひもづける" %}
+      </button>
+      <a href="{% url 'daycare:child_detail' child.id %}"
+         class="flex-1 text-center bg-gray-100 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-200 transition-colors no-underline">
+        {% t "キャンセル" "きゃんせる" %}
+      </a>
+    </div>
+  </form>
+
+  <script>
+    const searchInput = document.getElementById('search-input');
+    const select = document.getElementById('parent-select');
+    const preview = document.getElementById('selected-preview');
+    const selectedName = document.getElementById('selected-name');
+    const options = Array.from(select.options);
+
+    // 検索フィルタ
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.toLowerCase();
+      options.forEach(opt => {
+        if (!opt.value) return;
+        const name = (opt.dataset.name || '').toLowerCase();
+        opt.style.display = name.includes(q) ? '' : 'none';
+      });
+    });
+
+    // 選択プレビュー
+    select.addEventListener('change', () => {
+      const opt = select.options[select.selectedIndex];
+      if (opt.value) {
+        selectedName.textContent = opt.dataset.name || opt.text;
+        preview.classList.remove('hidden');
+      } else {
+        preview.classList.add('hidden');
+      }
+    });
+  </script>
+
+  {% else %}
+  <div class="text-center py-8">
+    <div class="text-5xl mb-3">👤</div>
+    <p class="text-gray-500 mb-4">
+      {% t "紐付け可能な保護者がいません。" "ひもづけ かのうな ほごしゃが いません。" %}<br>
+      {% t "先に保護者アカウントを作成してください。" "さきに ほごしゃあかうんとを さくせいしてください。" %}
+    </p>
+    <a href="/daycare/parent/signup/" class="btn-main bg-blue-500 text-white hover:bg-blue-600">
+      {% t "保護者アカウントを作成" "ほごしゃあかうんとを さくせい" %}
+    </a>
+  </div>
+  {% endif %}
+
+  <div class="mt-4 text-center">
+    <a href="{% url 'daycare:child_detail' child.id %}" class="text-sm text-gray-400 hover:text-gray-600 no-underline">
+      ← {% t "児童詳細に戻る" "じどうしょうさいに もどる" %}
+    </a>
+  </div>
+</div>
+{% endblock %}

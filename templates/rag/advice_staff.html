@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load text_mode %}
+
+{% block title %}🤖 AI個別アドバイス — {{ child.nickname }}{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+
+  <!-- ヘッダー -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <a href="{% url 'daycare:child_detail' child.id %}" class="text-sm text-gray-400 hover:text-gray-600">← {{ child.nickname }} の詳細に戻る</a>
+      <h1 class="text-2xl font-bold text-gray-800 mt-1">🤖 AI個別アドバイス</h1>
+      <p class="text-gray-500 text-sm mt-1">対象: <strong>{{ child.nickname }}</strong></p>
+    </div>
+    <!-- 埋め込み状況 -->
+    <div class="text-right text-sm">
+      <p class="text-gray-500">支援記録: <span class="font-bold text-gray-700">{{ total_records }}</span> 件</p>
+      <p class="text-gray-500">AI学習済: <span class="font-bold {% if embedded_records > 0 %}text-green-600{% else %}text-red-500{% endif %}">{{ embedded_records }}</span> 件</p>
+      {% if total_records > 0 %}
+      <button
+        id="embed-btn"
+        onclick="embedRecords()"
+        class="mt-1 text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 font-bold transition-colors">
+        🔄 支援記録をAIに学習させる
+      </button>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- クイック質問ボタン -->
+  <div class="card mb-6">
+    <h2 class="text-base font-bold text-gray-600 mb-3">💡 よくある質問（クリックで入力）</h2>
+    <div class="flex flex-wrap gap-2">
+      <button type="button" onclick="setQuery('この児童に向いている職業は何ですか？')" class="text-sm bg-purple-100 text-purple-700 px-3 py-2 rounded-lg hover:bg-purple-200 font-bold transition-colors">💼 向いている職業</button>
+      <button type="button" onclick="setQuery('コミュニケーション面の課題と改善策を教えてください。')" class="text-sm bg-blue-100 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-200 font-bold transition-colors">🗣️ コミュニケーション</button>
+      <button type="button" onclick="setQuery('集中力を高めるための支援方法を教えてください。')" class="text-sm bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 font-bold transition-colors">🎯 集中力向上</button>
+      <button type="button" onclick="setQuery('日常生活スキルの支援ポイントを教えてください。')" class="text-sm bg-yellow-100 text-yellow-700 px-3 py-2 rounded-lg hover:bg-yellow-200 font-bold transition-colors">🏠 生活スキル</button>
+      <button type="button" onclick="setQuery('最近の成長・強みについて分析してください。')" class="text-sm bg-orange-100 text-orange-700 px-3 py-2 rounded-lg hover:bg-orange-200 font-bold transition-colors">📈 成長・強み分析</button>
+      <button type="button" onclick="setQuery('保護者への報告で伝えるべきポイントは何ですか？')" class="text-sm bg-pink-100 text-pink-700 px-3 py-2 rounded-lg hover:bg-pink-200 font-bold transition-colors">👨‍👩‍👧 保護者報告</button>
+    </div>
+  </div>
+
+  <!-- 質問フォーム -->
+  <div class="card mb-6">
+    <h2 class="text-lg font-bold text-gray-700 mb-3">✏️ AIに質問する</h2>
+    <form method="post" id="advice-form">
+      {% csrf_token %}
+      <textarea
+        id="query-input"
+        name="query"
+        rows="3"
+        class="w-full border border-gray-300 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none mb-3"
+        placeholder="例: この児童に向いている職業は？ / コミュニケーション面の課題と対策は？"
+      >{{ query }}</textarea>
+      <button
+        type="submit"
+        id="submit-btn"
+        class="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold py-3 rounded-xl hover:from-purple-600 hover:to-blue-600 transition-all text-lg shadow">
+        🤖 AIアドバイスを生成する
+      </button>
+    </form>
+  </div>
+
+  <!-- AIアドバイス表示 -->
+  {% if advice_result %}
+  <div class="card mb-6 fade-in">
+    {% if advice_result.success %}
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-2xl">🤖</span>
+        <h2 class="text-lg font-bold text-gray-700">AIアドバイス</h2>
+        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">GPT-4o-mini</span>
+      </div>
+      <div class="bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-4 mb-4">
+        <p class="text-gray-800 leading-relaxed whitespace-pre-line">{{ advice_result.advice }}</p>
+      </div>
+
+      {% if advice_result.sources %}
+      <div class="mt-4">
+        <p class="text-xs font-bold text-gray-500 mb-2">📋 参照した支援記録:</p>
+        <div class="flex flex-wrap gap-2">
+          {% for source in advice_result.sources %}
+          <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-lg">
+            📅 {{ source.date }} — {{ source.summary }}…
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    {% else %}
+      <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+        <p class="text-red-700">⚠️ {{ advice_result.advice }}</p>
+      </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- 注意事項 -->
+  <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-800">
+    <p class="font-bold mb-1">⚠️ ご注意</p>
+    <ul class="list-disc pl-4 space-y-1">
+      <li>AIアドバイスは支援記録を参考にした提案です。専門家の判断を優先してください。</li>
+      <li>「AIに学習させる」ボタンを押すと、支援記録がOpenAIに送信されます。</li>
+      <li>最新記録を追加した後は、再度「学習させる」ボタンを押してください。</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+function setQuery(text) {
+  document.getElementById('query-input').value = text;
+  document.getElementById('query-input').focus();
+}
+
+function embedRecords() {
+  const btn = document.getElementById('embed-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 学習中...';
+
+  fetch("{% url 'rag:embed_records' child.id %}", {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': '{{ csrf_token }}',
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(res => res.json())
+  .then(data => {
+    btn.textContent = `✅ ${data.success}件 学習完了！`;
+    btn.classList.remove('bg-blue-100', 'text-blue-700');
+    btn.classList.add('bg-green-100', 'text-green-700');
+    setTimeout(() => location.reload(), 1500);
+  })
+  .catch(() => {
+    btn.textContent = '❌ エラーが発生しました';
+    btn.disabled = false;
+  });
+}
+
+// フォーム送信中のローディング表示
+document.getElementById('advice-form').addEventListener('submit', function() {
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ AIが分析中です...';
+});
+</script>
+{% endblock %}

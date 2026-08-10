@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% load text_mode %}
+
+{% block title %}{% t "発達グラフ" "はったつぐらふ" %} — {{ child.nickname }}{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+
+  {% if is_staff %}
+    <div class="role-badge staff">🏫 {% t "支援員メニュー" "しえんいんめにゅー" %}</div>
+  {% elif is_parent %}
+    <div class="role-badge parent">👨‍👩‍👧 {% t "保護者メニュー" "ほごしゃめにゅー" %}</div>
+  {% endif %}
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      {% if is_staff %}
+        <a href="{% url 'daycare:child_detail' child.id %}" class="text-sm text-gray-400 hover:text-gray-600">← {% t "詳細に戻る" "しょうさいにもどる" %}</a>
+      {% else %}
+        <a href="{% url 'daycare:parent_dashboard' %}" class="text-sm text-gray-400 hover:text-gray-600">← {% t "ダッシュボードに戻る" "だっしゅぼーどにもどる" %}</a>
+      {% endif %}
+      <h1 class="text-2xl font-bold text-gray-800 mt-1">📈 {{ child.nickname }}{% t "さんの発達グラフ" "さんのはったつぐらふ" %}</h1>
+    </div>
+    {% if is_staff %}
+      <a href="{% url 'daycare:score_add' child.id %}" class="btn-main btn-green" style="min-height:2.5rem; padding:0.5rem 1.25rem; font-size:1rem;">
+        ＋ {% t "スコアを記録" "すこあをきろく" %}
+      </a>
+    {% endif %}
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 p-3 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- 指標の説明 -->
+  <div class="card mb-6 bg-gray-50">
+    <h2 class="text-sm font-bold text-gray-600 mb-3">📖 {% t "各指標について" "かくしひょうについて" %}</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600">
+      <div class="flex items-start gap-2">
+        <span class="text-green-600 font-bold">🧠 {% t "集中力" "しゅうちゅうりょく" %}</span>
+        <span>{% t "課題に取り組む集中の程度" "かだいにとりくむしゅうちゅうのていど" %}</span>
+      </div>
+      <div class="flex items-start gap-2">
+        <span class="text-blue-600 font-bold">💬 {% t "コミュニケーション" "こみゅにけーしょん" %}</span>
+        <span>{% t "言葉・表情での意思疎通の程度" "ことば・ひょうじょうでのいしそつうのていど" %}</span>
+      </div>
+      <div class="flex items-start gap-2">
+        <span class="text-yellow-600 font-bold">🏠 {% t "生活習慣" "せいかつしゅうかん" %}</span>
+        <span>{% t "身の回りのことを自分でできる程度" "みのまわりのことをじぶんでできるていど" %}</span>
+      </div>
+      <div class="flex items-start gap-2">
+        <span class="text-purple-600 font-bold">🤝 {% t "社会性" "しゃかいせい" %}</span>
+        <span>{% t "友達・支援員とのかかわりの程度" "ともだち・しえんいんとのかかわりのていど" %}</span>
+      </div>
+      <div class="flex items-start gap-2">
+        <span class="text-red-600 font-bold">🏃 {% t "運動・身体" "うんどう・からだ" %}</span>
+        <span>{% t "体を使った活動への参加の程度" "からだをつかったかつどうへのさんかのていど" %}</span>
+      </div>
+    </div>
+  </div>
+
+  {% if latest %}
+    <!-- 最新スコアサマリー -->
+    <div class="card mb-6">
+      <h2 class="text-lg font-bold text-gray-700 mb-4">🎯 {% t "最新スコア" "さいしんすこあ" %}（{{ latest.date }}）</h2>
+      <div class="grid grid-cols-5 gap-3 text-center mb-4">
+        <div class="bg-green-50 rounded-xl p-3">
+          <div class="text-2xl font-bold text-green-600">{{ latest.focus }}</div>
+          <div class="text-xs text-gray-500 mt-1">🧠 {% t "集中力" "しゅうちゅうりょく" %}</div>
+        </div>
+        <div class="bg-blue-50 rounded-xl p-3">
+          <div class="text-2xl font-bold text-blue-600">{{ latest.communication }}</div>
+          <div class="text-xs text-gray-500 mt-1">💬 {% t "コミュニ" "こみゅに" %}</div>
+        </div>
+        <div class="bg-yellow-50 rounded-xl p-3">
+          <div class="text-2xl font-bold text-yellow-600">{{ latest.daily_living }}</div>
+          <div class="text-xs text-gray-500 mt-1">🏠 {% t "生活習慣" "せいかつ" %}</div>
+        </div>
+        <div class="bg-purple-50 rounded-xl p-3">
+          <div class="text-2xl font-bold text-purple-600">{{ latest.social }}</div>
+          <div class="text-xs text-gray-500 mt-1">🤝 {% t "社会性" "しゃかいせい" %}</div>
+        </div>
+        <div class="bg-red-50 rounded-xl p-3">
+          <div class="text-2xl font-bold text-red-600">{{ latest.motor }}</div>
+          <div class="text-xs text-gray-500 mt-1">🏃 {% t "運動" "うんどう" %}</div>
+        </div>
+      </div>
+      {% if latest.memo %}
+        <p class="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">📝 {{ latest.memo }}</p>
+      {% endif %}
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+      <!-- 折れ線グラフ -->
+      <div class="card">
+        <h2 class="text-lg font-bold text-gray-700 mb-4">📉 {% t "時系列グラフ" "じけいれつぐらふ" %}</h2>
+        <canvas id="lineChart" height="250"></canvas>
+      </div>
+
+      <!-- レーダーチャート -->
+      <div class="card flex flex-col items-center">
+        <h2 class="text-lg font-bold text-gray-700 mb-4">🕸 {% t "現在のバランス" "げんざいのばらんす" %}</h2>
+        <canvas id="radarChart" style="max-width:280px;"></canvas>
+      </div>
+    </div>
+
+    <!-- 記録一覧 -->
+    <div class="card">
+      <h2 class="text-lg font-bold text-gray-700 mb-4">📋 {% t "記録一覧" "きろくいちらん" %}</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-center">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="py-2 px-3 text-left text-gray-600">{% t "日付" "ひづけ" %}</th>
+              <th class="py-2 px-3 text-green-600">🧠 {% t "集中" "しゅうちゅう" %}</th>
+              <th class="py-2 px-3 text-blue-600">💬 {% t "コミュニ" "こみゅに" %}</th>
+              <th class="py-2 px-3 text-yellow-600">🏠 {% t "生活" "せいかつ" %}</th>
+              <th class="py-2 px-3 text-purple-600">🤝 {% t "社会性" "しゃかいせい" %}</th>
+              <th class="py-2 px-3 text-red-600">🏃 {% t "運動" "うんどう" %}</th>
+              <th class="py-2 px-3 text-left text-gray-600">{% t "メモ" "めも" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for score in scores %}
+              <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <td class="py-2 px-3 text-left text-gray-700 font-medium">{{ score.date }}</td>
+                <td class="py-2 px-3 font-bold text-green-600">{{ score.focus }}</td>
+                <td class="py-2 px-3 font-bold text-blue-600">{{ score.communication }}</td>
+                <td class="py-2 px-3 font-bold text-yellow-600">{{ score.daily_living }}</td>
+                <td class="py-2 px-3 font-bold text-purple-600">{{ score.social }}</td>
+                <td class="py-2 px-3 font-bold text-red-600">{{ score.motor }}</td>
+                <td class="py-2 px-3 text-left text-gray-500 text-xs">{{ score.memo|truncatechars:30 }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  {% else %}
+    <div class="card text-center py-16 text-gray-400">
+      <p class="text-5xl mb-4">📊</p>
+      <p class="text-lg font-bold mb-2">{% t "まだ記録がありません" "まだきろくがありません" %}</p>
+      <p class="text-sm">{% t "発達スコアを記録すると、グラフで成長が確認できます。" "はったつすこあをきろくすると、ぐらふでせいちょうがかくにんできます。" %}</p>
+      {% if is_staff %}
+        <a href="{% url 'daycare:score_add' child.id %}" class="btn-main btn-green mt-6 inline-block">
+          ＋ {% t "最初のスコアを記録する" "さいしょのすこあをきろくする" %}
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const chartData = {{ chart_data_json|safe }};
+const radarData = {{ radar_data_json|safe }};
+
+if (chartData.labels.length > 0) {
+  const lineCtx = document.getElementById('lineChart').getContext('2d');
+  new Chart(lineCtx, {
+    type: 'line',
+    data: chartData,
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } }
+      },
+      scales: {
+        y: { min: 1, max: 5, ticks: { stepSize: 1 } }
+      }
+    }
+  });
+}
+
+if (radarData) {
+  const radarCtx = document.getElementById('radarChart').getContext('2d');
+  new Chart(radarCtx, {
+    type: 'radar',
+    data: {
+      labels: radarData.labels,
+      datasets: [{
+        label: '現在のスコア',
+        data: radarData.data,
+        backgroundColor: 'rgba(16,185,129,0.2)',
+        borderColor: '#10b981',
+        pointBackgroundColor: '#10b981',
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          min: 0, max: 5,
+          ticks: { stepSize: 1, font: { size: 10 } },
+          pointLabels: { font: { size: 12 } }
+        }
+      }
+    }
+  });
+}
+</script>
+{% endblock %}

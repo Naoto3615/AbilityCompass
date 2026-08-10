@@ -9,6 +9,32 @@ DISABILITY_LEVEL_CHOICES = [
     ('other', 'その他'),
 ]
 
+USER_TYPE_CHOICES = [
+    ('adult', '就労を目指す大人'),
+    ('child', '児童'),
+]
+
+GRADE_CHOICES = [
+    ('', '---'),
+    ('elementary_low', '小学生（低学年）'),
+    ('elementary_high', '小学生（高学年）'),
+    ('junior_high', '中学生'),
+    ('high_school', '高校生'),
+]
+
+DESIRED_CAREER_CHOICES = [
+    ('', '未選択'),
+    ('doctor', '医師・看護師'),
+    ('teacher', '先生・保育士'),
+    ('engineer', 'エンジニア・プログラマー'),
+    ('artist', '絵・デザイン・音楽'),
+    ('sports', 'スポーツ選手'),
+    ('chef', '料理人・パティシエ'),
+    ('police', '警察官・消防士'),
+    ('vet', '獣医・動物関係'),
+    ('other', 'まだ決まっていない'),
+]
+
 
 DEFAULT_AVATAR_CONFIG = {
     "skin": "light",
@@ -33,6 +59,26 @@ class UserProfile(models.Model):
     supporter = models.ForeignKey(
         'SupporterProfile', on_delete=models.SET_NULL,
         null=True, blank=True, related_name='supported_users'
+    )
+    user_type = models.CharField(
+        max_length=10,
+        choices=USER_TYPE_CHOICES,
+        default='adult',
+        verbose_name='利用者種別'
+    )
+    grade = models.CharField(
+        max_length=20,
+        choices=GRADE_CHOICES,
+        blank=True,
+        default='',
+        verbose_name='学年区分'
+    )
+    desired_career = models.CharField(
+        max_length=20,
+        choices=DESIRED_CAREER_CHOICES,
+        blank=True,
+        default='',
+        verbose_name='なりたい職業'
     )
     created_at = models.DateTimeField(auto_now_add=True)
 

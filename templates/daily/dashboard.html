@@ -103,4 +103,13 @@
     <div class="text-xs text-gray-500">{% t "ステップを見る" "ステップを みる" %}</div>
   </a>
 </div>
+
+<!-- AIアドバイスカード -->
+<a href="{% url 'rag:advice_user' %}" class="block mt-4 fade-in" style="animation-delay:0.4s">
+  <div class="bg-gradient-to-r from-purple-500 to-pink-400 text-white rounded-2xl p-5 text-center shadow-lg hover:from-purple-600 hover:to-pink-500 transition-all">
+    <div class="text-4xl mb-2">🤖</div>
+    <div class="font-bold text-xl mb-1">{% t "AIに相談する" "えーあいにそうだんする" %}</div>
+    <div class="text-sm opacity-90">{% t "あなたの記録をもとにアドバイスをもらおう！" "あなたのきろくをもとにあどばいすをもらおう！" %}</div>
+  </div>
+</a>
 {% endblock %}

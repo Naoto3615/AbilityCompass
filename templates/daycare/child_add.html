@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "担当児童を追加" "たんとうじどうをついか" %}{% endblock %}
+{% block content %}
+<div class="card max-w-lg mx-auto">
+  <div class="flex items-center gap-3 mb-6">
+    <span class="text-4xl">👶</span>
+    <div>
+      <h1 class="text-xl font-bold text-gray-700">{% t "担当児童を追加" "たんとうじどうをついか" %}</h1>
+      <p class="text-sm text-gray-500">{% t "担当する児童を選んでください" "たんとうする じどうを えらんでください" %}</p>
+    </div>
+  </div>
+
+  {% if messages %}
+  <div class="mb-4">
+    {% for message in messages %}
+    <div class="p-3 rounded-xl mb-2
+      {% if message.tags == 'success' %}bg-green-50 text-green-700 border border-green-200
+      {% elif message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
+      {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if available_children %}
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- 検索ボックス -->
+    <div class="mb-4">
+      <label class="block text-sm font-bold text-gray-600 mb-1">
+        🔍 {% t "児童を検索" "じどうを けんさく" %}
+      </label>
+      <input type="text" id="search-input"
+             placeholder="{% t 'ニックネームで検索...' 'にっくねーむで けんさく...' %}"
+             class="w-full border border-gray-300 rounded-xl px-4 py-2 text-base focus:outline-none focus:border-green-400"
+             autocomplete="off">
+    </div>
+
+    <!-- リストボックス -->
+    <div class="mb-4">
+      <label class="block text-sm font-bold text-gray-600 mb-1">
+        {% t "児童を選択" "じどうを せんたく" %}
+      </label>
+      <select name="child_id" id="child-select"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-green-400 bg-white"
+              size="7">
+        <option value="">-- {% t "選択してください" "せんたくしてください" %} --</option>
+        {% for child in available_children %}
+        <option value="{{ child.id }}" data-name="{{ child.nickname }}">
+          {{ child.nickname }}{% if child.notes %} — {{ child.notes|truncatechars:20 }}{% endif %}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- 選択プレビュー -->
+    <div id="selected-preview" class="mb-4 p-3 bg-green-50 rounded-xl border border-green-200 hidden">
+      <p class="text-sm text-green-700 font-bold">
+        ✅ {% t "選択中：" "せんたくちゅう：" %}<span id="selected-name"></span>
+      </p>
+    </div>
+
+    <div class="flex gap-3">
+      <button type="submit"
+              class="flex-1 bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-600 transition-colors">
+        {% t "担当に追加する" "たんとうに ついかする" %}
+      </button>
+      <a href="{% url 'daycare:staff_dashboard' %}"
+         class="flex-1 text-center bg-gray-100 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-200 transition-colors no-underline">
+        {% t "キャンセル" "きゃんせる" %}
+      </a>
+    </div>
+  </form>
+
+  <script>
+    const searchInput = document.getElementById('search-input');
+    const select = document.getElementById('child-select');
+    const preview = document.getElementById('selected-preview');
+    const selectedName = document.getElementById('selected-name');
+    const allOptions = Array.from(select.options);
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.toLowerCase();
+      allOptions.forEach(opt => {
+        if (!opt.value) return;
+        const name = (opt.dataset.name || '').toLowerCase();
+        opt.style.display = name.includes(q) ? '' : 'none';
+      });
+      if (select.selectedOptions.length > 0 && select.selectedOptions[0].style.display === 'none') {
+        select.value = '';
+        preview.classList.add('hidden');
+      }
+    });
+
+    select.addEventListener('change', () => {
+      const opt = select.options[select.selectedIndex];
+      if (opt && opt.value) {
+        selectedName.textContent = opt.dataset.name || opt.text;
+        preview.classList.remove('hidden');
+      } else {
+        preview.classList.add('hidden');
+      }
+    });
+  </script>
+
+  {% else %}
+  <div class="text-center py-8">
+    <div class="text-5xl mb-3">🔍</div>
+    <p class="text-gray-500 mb-2">{% t "追加できる児童がいません。" "ついかできる じどうが いません。" %}</p>
+    <p class="text-sm text-gray-400 mb-4">{% t "管理者に児童の登録を依頼してください。" "かんりしゃに じどうの とうろくを いらいしてください。" %}</p>
+    <a href="{% url 'daycare:staff_dashboard' %}" class="btn-main bg-green-500 text-white hover:bg-green-600 no-underline">
+      ← {% t "ダッシュボードに戻る" "だっしゅぼーどに もどる" %}
+    </a>
+  </div>
+  {% endif %}
+
+  <div class="mt-6 text-center">
+    <a href="{% url 'daycare:staff_dashboard' %}" class="text-sm text-gray-400 hover:text-gray-600 no-underline">
+      ← {% t "ダッシュボードに戻る" "だっしゅぼーどに もどる" %}
+    </a>
+  </div>
+</div>
+{% endblock %}

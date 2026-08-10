@@ -515,7 +515,7 @@ def get_supporter_advice(user, daily_records):
         if not daily_records:
             return "まだ記録がありません。利用者に記録をつけるよう声かけしてみましょう。"
 
-        latest = daily_records[0]
+        latest = daily_records[-1]
         if latest.emotion_stamp >= 4:
             return "最近きもちが安定しているようです。この調子を応援しつつ、次のステップへの声かけをしてみましょう。"
         elif latest.emotion_stamp <= 2:

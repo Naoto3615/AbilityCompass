@@ -71,12 +71,12 @@ const difficultyConfig: Record<Difficulty, { label: string; color: string; emoji
   challenge: { label: 'チャレンジ', color: '#fecaca', emoji: '🔥' },
 };
 
-// Print layout sizes (~2× previous values)
-const WRITING_CELL_SIZE = 100;
+// Print layout sizes
 const TRACE_BOX_SIZE = 160;
+const WRITING_CELL_SIZE = TRACE_BOX_SIZE;
 const TRACE_FONT_SIZE = 112;
-const STROKE_GUIDE_SIZE = 96;
-const FILL_BLANK_SIZE = 56;
+const STROKE_GUIDE_SIZE = TRACE_BOX_SIZE;
+const FILL_BLANK_SIZE = 64; // inline □ in example sentence (kept compact)
 
 const writingCellBorder = (borderColor: string) =>
   borderColor === '#c4b5fd' ? '#a5b4fc' : borderColor === '#f9a8d4' ? '#f472b6' : '#67e8f9';
@@ -97,14 +97,33 @@ const WritingCells: React.FC<{
 
   const cell = (i: number) => (
     <div key={i} className="relative" style={cellStyle}>
-      <div style={{
-        position: 'absolute', top: 0, left: '50%', width: 1, height: '100%',
-        background: '#e5e7eb', transform: 'translateX(-50%)',
-      }} />
-      <div style={{
-        position: 'absolute', top: '50%', left: 0, width: '100%', height: 1,
-        background: '#e5e7eb', transform: 'translateY(-50%)',
-      }} />
+      {/* Dotted cross guide lines */}
+      <svg
+        width={WRITING_CELL_SIZE}
+        height={WRITING_CELL_SIZE}
+        style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
+      >
+        {/* Vertical center line */}
+        <line
+          x1={WRITING_CELL_SIZE / 2}
+          y1={4}
+          x2={WRITING_CELL_SIZE / 2}
+          y2={WRITING_CELL_SIZE - 4}
+          stroke="#d1d5db"
+          strokeWidth={1}
+          strokeDasharray="3 3"
+        />
+        {/* Horizontal center line */}
+        <line
+          x1={4}
+          y1={WRITING_CELL_SIZE / 2}
+          x2={WRITING_CELL_SIZE - 4}
+          y2={WRITING_CELL_SIZE / 2}
+          stroke="#d1d5db"
+          strokeWidth={1}
+          strokeDasharray="3 3"
+        />
+      </svg>
     </div>
   );
 
@@ -369,35 +388,41 @@ const ProblemCard: React.FC<{
 
       {problemType === 'fill' && (
         <div>
-          <p className="text-xs text-gray-500 mb-2">□に漢字を書こう！</p>
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="text-lg font-bold text-gray-700">
-              {kanji.example.replace(kanji.kanji, '')}の□に入る漢字は？
-            </div>
-          </div>
-          <div className="flex items-center gap-2 mt-2">
-            <p className="text-base font-bold text-gray-600">
-              {kanji.example.includes(kanji.kanji)
-                ? kanji.example.split(kanji.kanji).map((part, i, arr) => (
-                    <React.Fragment key={i}>
-                      {part}
-                      {i < arr.length - 1 && (
-                        <span
-                          className="inline-block mx-1 align-bottom"
-                          style={{
-                            width: FILL_BLANK_SIZE,
-                            height: FILL_BLANK_SIZE,
-                            border: `2px solid ${traceColor}`,
-                            borderRadius: 6,
-                            verticalAlign: 'middle',
-                          }}
-                        />
-                      )}
-                    </React.Fragment>
-                  ))
-                : kanji.example}
-            </p>
-          </div>
+          <p className="text-xs text-gray-500 mb-2">□に あてはまる 漢字を 書こう！</p>
+          <p className="text-base font-bold text-gray-600 leading-relaxed">
+            {kanji.example.includes(kanji.kanji)
+              ? kanji.example.split(kanji.kanji).map((part, i, arr) => (
+                  <React.Fragment key={i}>
+                    {part}
+                    {i < arr.length - 1 && (
+                      <span
+                        className="inline-block mx-1 align-bottom"
+                        style={{
+                          width: FILL_BLANK_SIZE,
+                          height: FILL_BLANK_SIZE,
+                          border: `2px solid ${traceColor}`,
+                          borderRadius: 6,
+                          verticalAlign: 'middle',
+                        }}
+                      />
+                    )}
+                  </React.Fragment>
+                ))
+              : (
+                <>
+                  <span className="inline-block mx-1 align-bottom"
+                    style={{
+                      width: FILL_BLANK_SIZE,
+                      height: FILL_BLANK_SIZE,
+                      border: `2px solid ${traceColor}`,
+                      borderRadius: 6,
+                      verticalAlign: 'middle',
+                    }}
+                  />
+                  {kanji.example}
+                </>
+              )}
+          </p>
           <p className="text-xs text-gray-400 mt-1">（{kanji.exampleReading}）</p>
           <div className="mt-2">
             <WritingCells count={3} borderColor={traceColor} />
@@ -440,7 +465,7 @@ export const PrintPreview: React.FC<Props> = ({ settings, kanjiList, printMode =
           {settings.showStampRally && (
             <p className="text-sm text-orange-600 font-bold mt-1 flex items-center gap-1">
               <span>👇</span>
-              スタンプラリー欄は プリントの いちばん下に あります。下まで スクロールして ね！
+              スタンプラリー欄は プリントの いちばん下に あります。
             </p>
           )}
         </div>

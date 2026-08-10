@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "きょうのアドバイス" "きょうのあどばいす" %}{% endblock %}
+{% block content %}
+
+<!-- ヘッダー -->
+<div class="text-center mb-6 fade-in">
+  <div class="text-6xl mb-2">{{ career_emoji }}</div>
+  <h1 class="text-2xl font-black text-gray-700 mb-1">
+    {{ profile.nickname }}{% t "さんの　なりたいものページ" "さんの　なりたいものぺーじ" %}
+  </h1>
+  {% if grade_label %}
+  <p class="text-sm text-gray-500">{{ grade_label }}</p>
+  {% endif %}
+</div>
+
+<!-- なりたい職業の選択 -->
+<div class="card mb-6 fade-in">
+  <h2 class="text-lg font-bold text-gray-700 mb-4 text-center">
+    🌟 {% t "なりたいものを　えらぼう！" "なりたいものを　えらぼう！" %}
+  </h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="grid grid-cols-3 gap-2 mb-4">
+      {% for value, emoji, label in career_choices %}
+      <label class="cursor-pointer">
+        <input type="radio" name="desired_career" value="{{ value }}"
+               class="hidden peer" {% if career == value %}checked{% endif %}>
+        <div class="peer-checked:ring-4 peer-checked:ring-green-400 peer-checked:bg-green-50
+                    border-2 border-gray-200 rounded-xl p-3 text-center hover:border-green-300
+                    transition-all">
+          <div class="text-2xl mb-1">{{ emoji }}</div>
+          <div class="text-xs font-bold text-gray-600 leading-tight">{{ label }}</div>
+        </div>
+      </label>
+      {% endfor %}
+    </div>
+    <button type="submit"
+            class="w-full bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-600 transition-colors text-lg">
+      {% t "えらんだ！" "えらんだ！" %} ✨
+    </button>
+  </form>
+</div>
+
+<!-- アドバイス表示 -->
+{% if advice_list %}
+<div class="mb-6 fade-in">
+  <h2 class="text-lg font-bold text-gray-700 mb-4 text-center">
+    💡 {{ career_label }}{% t "になるための　きょうの　アドバイス" "になるための　きょうの　あどばいす" %}
+  </h2>
+  <div class="space-y-3">
+    {% for advice in advice_list %}
+    <div class="flex items-start gap-3 p-4 bg-gradient-to-r from-yellow-50 to-orange-50
+                rounded-xl border border-yellow-200">
+      <span class="text-2xl">⭐</span>
+      <p class="text-gray-700 font-medium leading-relaxed">{{ advice }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% elif career %}
+<div class="card text-center mb-6 fade-in">
+  <p class="text-gray-500">{% t "じゅんびちゅう！もうすぐアドバイスが来るよ" "じゅんびちゅう！もうすぐあどばいすがくるよ" %} 🚀</p>
+</div>
+{% else %}
+<div class="card text-center mb-6 bg-blue-50 border border-blue-200 fade-in">
+  <div class="text-4xl mb-2">☝️</div>
+  <p class="text-blue-700 font-bold">{% t "まず　うえで　なりたいものを　えらんでみよう！" "まず　うえで　なりたいものを　えらんでみよう！" %}</p>
+</div>
+{% endif %}
+
+<!-- AIに相談するボタン -->
+<div class="mt-4 fade-in">
+  <a href="{% url 'rag:advice_user' %}" class="block">
+    <div class="bg-gradient-to-r from-purple-500 to-pink-400 text-white rounded-2xl p-5 text-center shadow-lg hover:from-purple-600 hover:to-pink-500 transition-all">
+      <div class="text-4xl mb-2">🤖</div>
+      <div class="font-bold text-xl mb-1">{% t "AIに相談する" "えーあいにそうだんする" %}</div>
+      <div class="text-sm opacity-90">{% t "AIがあなたにあったアドバイスをくれるよ！" "えーあいがあなたにあったあどばいすをくれるよ！" %}</div>
+    </div>
+  </a>
+</div>
+
+{% endblock %}

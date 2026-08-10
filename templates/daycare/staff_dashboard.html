@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load text_mode %}
+
+{% block title %}{% t "放課後デイ — 支援員ダッシュボード" "ほうかごでい — しえんいんだっしゅぼーど" %}{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+  <div class="role-badge staff">🏫 {% t "支援員メニュー" "しえんいんめにゅー" %}</div>
+
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">
+      📋 {% t "担当児童の管理" "たんとうじどうのかんり" %}
+    </h1>
+    <a href="{% url 'daycare:child_add' %}" class="btn-main btn-green text-base px-4 py-2" style="min-height:2.5rem; padding:0.5rem 1.25rem; font-size:1rem;">
+      ＋ {% t "担当児童を追加" "たんとうじどうをついか" %}
+    </a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 p-3 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if children_data %}
+    <div class="grid gap-4">
+      {% for item in children_data %}
+        <div class="card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-3 mb-1">
+              <p class="text-xl font-bold text-gray-800">👦 {{ item.child.nickname }}</p>
+              {% if item.recorded_today %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-300">
+                  ✅ {% t "記録済み" "きろくずみ" %}
+                </span>
+              {% else %}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-700 border border-orange-300">
+                  ⚠️ {% t "未記録" "みきろく" %}
+                </span>
+              {% endif %}
+            </div>
+            {% if item.latest_record %}
+              <p class="text-sm text-gray-500 mt-1">
+                📅 {% t "最終記録日" "さいしゅうきろくび" %}：{{ item.latest_record.date }}
+              </p>
+            {% else %}
+              <p class="text-sm text-orange-400 mt-1">⚠️ {% t "まだ記録がありません" "まだきろくがありません" %}</p>
+            {% endif %}
+            {% if item.child.notes %}
+              <p class="text-sm text-gray-600 mt-1">{{ item.child.notes }}</p>
+            {% endif %}
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <a href="{% url 'daycare:record_add' item.child.id %}"
+               class="btn-main btn-green text-sm"
+               style="min-height:2.2rem; padding:0.4rem 1rem; font-size:0.9rem;">
+              ✏️ {% t "今日記録する" "きょうきろくする" %}
+            </a>
+            <a href="{% url 'daycare:child_detail' item.child.id %}"
+               class="btn-main btn-orange text-sm"
+               style="min-height:2.2rem; padding:0.4rem 1rem; font-size:0.9rem;">
+              📋 {% t "詳細" "しょうさい" %}
+            </a>
+            <a href="{% url 'daycare:child_growth' item.child.id %}"
+               class="btn-main text-sm"
+               style="min-height:2.2rem; padding:0.4rem 1rem; font-size:0.9rem; background:#8b5cf6; color:white;">
+              📈 {% t "発達グラフ" "はったつぐらふ" %}
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card text-center py-12 text-gray-400">
+      <p class="text-5xl mb-4">👶</p>
+      <p class="text-lg">{% t "担当児童がまだいません。" "たんとうじどうがまだいません。" %}</p>
+      <a href="{% url 'daycare:child_add' %}" class="btn-main btn-green mt-4 inline-flex" style="min-height:2.5rem; padding:0.5rem 1.5rem; font-size:1rem;">
+        {% t "最初の児童を登録する" "さいしょのじどうをとうろくする" %}
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -422,7 +422,7 @@
 <!-- Speech controls -->
 <div id="speech-ui">
   <div id="speech-status"><div class="pulse"></div> 読み上げ中</div>
-  <button class="speech-btn" id="btn-start">🔊 クリックして開始</button>
+  <button class="speech-btn" id="btn-start" style="display:none">🔊 クリックして開始</button>
   <button class="speech-btn" id="btn-pause">⏸ 一時停止</button>
   <button class="speech-btn" id="btn-resume">▶ 再開</button>
   <button class="speech-btn" id="btn-stop">⏹ 停止</button>
@@ -452,21 +452,56 @@
   </div>
 
   <!-- ═══════════════════════════════════════════
-       Slide 2 – 開発の背景
+       Slide 2 – ミスマッチを解決する
   ═══════════════════════════════════════════ -->
   <div class="slide" data-index="1"
-    data-narration="このアプリを作ろうと思ったのは、私自身が障がいを持つ娘の父親だからです。既存の支援ツールは、現場の当事者目線が欠けていることが多い。だからこそ、使う人の気持ちが分かるエンジニアが作るべきだと感じました。7月から9月の3ヶ月間、失業給付を活用しながら、この開発にフルコミットする覚悟です。コアとなるプログラムはすでに60パーセント完成しており、残りの仕上げに向けて資金が必要な状況です。">
+    data-narration="企業が障がい者を雇用する際に直面する最大の課題は特性の理解です。障がいの種類や程度は千差万別で、どのような配慮が必要かが分からないまま雇用が続くケースが多くあります。その結果、仕事ができないというレッテルを貼られ、解雇に至ることも少なくありません。このアプリは、一人ひとりの特性と強みを見える化し、企業が適切な配慮や対処法を理解できる情報を提供することで、本人の成長と企業の受け入れ体制を同時にサポートすることを目指しています。">
     <div class="deco deco-1"></div>
     <div class="deco deco-2"></div>
     <div class="slide-inner">
-      <div class="slide-title">開発の背景とビジョン</div>
-      <div class="slide-heading">「愛」と「現場」から生まれた技術</div>
-      <div class="slide-body">
-        既存システムにはない、障がいを持つ当事者の家族（お父さんエンジニア）が開発するからこそ到達できる<br />
-        使いやすさと自立支援を目指します。<br />
-        7月〜9月の3ヶ月間、フルコミットで開発します。
+      <div class="slide-title" style="font-size:34px; margin-bottom:20px;">企業と障がい者の&ldquo;ミスマッチ&rdquo;を解決する</div>
+      <div class="cards two-col" style="margin-top:0; gap:24px; align-items:stretch;">
+        <!-- 左：現状の課題（赤系） -->
+        <div class="card" style="background:rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.4); text-align:left; padding:24px 22px;">
+          <div class="card-label" style="color:#ef4444; font-size:15px; font-weight:700; margin-bottom:16px;">⚠ 現状の課題</div>
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:12px; padding:0; margin:0;">
+            <li style="display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.65; color:#f8fafc;">
+              <span style="color:#ef4444; flex-shrink:0; margin-top:2px; font-size:16px;">▸</span>
+              企業が障がい者を雇用しても、<strong>特性を理解することが困難</strong>
+            </li>
+            <li style="display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.65; color:#f8fafc;">
+              <span style="color:#ef4444; flex-shrink:0; margin-top:2px; font-size:16px;">▸</span>
+              どのような配慮・対処をすれば良いか分からないまま雇用が続く
+            </li>
+            <li style="display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.65; color:#f8fafc;">
+              <span style="color:#ef4444; flex-shrink:0; margin-top:2px; font-size:16px;">▸</span>
+              「仕事ができない」レッテルを貼られ、<strong>解雇に至るケースも</strong>
+            </li>
+            <li style="display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.65; color:#f8fafc;">
+              <span style="color:#ef4444; flex-shrink:0; margin-top:2px; font-size:16px;">▸</span>
+              企業と障がい者の間に<strong>深刻なミスマッチ</strong>が生じている
+            </li>
+          </ul>
+        </div>
+        <!-- 右：アプリが目指すもの（緑系） -->
+        <div class="card" style="background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.4); text-align:left; padding:24px 22px;">
+          <div class="card-label" style="color:#10b981; font-size:15px; font-weight:700; margin-bottom:16px;">✓ このアプリが目指すもの</div>
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:12px; padding:0; margin:0;">
+            <li style="display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.65; color:#f8fafc;">
+              <span style="color:#10b981; flex-shrink:0; margin-top:2px; font-size:16px;">▸</span>
+              障がい者一人ひとりの特性・強みを<strong>「見える化」</strong>
+            </li>
+            <li style="display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.65; color:#f8fafc;">
+              <span style="color:#10b981; flex-shrink:0; margin-top:2px; font-size:16px;">▸</span>
+              企業側が適切な配慮・対処法を理解できる情報を提供
+            </li>
+            <li style="display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.65; color:#f8fafc;">
+              <span style="color:#10b981; flex-shrink:0; margin-top:2px; font-size:16px;">▸</span>
+              <strong>本人の成長と企業の受け入れ体制を同時にサポート</strong>
+            </li>
+          </ul>
+        </div>
       </div>
-      <div class="highlight-box">⚡ 60% コアプログラム完成済み</div>
     </div>
   </div>
 

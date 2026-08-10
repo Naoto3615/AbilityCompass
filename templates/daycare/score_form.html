@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load text_mode %}
+
+{% block title %}{% t "発達スコアを記録" "はったつすこあをきろく" %} — {{ child.nickname }}{% endblock %}
+
+{% block content %}
+<div class="fade-in max-w-2xl mx-auto">
+
+  <div class="mb-6">
+    <a href="{% url 'daycare:child_growth' child.id %}" class="text-sm text-gray-400 hover:text-gray-600">← {% t "発達グラフに戻る" "はったつぐらふにもどる" %}</a>
+    <h1 class="text-2xl font-bold text-gray-800 mt-1">📊 {% t "発達スコアを記録" "はったつすこあをきろく" %}</h1>
+    <p class="text-gray-500 text-sm mt-1">{{ child.nickname }}{% t "さん" "さん" %}</p>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 p-3 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" class="card space-y-6">
+    {% csrf_token %}
+
+    <!-- 日付 -->
+    <div>
+      <label class="block font-bold text-gray-700 mb-1">📅 {% t "日付" "ひづけ" %}</label>
+      {{ form.date }}
+      {% if form.date.errors %}
+        <p class="text-red-500 text-sm mt-1">{{ form.date.errors.0 }}</p>
+      {% endif %}
+    </div>
+
+    <!-- スコア指標 -->
+    {% for field in form %}
+      {% if field.name != 'date' and field.name != 'memo' %}
+      <div>
+        <label class="block font-bold text-gray-700 mb-1">
+          {% if field.name == 'focus' %}🧠{% elif field.name == 'communication' %}💬{% elif field.name == 'daily_living' %}🏠{% elif field.name == 'social' %}🤝{% elif field.name == 'motor' %}🏃{% endif %}
+          {{ field.label }}
+        </label>
+        <p class="text-xs text-gray-400 mb-2">
+          {% if field.name == 'focus' %}{% t "課題に取り組む集中の程度（1=むずかしい〜5=よくできる）" "かだいにとりくむしゅうちゅうのていど（1=むずかしい〜5=よくできる）" %}
+          {% elif field.name == 'communication' %}{% t "言葉や表情での意思疎通の程度" "ことばやひょうじょうでのいしそつうのていど" %}
+          {% elif field.name == 'daily_living' %}{% t "身の回りのことを自分でできる程度" "みのまわりのことをじぶんでできるていど" %}
+          {% elif field.name == 'social' %}{% t "友達・支援員とのかかわりの程度" "ともだち・しえんいんとのかかわりのていど" %}
+          {% elif field.name == 'motor' %}{% t "体を使った活動への参加の程度" "からだをつかったかつどうへのさんかのていど" %}
+          {% endif %}
+        </p>
+        <div class="flex gap-3" id="score-group-{{ field.name }}">
+          {% for radio in field %}
+            <label class="score-btn cursor-pointer select-none" data-group="{{ field.name }}" data-value="{{ radio.choice_value }}">
+              <input type="radio" name="{{ radio.data.name }}" value="{{ radio.choice_value }}"
+                     {% if radio.data.selected %}checked{% endif %}
+                     class="sr-only score-radio">
+              <span class="score-circle w-12 h-12 flex items-center justify-center rounded-full border-2 border-gray-300 font-bold text-lg transition-all hover:border-blue-400 hover:bg-blue-50
+                           {% if radio.data.selected %}bg-blue-500 text-white border-blue-500{% else %}bg-white text-gray-700{% endif %}">
+                {{ radio.choice_label }}
+              </span>
+            </label>
+          {% endfor %}
+        </div>
+        {% if field.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>
+        {% endif %}
+      </div>
+      {% endif %}
+    {% endfor %}
+
+    <!-- メモ -->
+    <div>
+      <label class="block font-bold text-gray-700 mb-1">📝 {% t "メモ" "めも" %}（{% t "任意" "にんい" %}）</label>
+      {{ form.memo }}
+      {% if form.memo.errors %}
+        <p class="text-red-500 text-sm mt-1">{{ form.memo.errors.0 }}</p>
+      {% endif %}
+    </div>
+
+    <div class="flex gap-3 pt-2">
+      <button type="submit" class="btn-main btn-green flex-1">✅ {% t "記録する" "きろくする" %}</button>
+      <a href="{% url 'daycare:child_growth' child.id %}" class="btn-main bg-gray-100 text-gray-700 hover:bg-gray-200 flex-1 text-center">{% t "キャンセル" "きゃんせる" %}</a>
+    </div>
+  </form>
+
+</div>
+
+<script>
+  document.querySelectorAll('.score-radio').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      const group = this.closest('[id^="score-group-"]');
+      if (!group) return;
+      group.querySelectorAll('.score-circle').forEach(function(span) {
+        span.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
+        span.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+      });
+      const selected = this.closest('label').querySelector('.score-circle');
+      if (selected) {
+        selected.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+        selected.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
+      }
+    });
+  });
+</script>
+{% endblock %}
