@@ -7,94 +7,94 @@ DIAGNOSIS_QUESTIONS = [
     {
         "id": "q1",
         "category": "focus",
-        "text": {"kanji": "同じ作業をずっとくりかえすことができる", "hiragana": "おなじさぎょうを　ずっと　くりかえすことが　できる"},
+        "text": "同じ作業をずっとくりかえすことができる",
         "emoji": "🔁",
     },
     {
         "id": "q2",
         "category": "focus",
-        "text": {"kanji": "好きな作業は時間を忘れて一生懸命できる", "hiragana": "すきなさぎょうは　じかんを　わすれて　いっしょうけんめい　できる"},
+        "text": "好きな作業は時間を忘れて一生懸命できる",
         "emoji": "⏰",
     },
     {
         "id": "q3",
         "category": "focus",
-        "text": {"kanji": "最後まであきらめずに作業を続けられる", "hiragana": "さいごまで　あきらめずに　さぎょうを　つづけられる"},
+        "text": "最後まであきらめずに作業を続けられる",
         "emoji": "🎯",
     },
     # コミュニケーション力（2問）
     {
         "id": "q4",
         "category": "communication",
-        "text": {"kanji": "わからないとき「わかりません」と言える", "hiragana": "わからないとき　「わかりません」と　いえる"},
+        "text": "わからないとき「わかりません」と言える",
         "emoji": "🙋",
     },
     {
         "id": "q5",
         "category": "communication",
-        "text": {"kanji": "「おはようございます」「ありがとうございます」のあいさつができる", "hiragana": "「おはようございます」「ありがとうございます」の　あいさつが　できる"},
+        "text": "「おはようございます」「ありがとうございます」のあいさつができる",
         "emoji": "👋",
     },
     # 体力・持続力（2問）
     {
         "id": "q6",
         "category": "endurance",
-        "text": {"kanji": "体を動かす仕事が好き", "hiragana": "からだを　うごかす　しごとが　すき"},
+        "text": "体を動かす仕事が好き",
         "emoji": "💪",
     },
     {
         "id": "q7",
         "category": "endurance",
-        "text": {"kanji": "1日中立って仕事をしても疲れにくい", "hiragana": "1日じゅう　たって　しごとを　しても　つかれにくい"},
+        "text": "1日中立って仕事をしても疲れにくい",
         "emoji": "🏃",
     },
     # 几帳面さ・正確性（2問）
     {
         "id": "q8",
         "category": "accuracy",
-        "text": {"kanji": "ものをきれいに並べたり整理することが好き", "hiragana": "ものを　きれいに　ならべたり　せいりすることが　すき"},
+        "text": "ものをきれいに並べたり整理することが好き",
         "emoji": "📦",
     },
     {
         "id": "q9",
         "category": "accuracy",
-        "text": {"kanji": "まちがいを見つけることや丁寧にやることが得意", "hiragana": "まちがいを　みつけること　や　ていねいに　やることが　とくい"},
+        "text": "まちがいを見つけることや丁寧にやることが得意",
         "emoji": "🔍",
     },
     # 感情コントロール（2問）
     {
         "id": "q10",
         "category": "emotion_control",
-        "text": {"kanji": "うまくできないとき、落ち着いてやり直せる", "hiragana": "うまく　できないとき　おちついて　やりなおせる"},
+        "text": "うまくできないとき、落ち着いてやり直せる",
         "emoji": "😌",
     },
     {
         "id": "q11",
         "category": "emotion_control",
-        "text": {"kanji": "予定が変わっても、パニックになりにくい", "hiragana": "よていが　かわっても　パニックに　なりにくい"},
+        "text": "予定が変わっても、パニックになりにくい",
         "emoji": "🧘",
     },
     # 学習意欲・変化への適応（2問）
     {
         "id": "q12",
         "category": "learning",
-        "text": {"kanji": "新しいことを教えてもらうのが好き", "hiragana": "あたらしいことを　おしえてもらうのが　すき"},
+        "text": "新しいことを教えてもらうのが好き",
         "emoji": "📚",
     },
     {
         "id": "q13",
         "category": "learning",
-        "text": {"kanji": "できないことができるようになると嬉しい", "hiragana": "できないことが　できるようになると　うれしい"},
+        "text": "できないことができるようになると嬉しい",
         "emoji": "⭐",
     },
 ]
 
 SCORE_LABELS = {
-    1: {"kanji": "全然あてはまらない", "hiragana": "ぜんぜん　あてはまらない"},
-    2: {"kanji": "あまりあてはまらない", "hiragana": "あまり　あてはまらない"},
-    3: {"kanji": "どちらとも言えない", "hiragana": "どちらとも　いえない"},
-    4: {"kanji": "少しあてはまる", "hiragana": "すこし　あてはまる"},
-    5: {"kanji": "とてもあてはまる", "hiragana": "とても　あてはまる"},
+    1: "全然あてはまらない",
+    2: "あまりあてはまらない",
+    3: "どちらとも言えない",
+    4: "少しあてはまる",
+    5: "とてもあてはまる",
 }
 
 SCORE_EMOJIS = {
@@ -109,37 +109,37 @@ SCORE_EMOJIS = {
 JOB_TYPES = [
     {
         "key": "agriculture",
-        "name": {"kanji": "農業・園芸系", "hiragana": "のうぎょう・えんげいけい"},
+        "name": "農業・園芸系",
         "emoji": "🌱",
-        "description": {"kanji": "いちごや野菜を育てたり、植物の世話をする仕事", "hiragana": "いちごや やさいを そだてたり、しょくぶつの せわを する しごと"},
+        "description": "いちごや野菜を育てたり、植物の世話をする仕事",
         "color": "green",
     },
     {
         "key": "manufacturing",
-        "name": {"kanji": "製造・組み立て系", "hiragana": "せいぞう・くみたてけい"},
+        "name": "製造・組み立て系",
         "emoji": "🔧",
-        "description": {"kanji": "部品を組み立てたり、決まった手順で作業する仕事", "hiragana": "ぶひんを くみたてたり、きまった てじゅんで さぎょうする しごと"},
+        "description": "部品を組み立てたり、決まった手順で作業する仕事",
         "color": "blue",
     },
     {
         "key": "cleaning",
-        "name": {"kanji": "清掃・環境整備系", "hiragana": "せいそう・かんきょうせいびけい"},
+        "name": "清掃・環境整備系",
         "emoji": "🧹",
-        "description": {"kanji": "建物や施設をきれいに掃除・整理する仕事", "hiragana": "たてものや しせつを きれいに そうじ・せいりする しごと"},
+        "description": "建物や施設をきれいに掃除・整理する仕事",
         "color": "sky",
     },
     {
         "key": "food_processing",
-        "name": {"kanji": "食品加工系", "hiragana": "しょくひんかこうけい"},
+        "name": "食品加工系",
         "emoji": "🍱",
-        "description": {"kanji": "食べ物を作ったり、袋に入れたりする仕事", "hiragana": "たべものを つくったり、ふくろに いれたりする しごと"},
+        "description": "食べ物を作ったり、袋に入れたりする仕事",
         "color": "orange",
     },
     {
         "key": "service",
-        "name": {"kanji": "接客・販売補助系", "hiragana": "せっきゃく・はんばいほじょけい"},
+        "name": "接客・販売補助系",
         "emoji": "🛒",
-        "description": {"kanji": "お店でお客さんのお手伝いや商品を並べる仕事", "hiragana": "おみせで おきゃくさんの おてつだいや しょうひんを ならべる しごと"},
+        "description": "お店でお客さんのお手伝いや商品を並べる仕事",
         "color": "pink",
     },
 ]
@@ -147,34 +147,34 @@ JOB_TYPES = [
 # ─── 特性ラベル ──────────────────────────────────────────────────────────────
 TRAIT_LABELS = {
     "focus": {
-        "name": {"kanji": "集中力", "hiragana": "しゅうちゅうりょく"},
+        "name": "集中力",
         "emoji": "🔁",
-        "desc": {"kanji": "同じ作業をずっと続ける力", "hiragana": "おなじ さぎょうを ずっと つづける ちから"},
+        "desc": "同じ作業をずっと続ける力",
     },
     "communication": {
-        "name": {"kanji": "コミュニケーション力", "hiragana": "コミュニケーションりょく"},
+        "name": "コミュニケーション力",
         "emoji": "👋",
-        "desc": {"kanji": "指示を聞いたり報告する力", "hiragana": "しじを きいたり ほうこくする ちから"},
+        "desc": "指示を聞いたり報告する力",
     },
     "endurance": {
-        "name": {"kanji": "体力・持続力", "hiragana": "たいりょく・じぞくりょく"},
+        "name": "体力・持続力",
         "emoji": "💪",
-        "desc": {"kanji": "体を使う仕事を続ける力", "hiragana": "からだを つかう しごとを つづける ちから"},
+        "desc": "体を使う仕事を続ける力",
     },
     "accuracy": {
-        "name": {"kanji": "几帳面さ・正確性", "hiragana": "きちょうめんさ・せいかくせい"},
+        "name": "几帳面さ・正確性",
         "emoji": "🔍",
-        "desc": {"kanji": "ていねいに正確に作業する力", "hiragana": "ていねいに せいかくに さぎょうする ちから"},
+        "desc": "ていねいに正確に作業する力",
     },
     "emotion_control": {
-        "name": {"kanji": "感情コントロール", "hiragana": "かんじょうコントロール"},
+        "name": "感情コントロール",
         "emoji": "😌",
-        "desc": {"kanji": "落ち着いて対処する力", "hiragana": "おちついて たいしょする ちから"},
+        "desc": "落ち着いて対処する力",
     },
     "learning": {
-        "name": {"kanji": "学習意欲・適応力", "hiragana": "がくしゅういよく・てきおうりょく"},
+        "name": "学習意欲・適応力",
         "emoji": "📚",
-        "desc": {"kanji": "新しいことを覚えようとする力", "hiragana": "あたらしいことを おぼえようとする ちから"},
+        "desc": "新しいことを覚えようとする力",
     },
 }
 
@@ -229,7 +229,7 @@ def analyze_with_ai(answers: dict) -> dict:
 
         trait_scores = _calc_trait_scores(answers)
         questions_text = "\n".join(
-            f"Q{i+1}. {q['text']['hiragana'] if isinstance(q['text'], dict) else q['text']}（スコア: {answers.get(q['id'], 3)}/5）"
+            f"Q{i+1}. {q['text'] if isinstance(q['text'], str) else q['text'].get('kanji', '')}（スコア: {answers.get(q['id'], 3)}/5）"
             for i, q in enumerate(DIAGNOSIS_QUESTIONS)
         )
 
@@ -281,66 +281,66 @@ def _fallback_analysis(answers: dict) -> dict:
 
     strength_map = {
         "focus": {
-            "title": {"kanji": "集中する力", "hiragana": "しゅうちゅうする ちから"},
-            "description": {"kanji": "同じ作業をずっと続けられます", "hiragana": "おなじ さぎょうを ずっと つづけられます"},
+            "title": "集中する力",
+            "description": "同じ作業をずっと続けられます",
             "emoji": "🔁",
         },
         "communication": {
-            "title": {"kanji": "コミュニケーション力", "hiragana": "コミュニケーションりょく"},
-            "description": {"kanji": "あいさつや報告ができます", "hiragana": "あいさつや ほうこくが できます"},
+            "title": "コミュニケーション力",
+            "description": "あいさつや報告ができます",
             "emoji": "👋",
         },
         "endurance": {
-            "title": {"kanji": "体力・続ける力", "hiragana": "たいりょく・つづける ちから"},
-            "description": {"kanji": "体を使う仕事が得意です", "hiragana": "からだを つかう しごとが とくいです"},
+            "title": "体力・続ける力",
+            "description": "体を使う仕事が得意です",
             "emoji": "💪",
         },
         "accuracy": {
-            "title": {"kanji": "ていねいさ", "hiragana": "ていねいさ"},
-            "description": {"kanji": "正確に作業できます", "hiragana": "せいかくに さぎょうできます"},
+            "title": "ていねいさ",
+            "description": "正確に作業できます",
             "emoji": "🔍",
         },
         "emotion_control": {
-            "title": {"kanji": "落ち着く力", "hiragana": "おちつく ちから"},
-            "description": {"kanji": "困ってもおちついて対処できます", "hiragana": "こまっても おちついて たいしょできます"},
+            "title": "落ち着く力",
+            "description": "困ってもおちついて対処できます",
             "emoji": "😌",
         },
         "learning": {
-            "title": {"kanji": "まなぶ意欲", "hiragana": "まなぶ いよく"},
-            "description": {"kanji": "新しいことを覚えようとします", "hiragana": "あたらしいことを おぼえようとします"},
+            "title": "まなぶ意欲",
+            "description": "新しいことを覚えようとします",
             "emoji": "📚",
         },
     }
 
     challenge_map = {
         "focus": {
-            "title": {"kanji": "集中の練習", "hiragana": "しゅうちゅうの れんしゅう"},
-            "description": {"kanji": "同じ作業を続けることを練習中", "hiragana": "おなじ さぎょうを つづけることを れんしゅうちゅう"},
+            "title": "集中の練習",
+            "description": "同じ作業を続けることを練習中",
             "emoji": "🔁",
         },
         "communication": {
-            "title": {"kanji": "はなす練習", "hiragana": "はなす れんしゅう"},
-            "description": {"kanji": "わからないとき伝える練習中", "hiragana": "わからないとき つたえる れんしゅうちゅう"},
+            "title": "はなす練習",
+            "description": "わからないとき伝える練習中",
             "emoji": "👋",
         },
         "endurance": {
-            "title": {"kanji": "体力づくり", "hiragana": "たいりょくづくり"},
-            "description": {"kanji": "体を動かす習慣をつけています", "hiragana": "からだを うごかす しゅうかんを つけています"},
+            "title": "体力づくり",
+            "description": "体を動かす習慣をつけています",
             "emoji": "💪",
         },
         "accuracy": {
-            "title": {"kanji": "ていねいさの練習", "hiragana": "ていねいさの れんしゅう"},
-            "description": {"kanji": "正確に作業する練習中", "hiragana": "せいかくに さぎょうする れんしゅうちゅう"},
+            "title": "ていねいさの練習",
+            "description": "正確に作業する練習中",
             "emoji": "🔍",
         },
         "emotion_control": {
-            "title": {"kanji": "きもちのコントロール", "hiragana": "きもちの コントロール"},
-            "description": {"kanji": "おちつく方法を練習中", "hiragana": "おちつく ほうほうを れんしゅうちゅう"},
+            "title": "きもちのコントロール",
+            "description": "おちつく方法を練習中",
             "emoji": "😌",
         },
         "learning": {
-            "title": {"kanji": "チャレンジする練習", "hiragana": "チャレンジする れんしゅう"},
-            "description": {"kanji": "新しいことに少しずつ挑戦中", "hiragana": "あたらしいことに すこしずつ ちょうせんちゅう"},
+            "title": "チャレンジする練習",
+            "description": "新しいことに少しずつ挑戦中",
             "emoji": "📚",
         },
     }
@@ -357,32 +357,14 @@ def _fallback_analysis(answers: dict) -> dict:
     ]
 
     job_type_messages = {
-        "agriculture": {
-            "kanji": "農業・園芸系の仕事が向いていそうです！植物を育てたり、外で体を使う仕事が向いています。",
-            "hiragana": "のうぎょう・えんげいけいの しごとが むいていそうです！しょくぶつを そだてたり、そとで からだを つかう しごとが むいています。",
-        },
-        "manufacturing": {
-            "kanji": "製造・組み立て系の仕事が向いていそうです！丁寧に同じ作業を続けることが得意なあなたにぴったりです。",
-            "hiragana": "せいぞう・くみたてけいの しごとが むいていそうです！ていねいに おなじ さぎょうを つづけることが とくいな あなたに ぴったりです。",
-        },
-        "cleaning": {
-            "kanji": "清掃・環境整備の仕事が向いていそうです！きれいにすることが得意なあなたにぴったりです。",
-            "hiragana": "せいそう・かんきょうせいびの しごとが むいていそうです！きれいにすることが とくいな あなたに ぴったりです。",
-        },
-        "food_processing": {
-            "kanji": "食品加工系の仕事が向いていそうです！丁寧で正確な作業が得意なあなたにぴったりです。",
-            "hiragana": "しょくひんかこうけいの しごとが むいていそうです！ていねいで せいかくな さぎょうが とくいな あなたに ぴったりです。",
-        },
-        "service": {
-            "kanji": "接客・販売補助系の仕事が向いていそうです！人と関わることが得意なあなたにぴったりです。",
-            "hiragana": "せっきゃく・はんばいほじょけいの しごとが むいていそうです！ひとと かかわることが とくいな あなたに ぴったりです。",
-        },
+        "agriculture": "農業・園芸系の仕事が向いていそうです！植物を育てたり、外で体を使う仕事が向いています。",
+        "manufacturing": "製造・組み立て系の仕事が向いていそうです！丁寧に同じ作業を続けることが得意なあなたにぴったりです。",
+        "cleaning": "清掃・環境整備の仕事が向いていそうです！きれいにすることが得意なあなたにぴったりです。",
+        "food_processing": "食品加工系の仕事が向いていそうです！丁寧で正確な作業が得意なあなたにぴったりです。",
+        "service": "接客・販売補助系の仕事が向いていそうです！人と関わることが得意なあなたにぴったりです。",
     }
 
-    default_message = {
-        "kanji": "あなたには素晴らしい可能性があります。一歩ずつ進んでいきましょう！",
-        "hiragana": "あなたには すばらしい かのうせいが あります。いっぽずつ すすんでいきましょう！",
-    }
+    default_message = "あなたには素晴らしい可能性があります。一歩ずつ進んでいきましょう！"
 
     return {
         "strengths": strengths,

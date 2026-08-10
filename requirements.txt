@@ -6,5 +6,7 @@ gunicorn
 psycopg2-binary
 dj-database-url
 whitenoise
+pykakasi>=2.2
+numpy
 pgvector
 numpy

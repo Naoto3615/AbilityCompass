@@ -1,21 +1,52 @@
 from django import template
+from functools import lru_cache
 
 register = template.Library()
 
 
+@lru_cache(maxsize=2048)
+def to_hiragana(text: str) -> str:
+    """漢字テキストをひらがなに変換する（結果はLRUキャッシュで保持）。
+
+    pykakasi を使って変換し、単語間にスペースを入れて読みやすくする。
+    """
+    try:
+        import pykakasi
+        kks = pykakasi.kakasi()
+        result = kks.convert(text)
+        parts = []
+        for item in result:
+            hira = item.get('hira') or item.get('orig', '')
+            parts.append(hira)
+        return ''.join(parts)
+    except Exception:
+        return text
+
+
 @register.simple_tag(takes_context=True)
-def t(context, kanji_text, hiragana_text):
-    """Return kanji_text or hiragana_text based on the session's text_mode.
+def t(context, kanji_text, hiragana_text=None):
+    """テキストモードに応じて漢字またはひらがなを返す。
+
+    第2引数を省略すると pykakasi で自動変換する。
 
     Usage in templates:
         {% load text_mode %}
-        {% t "漢字テキスト" "ひらがなてきすと" %}
+        {% t "診断を受ける" %}                          ← 自動変換
+        {% t "診断を受ける" "しんだんを うける" %}        ← 手動指定（優先）
     """
     request = context.get('request')
     mode = 'hiragana'
     if request:
         mode = request.session.get('text_mode', 'hiragana')
-    return kanji_text if mode == 'kanji' else hiragana_text
+
+    if mode == 'kanji':
+        return kanji_text
+
+    # ひらがなモード: 手動指定があればそちらを優先
+    if hiragana_text is not None:
+        return hiragana_text
+
+    return to_hiragana(kanji_text)
 
 
 # ─── アバター レンダリング ────────────────────────────────────────────────────
