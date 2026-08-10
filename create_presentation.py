@@ -1555,7 +1555,7 @@ if __name__ == '__main__':
     add_summary_slide(prs)
     print("  [18/18] まとめ・次のアクション")
 
-    output_path = '/Users/matsunaganaoto/Desktop/projects/App/ステップアップナビ_機能紹介.pptx'
+    output_path = '/workspace/ステップアップナビ_機能紹介.pptx'
     prs.save(output_path)
     print(f"\n✅ 完成しました！")
     print(f"📄 ファイル: {output_path}")
