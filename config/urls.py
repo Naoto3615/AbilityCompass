@@ -6,6 +6,13 @@ from django.shortcuts import render, redirect
 
 class HomeView(View):
     def get(self, request):
+        if request.user.is_authenticated:
+            if hasattr(request.user, 'user_profile'):
+                if request.user.user_profile.user_type == 'child':
+                    return redirect('daily:child_dashboard')
+                return redirect('daily:dashboard')
+            elif hasattr(request.user, 'supporter_profile'):
+                return redirect('accounts:supporter_dashboard')
         return render(request, 'home.html')
 
 

@@ -21,6 +21,8 @@ class UserSignupView(View):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            if user.user_profile.user_type == 'child':
+                return redirect('daily:child_dashboard')
             return redirect('daily:dashboard')
         return render(request, 'accounts/user_signup.html', {'form': form})
 
@@ -77,6 +79,8 @@ class LoginView(View):
 
     def _redirect_by_role(self, user):
         if hasattr(user, 'user_profile'):
+            if user.user_profile.user_type == 'child':
+                return redirect('daily:child_dashboard')
             return redirect('daily:dashboard')
         elif hasattr(user, 'supporter_profile'):
             return redirect('accounts:supporter_dashboard')
