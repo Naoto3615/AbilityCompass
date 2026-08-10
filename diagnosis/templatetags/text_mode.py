@@ -3,12 +3,28 @@ from functools import lru_cache
 
 register = template.Library()
 
+# pykakasi の誤変換を補正するマップ（変換後のひらがな → 正しいひらがな）
+_CORRECTION_MAP = {
+    'さむらい': 'し',      # 士 → さむらい の誤読を修正
+    'ほいくさむらい': 'ほいくし',
+    'いさむらい': 'いし',
+    'かんごさむらい': 'かんごし',
+    'けいさつかんさむらい': 'けいさつかんし',
+    'しょうぼうさむらい': 'しょうぼうし',
+    'じゅうい': 'じゅうい',
+}
+
+# 変換後テキストに対する後処理（長い文字列内の誤読を修正）
+_POST_REPLACEMENTS = [
+    ('さむらい', 'し'),   # 士 の誤読を一括修正
+]
+
 
 @lru_cache(maxsize=2048)
 def to_hiragana(text: str) -> str:
     """漢字テキストをひらがなに変換する（結果はLRUキャッシュで保持）。
 
-    pykakasi を使って変換し、単語間にスペースを入れて読みやすくする。
+    pykakasi を使って変換し、既知の誤変換を後処理で補正する。
     """
     try:
         import pykakasi
@@ -18,7 +34,13 @@ def to_hiragana(text: str) -> str:
         for item in result:
             hira = item.get('hira') or item.get('orig', '')
             parts.append(hira)
-        return ''.join(parts)
+        converted = ''.join(parts)
+
+        # 後処理: 誤変換を修正
+        for wrong, correct in _POST_REPLACEMENTS:
+            converted = converted.replace(wrong, correct)
+
+        return converted
     except Exception:
         return text
 
