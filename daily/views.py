@@ -7,10 +7,6 @@ from django.utils import timezone
 from django.http import JsonResponse
 from datetime import timedelta
 from .models import DailyRecord, AvatarChatMessage, EMOTION_CHOICES, HEALTH_CHOICES, EMOTION_EMOJIS, EMOTION_COLORS, EMOTION_LABELS
-from .child_advice import (
-    CHILD_ADVICE, CAREER_LABELS, CAREER_LABELS_HIRAGANA,
-    GRADE_LABELS, GRADE_LABELS_HIRAGANA, CAREER_EMOJIS,
-)
 
 LOGIN_URL = '/accounts/login/'
 
@@ -196,71 +192,58 @@ class AvatarChatClearView(View):
         return redirect('daily:avatar_chat')
 
 
-CAREER_CHOICES_DISPLAY = [
-    ('doctor', '🏥', '医師・看護師'),
-    ('teacher', '📚', '先生・保育士'),
-    ('engineer', '💻', 'エンジニア・プログラマー'),
-    ('artist', '🎨', '絵・デザイン・音楽'),
-    ('sports', '⚽', 'スポーツ選手'),
-    ('chef', '🍳', '料理人・パティシエ'),
-    ('police', '🚔', '警察官・消防士'),
-    ('vet', '🐾', '獣医・動物関係'),
-    ('other', '🌟', 'まだ決まっていない'),
-]
-
-
 @login_required(login_url=LOGIN_URL)
 def child_dashboard(request):
-    """児童ユーザー向けダッシュボード"""
-    try:
-        profile = request.user.user_profile
-    except Exception:
-        return redirect('accounts:login')
+    """児童ユーザー専用ダッシュボード"""
+    if not hasattr(request.user, 'user_profile'):
+        return redirect('/')
 
+    profile = request.user.user_profile
+
+    # 大人ユーザーが誤ってアクセスした場合は通常ダッシュボードへ
     if profile.user_type != 'child':
         return redirect('daily:dashboard')
 
+    from .child_advice import (
+        CHILD_ADVICE, CAREER_LABELS, CAREER_LABELS_HIRAGANA,
+        GRADE_LABELS, GRADE_LABELS_HIRAGANA, CAREER_EMOJIS, CAREER_CHOICES,
+    )
+
+    # なりたい職業の更新
     if request.method == 'POST':
         career = request.POST.get('desired_career', '')
         profile.desired_career = career
         profile.save()
         return redirect('daily:child_dashboard')
 
+    text_mode = request.session.get('text_mode', 'kanji')
     grade = profile.grade
     career = profile.desired_career
-    text_mode = request.session.get('text_mode', 'kanji')
 
-    raw_advice = []
-    if grade and career:
-        raw_advice = CHILD_ADVICE.get(grade, {}).get(career, [])
+    # アドバイスをtext_modeに応じて解決
+    raw_advice = CHILD_ADVICE.get(grade, {}).get(career, [])
+    advice_list = [
+        item.get(text_mode, item.get('kanji', '')) if isinstance(item, dict) else item
+        for item in raw_advice
+    ]
 
-    advice_list = []
-    for item in raw_advice:
-        if isinstance(item, dict):
-            advice_list.append(item.get(text_mode, item.get('kanji', '')))
-        else:
-            advice_list.append(item)
+    # ラベルをtext_modeに応じて選択
+    career_label_map = CAREER_LABELS_HIRAGANA if text_mode == 'hiragana' else CAREER_LABELS
+    grade_label_map = GRADE_LABELS_HIRAGANA if text_mode == 'hiragana' else GRADE_LABELS
 
-    if text_mode == 'hiragana':
-        grade_label = GRADE_LABELS_HIRAGANA.get(grade, '')
-        career_label = CAREER_LABELS_HIRAGANA.get(career, '')
-        career_choices = [
-            (value, emoji, CAREER_LABELS_HIRAGANA.get(value, label))
-            for value, emoji, label in CAREER_CHOICES_DISPLAY
-        ]
-    else:
-        grade_label = GRADE_LABELS.get(grade, '')
-        career_label = CAREER_LABELS.get(career, '')
-        career_choices = CAREER_CHOICES_DISPLAY
+    # 職業選択肢（value, emoji, label）
+    career_choices_resolved = [
+        (value, emoji, hira if text_mode == 'hiragana' else kanji)
+        for value, emoji, kanji, hira in CAREER_CHOICES
+    ]
 
     return render(request, 'daily/child_dashboard.html', {
         'profile': profile,
         'grade': grade,
-        'grade_label': grade_label,
+        'grade_label': grade_label_map.get(grade, ''),
         'career': career,
-        'career_label': career_label,
+        'career_label': career_label_map.get(career, ''),
         'career_emoji': CAREER_EMOJIS.get(career, '🌟'),
         'advice_list': advice_list,
-        'career_choices': career_choices,
-        'text_mode': text_mode,
+        'career_choices': career_choices_resolved,
     })

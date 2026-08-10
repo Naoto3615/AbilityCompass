@@ -95,6 +95,43 @@
       {% endif %}
     </div>
 
+    <!-- 利用者種別 -->
+    <div>
+      <label class="block font-bold text-gray-700 mb-3">🙋 {% t "あなたは？" "あなたは？" %}</label>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="cursor-pointer">
+          <input type="radio" name="user_type" value="adult" class="hidden peer"
+                 {% if form.user_type.value != 'child' %}checked{% endif %}>
+          <div class="peer-checked:ring-4 peer-checked:ring-green-400 peer-checked:bg-green-50
+                      border-2 border-gray-200 rounded-2xl p-4 text-center hover:border-green-300 transition-all">
+            <div class="text-3xl mb-1">💼</div>
+            <div class="font-bold text-gray-700 text-sm">{% t "就労を目指す大人" "しゅうろうを めざす おとな" %}</div>
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="user_type" value="child" class="hidden peer"
+                 id="user_type_child" {% if form.user_type.value == 'child' %}checked{% endif %}>
+          <div class="peer-checked:ring-4 peer-checked:ring-blue-400 peer-checked:bg-blue-50
+                      border-2 border-gray-200 rounded-2xl p-4 text-center hover:border-blue-300 transition-all">
+            <div class="text-3xl mb-1">🎒</div>
+            <div class="font-bold text-gray-700 text-sm">{% t "児童（子ども）" "じどう（こども）" %}</div>
+          </div>
+        </label>
+      </div>
+      {% if form.user_type.errors %}
+        {% for e in form.user_type.errors %}<p class="text-red-500 text-sm mt-1">{{ e }}</p>{% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- 学年（児童のみ表示） -->
+    <div id="grade-field" class="{% if form.user_type.value != 'child' %}hidden{% endif %}">
+      <label class="block font-bold text-gray-700 mb-2">📚 {% t "学年" "がくねん" %}</label>
+      {{ form.grade }}
+      {% if form.grade.errors %}
+        {% for e in form.grade.errors %}<p class="text-red-500 text-sm mt-1">{{ e }}</p>{% endfor %}
+      {% endif %}
+    </div>
+
     <div>
       <label class="block font-bold text-gray-700 mb-2">🔑 {% t "ログインID（ローマ字・数字）" "ろぐいんID（えいじと すうじ）" %}</label>
       {{ form.username }}
@@ -137,4 +174,16 @@
   <a href="/accounts/login/" class="text-green-600 hover:underline">{% t "すでにアカウントがある → ログイン" "すでに アカウントがある → ろぐいん" %}</a><br>
   <a href="/accounts/signup/supporter/" class="text-gray-500 text-sm hover:underline">{% t "支援者として登録する" "しえんしゃとして とうろくする" %}</a>
 </div>
+
+{% block extra_js %}
+<script>
+  // 児童選択時のみ学年フィールドを表示
+  document.querySelectorAll('input[name="user_type"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      var gradeField = document.getElementById('grade-field');
+      gradeField.classList.toggle('hidden', this.value !== 'child');
+    });
+  });
+</script>
+{% endblock %}
 {% endblock %}

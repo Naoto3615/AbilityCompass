@@ -16,23 +16,10 @@ USER_TYPE_CHOICES = [
 
 GRADE_CHOICES = [
     ('', '---'),
-    ('elementary_low', '小学生（低学年）'),
-    ('elementary_high', '小学生（高学年）'),
+    ('elementary_low', '小学生（低学年：1〜3年）'),
+    ('elementary_high', '小学生（高学年：4〜6年）'),
     ('junior_high', '中学生'),
     ('high_school', '高校生'),
-]
-
-DESIRED_CAREER_CHOICES = [
-    ('', '未選択'),
-    ('doctor', '医師・看護師'),
-    ('teacher', '先生・保育士'),
-    ('engineer', 'エンジニア・プログラマー'),
-    ('artist', '絵・デザイン・音楽'),
-    ('sports', 'スポーツ選手'),
-    ('chef', '料理人・パティシエ'),
-    ('police', '警察官・消防士'),
-    ('vet', '獣医・動物関係'),
-    ('other', 'まだ決まっていない'),
 ]
 
 
@@ -54,31 +41,14 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
     nickname = models.CharField('ニックネーム', max_length=30)
     disability_level = models.CharField('障害区分', max_length=20, choices=DISABILITY_LEVEL_CHOICES, default='mild')
+    user_type = models.CharField('利用者種別', max_length=10, choices=USER_TYPE_CHOICES, default='adult')
+    grade = models.CharField('学年', max_length=20, choices=GRADE_CHOICES, blank=True, default='')
+    desired_career = models.CharField('なりたい職業', max_length=30, blank=True, default='')
     avatar_emoji = models.CharField('アバター絵文字', max_length=10, default='🌟')
     avatar_config = models.JSONField('アバター設定', default=dict, blank=True)
     supporter = models.ForeignKey(
         'SupporterProfile', on_delete=models.SET_NULL,
         null=True, blank=True, related_name='supported_users'
-    )
-    user_type = models.CharField(
-        max_length=10,
-        choices=USER_TYPE_CHOICES,
-        default='adult',
-        verbose_name='利用者種別'
-    )
-    grade = models.CharField(
-        max_length=20,
-        choices=GRADE_CHOICES,
-        blank=True,
-        default='',
-        verbose_name='学年区分'
-    )
-    desired_career = models.CharField(
-        max_length=20,
-        choices=DESIRED_CAREER_CHOICES,
-        blank=True,
-        default='',
-        verbose_name='なりたい職業'
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
