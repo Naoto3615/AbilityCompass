@@ -13,6 +13,27 @@ class UserSignupForm(UserCreationForm):
             'class': 'w-full border-2 border-green-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-green-500',
         }),
     )
+    user_type = forms.ChoiceField(
+        label='あなたは？',
+        choices=[('adult', '就労を目指す大人'), ('child', '児童（子ども）')],
+        widget=forms.RadioSelect(attrs={'class': 'user-type-radio'}),
+        initial='adult',
+    )
+    grade = forms.ChoiceField(
+        label='学年',
+        choices=[
+            ('', '---'),
+            ('elementary_low', '小学生（低学年：1〜3年）'),
+            ('elementary_high', '小学生（高学年：4〜6年）'),
+            ('junior_high', '中学生'),
+            ('high_school', '高校生'),
+        ],
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'w-full border-2 border-green-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-green-500',
+            'id': 'id_grade',
+        }),
+    )
 
     class Meta:
         model = User
@@ -65,12 +86,22 @@ class UserSignupForm(UserCreationForm):
                 'required': 'ぱすわーど（かくにん）を いれてください',
             })
 
+    def clean(self):
+        cleaned_data = super().clean()
+        user_type = cleaned_data.get('user_type')
+        grade = cleaned_data.get('grade')
+        if user_type == 'child' and not grade:
+            self.add_error('grade', '学年を選択してください')
+        return cleaned_data
+
     def save(self, commit=True):
         user = super().save(commit=commit)
         if commit:
             UserProfile.objects.create(
                 user=user,
                 nickname=self.cleaned_data['nickname'],
+                user_type=self.cleaned_data.get('user_type', 'adult'),
+                grade=self.cleaned_data.get('grade', ''),
             )
         return user
 

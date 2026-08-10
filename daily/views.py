@@ -190,3 +190,60 @@ class AvatarChatClearView(View):
         profile = request.user.user_profile
         AvatarChatMessage.objects.filter(profile=profile).delete()
         return redirect('daily:avatar_chat')
+
+
+@login_required(login_url=LOGIN_URL)
+def child_dashboard(request):
+    """児童ユーザー専用ダッシュボード"""
+    if not hasattr(request.user, 'user_profile'):
+        return redirect('/')
+
+    profile = request.user.user_profile
+
+    # 大人ユーザーが誤ってアクセスした場合は通常ダッシュボードへ
+    if profile.user_type != 'child':
+        return redirect('daily:dashboard')
+
+    from .child_advice import (
+        CHILD_ADVICE, CAREER_LABELS, CAREER_LABELS_HIRAGANA,
+        GRADE_LABELS, GRADE_LABELS_HIRAGANA, CAREER_EMOJIS, CAREER_CHOICES,
+    )
+
+    # なりたい職業の更新
+    if request.method == 'POST':
+        career = request.POST.get('desired_career', '')
+        profile.desired_career = career
+        profile.save()
+        return redirect('daily:child_dashboard')
+
+    text_mode = request.session.get('text_mode', 'kanji')
+    grade = profile.grade
+    career = profile.desired_career
+
+    # アドバイスをtext_modeに応じて解決
+    raw_advice = CHILD_ADVICE.get(grade, {}).get(career, [])
+    advice_list = [
+        item.get(text_mode, item.get('kanji', '')) if isinstance(item, dict) else item
+        for item in raw_advice
+    ]
+
+    # ラベルをtext_modeに応じて選択
+    career_label_map = CAREER_LABELS_HIRAGANA if text_mode == 'hiragana' else CAREER_LABELS
+    grade_label_map = GRADE_LABELS_HIRAGANA if text_mode == 'hiragana' else GRADE_LABELS
+
+    # 職業選択肢（value, emoji, label）
+    career_choices_resolved = [
+        (value, emoji, hira if text_mode == 'hiragana' else kanji)
+        for value, emoji, kanji, hira in CAREER_CHOICES
+    ]
+
+    return render(request, 'daily/child_dashboard.html', {
+        'profile': profile,
+        'grade': grade,
+        'grade_label': grade_label_map.get(grade, ''),
+        'career': career,
+        'career_label': career_label_map.get(career, ''),
+        'career_emoji': CAREER_EMOJIS.get(career, '🌟'),
+        'advice_list': advice_list,
+        'career_choices': career_choices_resolved,
+    })
