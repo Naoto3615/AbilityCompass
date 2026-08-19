@@ -10,10 +10,10 @@
 
 <!-- スタンプの種類別カウント -->
 <div class="grid grid-cols-3 gap-3 mb-6 fade-in">
-  {% for key, emoji, label in stamp_types %}
-  <div class="card text-center border-2 {% if stamp_counts|default_if_none:0 %}border-yellow-300 bg-yellow-50{% else %}border-gray-200{% endif %}">
+  {% for key, emoji, label, count in stamp_summary %}
+  <div class="card text-center border-2 {% if count > 0 %}border-yellow-300 bg-yellow-50{% else %}border-gray-200{% endif %}">
     <div class="text-3xl mb-1">{{ emoji }}</div>
-    <div class="text-xl font-black text-gray-700">{{ stamp_counts|default_if_none:0 }}</div>
+    <div class="text-xl font-black {% if count > 0 %}text-yellow-600{% else %}text-gray-300{% endif %}">{{ count }}</div>
     <div class="text-xs text-gray-500">{% t label %}</div>
   </div>
   {% endfor %}
@@ -21,11 +21,11 @@
 
 <!-- 最近のスタンプ -->
 {% if stamps %}
-<div class="card fade-in">
+<div class="card fade-in mb-5">
   <h2 class="text-lg font-bold text-gray-700 mb-3">📜 {% t "さいきんのスタンプ" %}</h2>
   <div class="grid grid-cols-5 gap-2">
     {% for stamp in stamps %}
-    <div class="text-center p-2 bg-yellow-50 rounded-xl border border-yellow-100" title="{{ stamp.note }}">
+    <div class="text-center p-2 bg-yellow-50 rounded-xl border border-yellow-100">
       <div class="text-2xl">{{ stamp.stamp_emoji }}</div>
       <div class="text-xs text-gray-400">{{ stamp.earned_at|date:"m/d" }}</div>
     </div>
@@ -33,7 +33,7 @@
   </div>
 </div>
 {% else %}
-<div class="card text-center bg-blue-50 border border-blue-200 fade-in">
+<div class="card text-center bg-blue-50 border border-blue-200 fade-in mb-5">
   <div class="text-4xl mb-2">🌟</div>
   <p class="text-blue-700 font-bold">{% t "スタンプをあつめよう！" %}</p>
   <p class="text-sm text-gray-500 mt-1">{% t "ログイン・きろく・クイズでスタンプがもらえる" %}</p>
@@ -41,14 +41,22 @@
 {% endif %}
 
 <!-- アクション -->
-<div class="grid grid-cols-2 gap-3 mt-5">
-  <a href="{% url 'learning:quiz_list' %}" class="card text-center hover:shadow-lg transition">
+<div class="grid grid-cols-2 gap-3">
+  <a href="{% url 'learning:quiz_list' %}" class="card text-center hover:shadow-lg transition no-underline">
     <div class="text-3xl mb-1">🎓</div>
     <div class="text-sm font-bold text-gray-700">{% t "クイズでスタンプ" %}</div>
   </a>
-  <a href="{% url 'learning:book_list' %}" class="card text-center hover:shadow-lg transition">
+  <a href="{% url 'learning:book_list' %}" class="card text-center hover:shadow-lg transition no-underline">
     <div class="text-3xl mb-1">📖</div>
     <div class="text-sm font-bold text-gray-700">{% t "読書でスタンプ" %}</div>
+  </a>
+  <a href="{% url 'learning:talent_notes' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-3xl mb-1">📝</div>
+    <div class="text-sm font-bold text-gray-700">{% t "きろくでスタンプ" %}</div>
+  </a>
+  <a href="{% url 'daily:child_dashboard' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-3xl mb-1">🏠</div>
+    <div class="text-sm font-bold text-gray-700">{% t "トップにもどる" %}</div>
   </a>
 </div>
 {% endblock %}

@@ -69,6 +69,17 @@ class LoginView(View):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
+            # ストリーク更新 & 子どもの場合はログインスタンプ付与
+            try:
+                from gamification.models import UserStreak
+                streak = UserStreak.update_streak(user)
+                if hasattr(user, 'user_profile') and user.user_profile.user_type == 'child':
+                    from learning.models import StampEntry
+                    StampEntry.objects.create(
+                        user=user, stamp_type='login', stamp_emoji='🌟', note='ログインした'
+                    )
+            except Exception:
+                pass
             next_url = request.POST.get('next', '')
             if next_url:
                 return redirect(next_url)

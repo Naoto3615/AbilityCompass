@@ -198,15 +198,21 @@ def book_list(request):
 def stamp_rally(request):
     """スタンプラリー（子ども向け）"""
     stamps = StampEntry.objects.filter(user=request.user).order_by('-earned_at')[:30]
-    stamp_counts = {}
+
+    # 種別ごとのカウントを集計してリスト形式に変換
+    raw_counts = {}
     for s in stamps:
-        stamp_counts[s.stamp_type] = stamp_counts.get(s.stamp_type, 0) + 1
+        raw_counts[s.stamp_type] = raw_counts.get(s.stamp_type, 0) + 1
+
+    stamp_summary = [
+        (key, emoji, label, raw_counts.get(key, 0))
+        for key, emoji, label in STAMP_TYPES
+    ]
 
     return render(request, 'learning/stamp_rally.html', {
         'stamps': stamps,
-        'stamp_counts': stamp_counts,
-        'stamp_types': STAMP_TYPES,
-        'total': stamps.count(),
+        'stamp_summary': stamp_summary,
+        'total': StampEntry.objects.filter(user=request.user).count(),
     })
 
 
