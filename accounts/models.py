@@ -44,6 +44,10 @@ class UserProfile(models.Model):
     user_type = models.CharField('利用者種別', max_length=10, choices=USER_TYPE_CHOICES, default='adult')
     grade = models.CharField('学年', max_length=20, choices=GRADE_CHOICES, blank=True, default='')
     desired_career = models.CharField('なりたい職業', max_length=30, blank=True, default='')
+    job_type_preference = models.CharField(
+        '診断で判定された職業タイプ', max_length=30, blank=True, default='',
+        help_text='diagnosis の job_type が自動セットされる'
+    )
     avatar_emoji = models.CharField('アバター絵文字', max_length=10, default='🌟')
     avatar_config = models.JSONField('アバター設定', default=dict, blank=True)
     supporter = models.ForeignKey(
