@@ -44,10 +44,15 @@ def quiz_play(request, category):
     ).values_list('quiz_id', flat=True)
 
     unanswered = MannerQuiz.objects.filter(category=category).exclude(id__in=answered_ids)
+
     if not unanswered.exists():
+        all_in_category = MannerQuiz.objects.filter(category=category)
+        if not all_in_category.exists():
+            # カテゴリに問題がない場合は一覧に戻す
+            return redirect('learning:quiz_list')
         # 全問回答済みならリセット（全問再挑戦）
         UserQuizResult.objects.filter(user=request.user, quiz__category=category).delete()
-        unanswered = MannerQuiz.objects.filter(category=category)
+        unanswered = all_in_category
 
     quiz = random.choice(list(unanswered))
     choices = quiz.choices.all()
