@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'daily',
     'daycare',
     'rag',
+    'gamification',
+    'learning',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "クールダウンコーナー" %}{% endblock %}
+{% block content %}
+<div class="text-center mb-8 fade-in">
+  <div class="text-6xl mb-3">🧘</div>
+  <h1 class="text-2xl font-black text-purple-700">{% t "きもちをおちつかせよう" %}</h1>
+</div>
+
+<!-- 深呼吸ガイド -->
+<div class="card mb-5 fade-in bg-blue-50 border-2 border-blue-200">
+  <h2 class="text-lg font-bold text-blue-700 mb-4 text-center">🌬️ {% t "ふかいこきゅう" %}</h2>
+  <div id="breathe-guide" class="text-center">
+    <div id="circle" class="w-32 h-32 rounded-full bg-blue-400 mx-auto flex items-center justify-center text-white text-xl font-bold transition-all duration-1000 cursor-pointer"
+         onclick="startBreathing()">
+      {% t "タップしてスタート" %}
+    </div>
+    <div id="breathe-text" class="mt-4 text-2xl font-black text-blue-600 hidden"></div>
+  </div>
+</div>
+
+<!-- 気持ちを落ち着かせる方法 -->
+<div class="card mb-5 fade-in">
+  <h2 class="text-lg font-bold text-gray-700 mb-4">💡 {% t "きもちのおちつかせかた" %}</h2>
+  <div class="space-y-3">
+    <div class="flex items-start gap-3 p-3 bg-green-50 rounded-xl">
+      <span class="text-2xl">🔢</span>
+      <div>
+        <div class="font-bold text-gray-700">{% t "かずをかぞえる" %}</div>
+        <div class="text-sm text-gray-500">{% t "1から10までゆっくりかぞえよう" %}</div>
+      </div>
+    </div>
+    <div class="flex items-start gap-3 p-3 bg-yellow-50 rounded-xl">
+      <span class="text-2xl">💧</span>
+      <div>
+        <div class="font-bold text-gray-700">{% t "みずをのむ" %}</div>
+        <div class="text-sm text-gray-500">{% t "ゆっくりひとくちのんでみよう" %}</div>
+      </div>
+    </div>
+    <div class="flex items-start gap-3 p-3 bg-purple-50 rounded-xl">
+      <span class="text-2xl">🤝</span>
+      <div>
+        <div class="font-bold text-gray-700">{% t "だれかにはなす" %}</div>
+        <div class="text-sm text-gray-500">{% t "先生や支援員の先生に話しかけよう" %}</div>
+      </div>
+    </div>
+    <div class="flex items-start gap-3 p-3 bg-orange-50 rounded-xl">
+      <span class="text-2xl">🚶</span>
+      <div>
+        <div class="font-bold text-gray-700">{% t "ちょっとあるく" %}</div>
+        <div class="text-sm text-gray-500">{% t "トイレや廊下を少し歩いてみよう" %}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="text-center">
+  <a href="javascript:history.back()" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-200 transition">
+    {% t "もどる" %}
+  </a>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let breathing = false;
+let timer = null;
+
+function startBreathing() {
+  if (breathing) return;
+  breathing = true;
+  const circle = document.getElementById('circle');
+  const text = document.getElementById('breathe-text');
+  text.classList.remove('hidden');
+
+  const steps = [
+    { label: '{% t "すいこむ" %}（4びょう）', scale: 'scale-150', color: 'bg-blue-500', duration: 4000 },
+    { label: '{% t "とめる" %}（4びょう）', scale: 'scale-150', color: 'bg-purple-500', duration: 4000 },
+    { label: '{% t "はく" %}（6びょう）', scale: 'scale-75', color: 'bg-green-400', duration: 6000 },
+  ];
+
+  let i = 0;
+  circle.textContent = '';
+
+  function step() {
+    const s = steps[i % steps.length];
+    circle.className = `w-32 h-32 rounded-full ${s.color} mx-auto flex items-center justify-center text-white text-lg font-bold transition-all duration-1000 ${s.scale}`;
+    text.textContent = s.label;
+    i++;
+    if (i < steps.length * 3) {
+      timer = setTimeout(step, s.duration);
+    } else {
+      breathing = false;
+      circle.className = 'w-32 h-32 rounded-full bg-blue-400 mx-auto flex items-center justify-center text-white text-xl font-bold transition-all duration-1000 cursor-pointer';
+      circle.textContent = '{% t "もういちど" %}';
+      circle.onclick = function() { i=0; breathing=false; startBreathing(); };
+      text.textContent = '{% t "おつかれさまでした！" %} 🌟';
+    }
+  }
+  step();
+}
+</script>
+{% endblock %}

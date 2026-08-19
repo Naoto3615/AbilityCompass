@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "得意なことノート" %}{% endblock %}
+{% block content %}
+<div class="text-center mb-6 fade-in">
+  <div class="text-5xl mb-2">⭐</div>
+  <h1 class="text-2xl font-black text-gray-700">{% t "とくいなことノート" %}</h1>
+</div>
+
+<!-- 追加フォーム -->
+<div class="card mb-5 fade-in">
+  <form method="post" class="space-y-3">
+    {% csrf_token %}
+    <div>
+      <label class="block font-bold text-gray-700 mb-1">📝 {% t "きょう　とくいなことや　できたこと" %}</label>
+      <textarea name="content" rows="3" required
+                class="w-full border-2 border-green-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-green-500"
+                placeholder="{% t 'たとえば：くつをじぶんでしめられた' %}"></textarea>
+    </div>
+    <div>
+      <label class="block font-bold text-gray-700 mb-2">🎨 {% t "えもじをえらんで" %}</label>
+      <div class="flex gap-2 flex-wrap">
+        {% for emoji in "⭐🎉💪🌟😊🏆🎯🌈🦋🍀" %}
+        <label class="cursor-pointer">
+          <input type="radio" name="emoji" value="{{ emoji }}" class="hidden peer" {% if forloop.first %}checked{% endif %}>
+          <span class="text-3xl peer-checked:ring-4 peer-checked:ring-green-400 rounded-lg p-1 block hover:bg-green-50 transition">{{ emoji }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    <button type="submit" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-600 transition">
+      ✅ {% t "きろくする！" %}
+    </button>
+  </form>
+</div>
+
+<!-- 記録一覧 -->
+{% if notes %}
+<div class="space-y-3">
+  {% for note in notes %}
+  <div class="card flex items-start gap-3 fade-in">
+    <span class="text-3xl">{{ note.emoji }}</span>
+    <div class="flex-1">
+      <p class="font-medium text-gray-700">{{ note.content }}</p>
+      <p class="text-xs text-gray-400 mt-1">{{ note.date }}</p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card text-center bg-yellow-50 border border-yellow-200 fade-in">
+  <div class="text-4xl mb-2">📖</div>
+  <p class="text-yellow-700 font-bold">{% t "まだきろくがありません。きょうのとくいなことをかいてみよう！" %}</p>
+</div>
+{% endif %}
+{% endblock %}

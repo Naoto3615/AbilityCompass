@@ -112,4 +112,32 @@
     <div class="text-sm opacity-90">{% t "あなたの記録をもとにアドバイスをもらおう！" "あなたのきろくをもとにあどばいすをもらおう！" %}</div>
   </div>
 </a>
+
+<!-- 追加機能リンク -->
+<div class="grid grid-cols-3 gap-3 mt-4 fade-in" style="animation-delay:0.5s">
+  <a href="{% url 'gamification:dashboard' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-2xl mb-1">🏆</div>
+    <div class="text-xs font-bold text-gray-700">{% t "実績" %}</div>
+  </a>
+  <a href="{% url 'learning:quiz_list' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-2xl mb-1">📚</div>
+    <div class="text-xs font-bold text-gray-700">{% t "クイズ" %}</div>
+  </a>
+  <a href="{% url 'learning:interview_practice' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-2xl mb-1">🎤</div>
+    <div class="text-xs font-bold text-gray-700">{% t "面接練習" %}</div>
+  </a>
+  <a href="{% url 'gamification:cheer_messages' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-2xl mb-1">💌</div>
+    <div class="text-xs font-bold text-gray-700">{% t "応援" %}</div>
+  </a>
+  <a href="{% url 'gamification:internship_list' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-2xl mb-1">🏢</div>
+    <div class="text-xs font-bold text-gray-700">{% t "実習記録" %}</div>
+  </a>
+  <a href="{% url 'learning:contact_list' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-2xl mb-1">📓</div>
+    <div class="text-xs font-bold text-gray-700">{% t "連絡帳" %}</div>
+  </a>
+</div>
 {% endblock %}

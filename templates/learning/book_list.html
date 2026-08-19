@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "読書記録" %}{% endblock %}
+{% block content %}
+<div class="text-center mb-6 fade-in">
+  <div class="text-5xl mb-2">📖</div>
+  <h1 class="text-2xl font-black text-gray-700">{% t "読書きろく" %}</h1>
+  <p class="text-sm text-gray-500">{% t "よんだほんをきろくしよう！" %} 📚</p>
+</div>
+
+<div class="card mb-5 fade-in">
+  <form method="post" class="space-y-3">
+    {% csrf_token %}
+    <div>
+      <label class="block font-bold text-gray-700 mb-1">📕 {% t "ほんのタイトル" %}</label>
+      <input type="text" name="title" required
+             class="w-full border-2 border-blue-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-blue-500"
+             placeholder="{% t 'タイトルをかいてね' %}">
+    </div>
+    <div>
+      <label class="block font-bold text-gray-700 mb-1">💬 {% t "ひとことかんそう" %}</label>
+      <textarea name="comment" rows="2"
+                class="w-full border-2 border-blue-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-blue-500"
+                placeholder="{% t 'かんたんにかいてね' %}"></textarea>
+    </div>
+    <div>
+      <label class="block font-bold text-gray-700 mb-2">⭐ {% t "評価" %}</label>
+      <div class="flex gap-4">
+        {% for v, label in "1,⭐|2,⭐⭐|3,⭐⭐⭐"|split:"|" %}
+        {% endfor %}
+        <label><input type="radio" name="rating" value="1"> ⭐</label>
+        <label><input type="radio" name="rating" value="2"> ⭐⭐</label>
+        <label><input type="radio" name="rating" value="3" checked> ⭐⭐⭐</label>
+      </div>
+    </div>
+    <input type="hidden" name="read_at" value="{{ today|date:'Y-m-d' }}">
+    <button type="submit" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl hover:bg-blue-600 transition">
+      📖 {% t "きろくする！" %}
+    </button>
+  </form>
+</div>
+
+{% if books %}
+<div class="space-y-3">
+  {% for book in books %}
+  <div class="card flex items-start gap-3 fade-in">
+    <div class="text-3xl">📕</div>
+    <div class="flex-1">
+      <div class="font-bold text-gray-800">{{ book.title }}</div>
+      {% if book.comment %}<p class="text-sm text-gray-600 mt-1">{{ book.comment }}</p>{% endif %}
+      <div class="flex items-center gap-2 mt-1">
+        <span class="text-yellow-500">{{ book.get_rating_display }}</span>
+        <span class="text-xs text-gray-400">{{ book.read_at }}</span>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card text-center bg-blue-50 border border-blue-200 fade-in">
+  <p class="text-blue-700 font-bold">{% t "まだきろくがないよ。ほんをよんだらきろくしよう！" %}</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "クイズ" %} — ステップアップナビ{% endblock %}
+{% block content %}
+<div class="text-center mb-6 fade-in">
+  <div class="text-5xl mb-2">{{ quiz.emoji }}</div>
+  <h1 class="text-xl font-bold text-gray-700">{% t quiz.question %}</h1>
+</div>
+
+<form method="post" action="{% url 'learning:quiz_answer' quiz.id %}">
+  {% csrf_token %}
+  <div class="space-y-3 mb-6">
+    {% for choice in choices %}
+    <label class="block cursor-pointer">
+      <input type="radio" name="choice_id" value="{{ choice.id }}" class="hidden peer" required>
+      <div class="card peer-checked:ring-4 peer-checked:ring-green-400 peer-checked:bg-green-50 hover:border-green-300 border-2 border-transparent transition-all">
+        <span class="font-medium text-gray-700">{% t choice.text %}</span>
+      </div>
+    </label>
+    {% endfor %}
+  </div>
+  <button type="submit" class="w-full bg-green-500 text-white font-bold py-4 rounded-xl hover:bg-green-600 transition text-lg">
+    {% t "こたえる" %} ✅
+  </button>
+</form>
+
+<div class="text-center mt-4">
+  <a href="{% url 'learning:quiz_list' %}" class="text-gray-400 text-sm underline">{% t "一覧に戻る" %}</a>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "連絡帳" %}{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-5">
+  <h1 class="text-xl font-bold text-gray-700">📓 {% t "連絡帳" %}</h1>
+  {% if not is_receiver %}
+  <a href="{% url 'learning:contact_write' %}" class="bg-green-500 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-green-600 transition">+ {% t "書く" %}</a>
+  {% endif %}
+</div>
+
+{% if notes %}
+<div class="space-y-4">
+  {% for note in notes %}
+  <div class="card fade-in {% if not note.is_read and is_receiver %}border-2 border-blue-300 bg-blue-50{% endif %}">
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">{{ note.get_mood_emoji }}</span>
+        <span class="font-bold text-gray-700">{{ note.date }}</span>
+        {% if not note.is_read and is_receiver %}<span class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">NEW</span>{% endif %}
+      </div>
+    </div>
+    <p class="text-gray-700 leading-relaxed">{{ note.content }}</p>
+    {% if note.homework %}<div class="mt-3 p-3 bg-yellow-50 rounded-xl border border-yellow-200"><span class="text-xs font-bold text-yellow-700">🏠 {% t "おうちでやること" %}</span><p class="text-sm text-gray-700 mt-1">{{ note.homework }}</p></div>{% endif %}
+    <p class="text-xs text-gray-400 mt-2">{{ note.from_user.username }} → {{ note.to_user.username }}</p>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card text-center bg-gray-50 fade-in">
+  <div class="text-4xl mb-2">📓</div>
+  <p class="text-gray-500">{% t "連絡帳はまだありません" %}</p>
+</div>
+{% endif %}
+{% endblock %}

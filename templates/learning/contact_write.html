@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "連絡帳を書く" %}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-gray-700 mb-5">📓 {% t "連絡帳を書く" %}</h1>
+<div class="card fade-in">
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    <div>
+      <label class="block font-bold text-gray-700 mb-1">👨‍👩‍👧 {% t "送り先（保護者）" %}</label>
+      <select name="to_user_id" required class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-green-400">
+        {% for p in parents %}
+        <option value="{{ p.user.id }}">{{ p.user.username }}（{{ p.child.name }}{% t "の保護者" %}）</option>
+        {% empty %}
+        <option value="">{% t "保護者が登録されていません" %}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="block font-bold text-gray-700 mb-1">📅 {% t "対象日" %}</label>
+      <input type="date" name="date" value="{{ today|date:'Y-m-d' }}" required class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-green-400">
+    </div>
+    <div>
+      <label class="block font-bold text-gray-700 mb-2">😊 {% t "今日のようす" %}</label>
+      <div class="grid grid-cols-5 gap-2">
+        {% for val, label in "5,😄|4,😊|3,😐|2,😟|1,😢"|split:"|" %}
+        {% endfor %}
+        {% for v, e in '5,😄|4,😊|3,😐|2,😟|1,😢'|split:'|' %}{% endfor %}
+        <label><input type="radio" name="mood" value="5" checked> 😄</label>
+        <label><input type="radio" name="mood" value="4"> 😊</label>
+        <label><input type="radio" name="mood" value="3"> 😐</label>
+        <label><input type="radio" name="mood" value="2"> 😟</label>
+        <label><input type="radio" name="mood" value="1"> 😢</label>
+      </div>
+    </div>
+    <div>
+      <label class="block font-bold text-gray-700 mb-1">📝 {% t "今日の連絡" %}</label>
+      <textarea name="content" rows="4" required class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-green-400" placeholder="{% t '今日の活動・ようすを書いてください' %}"></textarea>
+    </div>
+    <div>
+      <label class="block font-bold text-gray-700 mb-1">🏠 {% t "おうちでやってほしいこと" %}</label>
+      <textarea name="homework" rows="2" class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-green-400"></textarea>
+    </div>
+    <button type="submit" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-600 transition">
+      📮 {% t "送る" %}
+    </button>
+  </form>
+</div>
+{% endblock %}

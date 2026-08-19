@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "きょうのよてい" %}{% endblock %}
+{% block content %}
+<div class="text-center mb-6 fade-in">
+  <div class="text-5xl mb-2">📅</div>
+  <h1 class="text-2xl font-black text-gray-700">{% t "きょうのよてい" %}</h1>
+  <p class="text-sm text-gray-400">{{ today }}</p>
+</div>
+
+{% if schedule %}
+<div class="card fade-in">
+  <h2 class="text-lg font-bold text-gray-700 mb-4">{{ schedule.name }}</h2>
+  <div class="space-y-3">
+    {% for item in schedule.items.all %}
+    <div class="flex items-center gap-3 p-3 bg-{{ item.color }}-50 rounded-xl border border-{{ item.color }}-100">
+      <span class="text-2xl">{{ item.emoji }}</span>
+      <div>
+        <div class="font-mono text-sm text-gray-500">{{ item.time }}</div>
+        <div class="font-bold text-gray-700">{% t item.activity %}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+<div class="card text-center bg-blue-50 border border-blue-200 fade-in">
+  <div class="text-4xl mb-2">📋</div>
+  <p class="text-blue-700 font-bold">{% t "今日のスケジュールはまだ登録されていません" %}</p>
+  <p class="text-sm text-gray-500 mt-1">{% t "支援員の先生に聞いてみよう！" %}</p>
+</div>
+{% endif %}
+
+<div class="mt-5 text-center">
+  <a href="{% url 'learning:cooldown' %}" class="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-5 py-3 rounded-xl font-bold hover:bg-purple-200 transition">
+    🧘 {% t "きもちをおちつかせたいとき" %}
+  </a>
+</div>
+{% endblock %}

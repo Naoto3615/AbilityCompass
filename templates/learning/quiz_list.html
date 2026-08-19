@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "クイズ" %} — ステップアップナビ{% endblock %}
+{% block content %}
+<div class="text-center mb-6 fade-in">
+  <div class="text-5xl mb-2">📚</div>
+  <h1 class="text-2xl font-bold text-gray-700">{% t "就労マナークイズ" %}</h1>
+  <p class="text-sm text-gray-500 mt-1">{% t "正解するとポイントがもらえる！" %} 💰</p>
+  <div class="mt-2 text-lg font-bold text-yellow-600">{% t "総正解数" %}: {{ total_correct }}{% t "問" %} 🎓</div>
+</div>
+
+<div class="space-y-4">
+  {% for cat in categories %}
+  <a href="{% url 'learning:quiz_play' cat.key %}" class="block no-underline fade-in">
+    <div class="card hover:shadow-lg transition border-2 {% if cat.answered == cat.total and cat.total > 0 %}border-green-300 bg-green-50{% else %}border-transparent{% endif %}">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="font-bold text-gray-800 text-lg">{% t cat.label %}</div>
+          <div class="text-sm text-gray-500">{{ cat.answered }} / {{ cat.total }} {% t "問回答済み" %}</div>
+        </div>
+        <div class="text-right">
+          {% if cat.answered == cat.total and cat.total > 0 %}
+          <span class="text-green-500 text-3xl">✅</span>
+          {% else %}
+          <span class="text-gray-400 text-3xl">→</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="mt-2 bg-gray-200 rounded-full h-2">
+        {% if cat.total > 0 %}
+        <div class="bg-green-500 h-2 rounded-full" style="width: {% widthratio cat.answered cat.total 100 %}%"></div>
+        {% endif %}
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

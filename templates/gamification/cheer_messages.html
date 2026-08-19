@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "応援メッセージ" %}{% endblock %}
+{% block content %}
+<div class="text-center mb-6 fade-in">
+  <div class="text-5xl mb-2">💌</div>
+  <h1 class="text-2xl font-bold text-gray-700">{% t "応援メッセージ" %}</h1>
+</div>
+
+{% if messages %}
+<div class="space-y-4">
+  {% for msg in messages %}
+  <div class="card fade-in {% if not msg.is_read %}bg-yellow-50 border-2 border-yellow-200{% endif %}">
+    <div class="flex items-start gap-3">
+      <span class="text-4xl">{{ msg.emoji }}</span>
+      <div class="flex-1">
+        <p class="font-bold text-gray-700">{{ msg.from_user.username }} {% t "より" %}</p>
+        <p class="text-gray-700 mt-1 leading-relaxed">{{ msg.message }}</p>
+        <p class="text-xs text-gray-400 mt-2">{{ msg.created_at|date:"Y/m/d H:i" }}</p>
+      </div>
+      {% if not msg.is_read %}<span class="bg-yellow-400 text-white text-xs px-2 py-1 rounded-full font-bold">NEW</span>{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card text-center bg-gray-50 fade-in">
+  <div class="text-4xl mb-2">💌</div>
+  <p class="text-gray-500">{% t "まだメッセージがありません" %}</p>
+</div>
+{% endif %}
+{% endblock %}

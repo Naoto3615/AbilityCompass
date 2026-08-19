@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "応援メッセージを送る" %}{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold text-gray-700 mb-5">💌 {% t "応援メッセージを送る" %}</h1>
+<div class="card fade-in">
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    <div>
+      <label class="block font-bold text-gray-700 mb-2">👤 {% t "送り先" %}</label>
+      {% if supported_users %}
+      <select name="to_username" required class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-green-400">
+        {% for up in supported_users %}
+        <option value="{{ up.user.username }}">{{ up.nickname }} ({{ up.user.username }})</option>
+        {% endfor %}
+      </select>
+      {% else %}
+      <input type="text" name="to_username" placeholder="{% t 'ログインID' %}" required class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-green-400">
+      {% endif %}
+    </div>
+    <div>
+      <label class="block font-bold text-gray-700 mb-2">🎨 {% t "絵文字" %}</label>
+      <div class="flex gap-2 flex-wrap">
+        {% for e in "💪🌟🎉👍🔥🏆✨🌈💡❤️" %}
+        <label class="cursor-pointer">
+          <input type="radio" name="emoji" value="{{ e }}" class="hidden peer" {% if forloop.first %}checked{% endif %}>
+          <span class="text-3xl peer-checked:ring-4 peer-checked:ring-green-400 rounded-lg p-1 block">{{ e }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    <div>
+      <label class="block font-bold text-gray-700 mb-1">💬 {% t "メッセージ" %}</label>
+      <textarea name="message" rows="4" required class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-green-400" placeholder="{% t '今日もよく頑張りましたね！...' %}"></textarea>
+    </div>
+    <button type="submit" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-600 transition">
+      💌 {% t "送る" %}
+    </button>
+  </form>
+</div>
+{% endblock %}

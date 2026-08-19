@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "実習記録" %}{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-5">
+  <h1 class="text-2xl font-bold text-gray-700">🏢 {% t "実習記録" %}</h1>
+  <a href="{% url 'gamification:internship_add' %}" class="bg-green-500 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-green-600 transition">+ {% t "追加" %}</a>
+</div>
+
+{% if records %}
+<div class="space-y-4">
+  {% for rec in records %}
+  <div class="card fade-in">
+    <div class="flex items-start justify-between mb-2">
+      <div>
+        <div class="font-bold text-gray-800 text-lg">{{ rec.company_name }}</div>
+        <div class="text-sm text-gray-500">{{ rec.date }} · {{ rec.duration_hours }}{% t "時間" %}</div>
+      </div>
+    </div>
+    <div class="space-y-2">
+      <div class="p-2 bg-gray-50 rounded-lg"><span class="text-xs font-bold text-gray-500">{% t "作業内容" %}</span><p class="text-sm text-gray-700">{{ rec.work_content }}</p></div>
+      {% if rec.good_points %}<div class="p-2 bg-green-50 rounded-lg"><span class="text-xs font-bold text-green-600">👍 {% t "良かったこと" %}</span><p class="text-sm text-gray-700">{{ rec.good_points }}</p></div>{% endif %}
+      {% if rec.challenges %}<div class="p-2 bg-orange-50 rounded-lg"><span class="text-xs font-bold text-orange-600">💪 {% t "課題" %}</span><p class="text-sm text-gray-700">{{ rec.challenges }}</p></div>{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card text-center bg-gray-50 fade-in">
+  <div class="text-4xl mb-2">🏢</div>
+  <p class="text-gray-500">{% t "まだ実習記録がありません" %}</p>
+</div>
+{% endif %}
+{% endblock %}

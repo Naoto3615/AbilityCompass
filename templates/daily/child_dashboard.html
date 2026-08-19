@@ -79,4 +79,32 @@
   </a>
 </div>
 
+<!-- 子ども向け機能 -->
+<div class="grid grid-cols-3 gap-3 mt-4 fade-in">
+  <a href="{% url 'learning:stamp_rally' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-3xl mb-1">⭐</div>
+    <div class="text-xs font-black text-gray-700">{% t "スタンプ" %}</div>
+  </a>
+  <a href="{% url 'learning:talent_notes' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-3xl mb-1">📝</div>
+    <div class="text-xs font-black text-gray-700">{% t "とくいなことノート" %}</div>
+  </a>
+  <a href="{% url 'learning:quiz_list' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-3xl mb-1">🎓</div>
+    <div class="text-xs font-black text-gray-700">{% t "クイズ" %}</div>
+  </a>
+  <a href="{% url 'learning:book_list' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-3xl mb-1">📖</div>
+    <div class="text-xs font-black text-gray-700">{% t "読書きろく" %}</div>
+  </a>
+  <a href="{% url 'learning:schedule' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-3xl mb-1">📅</div>
+    <div class="text-xs font-black text-gray-700">{% t "きょうのよてい" %}</div>
+  </a>
+  <a href="{% url 'learning:cooldown' %}" class="card text-center hover:shadow-lg transition no-underline">
+    <div class="text-3xl mb-1">🧘</div>
+    <div class="text-xs font-black text-gray-700">{% t "クールダウン" %}</div>
+  </a>
+</div>
+
 {% endblock %}

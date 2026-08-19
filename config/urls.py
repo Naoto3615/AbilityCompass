@@ -32,4 +32,6 @@ urlpatterns = [
     path('daily/', include('daily.urls')),
     path('daycare/', include('daycare.urls')),
     path('rag/', include('rag.urls')),
+    path('gamification/', include('gamification.urls')),
+    path('learning/', include('learning.urls')),
 ]
