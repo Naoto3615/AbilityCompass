@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "仕事タイプ一覧" %} — ステップアップナビ{% endblock %}
+{% block content %}
+
+<div class="text-center mb-6 fade-in">
+  <div class="text-5xl mb-3">💼</div>
+  <h1 class="text-2xl font-bold text-gray-700">{% t "向いている仕事タイプを知ろう" %}</h1>
+  {% if user_job_type %}
+  <p class="text-sm text-green-600 mt-2 font-medium">
+    ⭐ {% t "あなたの診断結果" %}: {% t user_job_type %}
+  </p>
+  {% endif %}
+</div>
+
+<div class="space-y-4">
+  {% for career in careers %}
+  <a href="{% url 'diagnosis:career_detail' career.key %}" class="block no-underline fade-in">
+    <div class="card hover:shadow-lg transition-shadow border-2 {% if career.key == user_job_type %}border-green-400 bg-green-50{% else %}border-transparent{% endif %}">
+      <div class="flex items-center gap-4">
+        <div class="text-5xl">{{ career.emoji }}</div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-1">
+            <h2 class="text-lg font-bold text-gray-800">{% t career.name %}</h2>
+            {% if career.key == user_job_type %}
+            <span class="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-bold">あなたにおすすめ ⭐</span>
+            {% endif %}
+          </div>
+          <p class="text-sm text-gray-600">{% t career.description %}</p>
+          <div class="flex flex-wrap gap-1 mt-2">
+            {% for f in career.features %}
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{% t f %}</span>
+            {% endfor %}
+          </div>
+        </div>
+        <span class="text-gray-400 text-xl">→</span>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+
+<div class="text-center mt-6">
+  <a href="{% url 'diagnosis:start' %}" class="btn-main btn-green inline-block px-8 py-3">
+    🎯 {% t "診断を受けてみる" %}
+  </a>
+</div>
+
+{% endblock %}

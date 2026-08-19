@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 import json
 
 
@@ -14,6 +15,10 @@ JOB_TYPE_CHOICES = [
 class DiagnosisSession(models.Model):
     """診断セッション（ログインなしでも使用可能）"""
     session_key = models.CharField(max_length=100, unique=True)
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='diagnosis_sessions'
+    )
     answers = models.TextField(default='{}')
 
     # 6特性スコア（各0〜15点程度）

@@ -1,12 +1,14 @@
 import uuid
 import json
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.views import View
 from .models import DiagnosisSession
 from .services import (
     get_questions, get_job_types, analyze_with_ai,
     SCORE_LABELS, SCORE_EMOJIS, TRAIT_LABELS, _calc_trait_scores, _determine_job_type
 )
+from .job_data import JOB_TYPE_DETAILS, JOB_LISTINGS
 from roadmap.services import resolve_data
 
 
@@ -137,7 +139,14 @@ class DiagnosisQuestionsView(View):
 
         # ─── アバターに診断結果を反映 ────────────────────────────────────────
         if request.user.is_authenticated and hasattr(request.user, 'user_profile'):
-            _apply_diagnosis_to_avatar(request.user.user_profile, session.job_type, trait_scores)
+            profile = request.user.user_profile
+            _apply_diagnosis_to_avatar(profile, session.job_type, trait_scores)
+            # ① UserProfile に job_type_preference を自動セット
+            profile.job_type_preference = session.job_type
+            profile.save()
+            # ① DiagnosisSession に user を紐付け
+            session.user = request.user
+            session.save()
 
         return redirect('diagnosis:result')
 
@@ -196,11 +205,33 @@ class DiagnosisResultView(View):
         # アバター設定（ログインユーザーのみ）
         avatar_config = None
         show_avatar_prompt = False
+        previous_session = None
         if request.user.is_authenticated and hasattr(request.user, 'user_profile'):
             profile = request.user.user_profile
             avatar_config = profile.get_avatar_config()
-            # 'skin' がアバター設定に明示的にない = ユーザーがまだアバターを作成していない
             show_avatar_prompt = 'skin' not in (profile.avatar_config or {})
+            # ⑥ 前回の診断セッションを取得（今回以外の最新）
+            previous_session = DiagnosisSession.objects.filter(
+                user=request.user
+            ).exclude(session_key=session_key).order_by('-created_at').first()
+
+        # ② 練習タスク
+        practice_tasks = JOB_TYPE_DETAILS.get(session.job_type, {}).get('practice_tasks', [])
+
+        # ⑦ マッチング求人（同じ職種）
+        matched_jobs = [j for j in JOB_LISTINGS if j['type'] == session.job_type]
+
+        # ④ ⑥ 前回比較用スコア
+        prev_trait_data = None
+        if previous_session:
+            prev_trait_data = {
+                'focus': previous_session.focus_score / 10,
+                'communication': previous_session.communication_score / 10,
+                'endurance': previous_session.endurance_score / 10,
+                'accuracy': previous_session.accuracy_score / 10,
+                'emotion_control': previous_session.emotion_control_score / 10,
+                'learning': previous_session.learning_score / 10,
+            }
 
         context = {
             'session': session,
@@ -213,5 +244,71 @@ class DiagnosisResultView(View):
             'text_mode': text_mode,
             'avatar_config': avatar_config,
             'show_avatar_prompt': show_avatar_prompt,
+            'practice_tasks': practice_tasks,
+            'matched_jobs': matched_jobs,
+            'previous_session': previous_session,
+            'prev_trait_data': prev_trait_data,
+            'prev_trait_json': json.dumps(prev_trait_data, ensure_ascii=False) if prev_trait_data else 'null',
         }
         return render(request, 'diagnosis/result.html', context)
+
+
+class CareerListView(View):
+    """③ 向いている職業の一覧ページ"""
+    def get(self, request):
+        job_type_pref = ''
+        if request.user.is_authenticated and hasattr(request.user, 'user_profile'):
+            job_type_pref = request.user.user_profile.job_type_preference
+
+        careers = list(JOB_TYPE_DETAILS.values())
+        return render(request, 'diagnosis/career_list.html', {
+            'careers': careers,
+            'user_job_type': job_type_pref,
+        })
+
+
+class CareerDetailView(View):
+    """③ 向いている職業の詳細ページ"""
+    def get(self, request, job_type):
+        detail = JOB_TYPE_DETAILS.get(job_type)
+        if not detail:
+            return redirect('diagnosis:career_list')
+
+        matched_jobs = [j for j in JOB_LISTINGS if j['type'] == job_type]
+        user_job_type = ''
+        if request.user.is_authenticated and hasattr(request.user, 'user_profile'):
+            user_job_type = request.user.user_profile.job_type_preference
+
+        return render(request, 'diagnosis/career_detail.html', {
+            'detail': detail,
+            'matched_jobs': matched_jobs,
+            'is_my_type': user_job_type == job_type,
+        })
+
+
+@login_required(login_url='/accounts/login/')
+def diagnosis_history(request):
+    """④ 診断スコアの変化グラフ"""
+    sessions = DiagnosisSession.objects.filter(
+        user=request.user
+    ).order_by('created_at')
+
+    history_data = [
+        {
+            'date': s.created_at.strftime('%m/%d'),
+            'job_type': s.job_type,
+            'focus': s.focus_score / 10,
+            'communication': s.communication_score / 10,
+            'endurance': s.endurance_score / 10,
+            'accuracy': s.accuracy_score / 10,
+            'emotion_control': s.emotion_control_score / 10,
+            'learning': s.learning_score / 10,
+        }
+        for s in sessions
+    ]
+
+    return render(request, 'diagnosis/history.html', {
+        'sessions': sessions,
+        'history_json': json.dumps(history_data, ensure_ascii=False),
+        'has_multiple': sessions.count() >= 2,
+    })

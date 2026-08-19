@@ -227,6 +227,12 @@ class SupporterDashboardView(View):
                 supporter=request.user, target_user=up.user
             ).order_by('-created_at')[:3]
 
+            # ⑤ 診断結果を追加
+            from diagnosis.models import DiagnosisSession
+            latest_diagnosis = DiagnosisSession.objects.filter(
+                user=up.user
+            ).order_by('-created_at').first()
+
             emotion_trend = [
                 {
                     'date': r.date.strftime('%m/%d'),
@@ -245,6 +251,7 @@ class SupporterDashboardView(View):
                 'ai_advice': ai_advice,
                 'notes': notes,
                 'emotion_trend': emotion_trend,
+                'latest_diagnosis': latest_diagnosis,
             })
 
         context = {
