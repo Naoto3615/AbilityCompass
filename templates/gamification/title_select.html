@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load text_mode %}
+{% block title %}{% t "称号を選ぶ" %}{% endblock %}
+{% block content %}
+<div class="text-center mb-6 fade-in">
+  <h1 class="text-2xl font-bold text-gray-700">🏅 {% t "表示する称号を選ぼう" %}</h1>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="space-y-3 mb-5">
+    {% for title in titles %}
+    <label class="block cursor-pointer">
+      <input type="radio" name="title_id" value="{{ title.id }}" class="hidden peer"
+             {% if title.is_displayed %}checked{% endif %}>
+      <div class="card peer-checked:ring-4 peer-checked:ring-purple-400 peer-checked:bg-purple-50 border-2 border-transparent hover:border-purple-300 transition-all">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-bold text-gray-800">{{ title.title_name }}</div>
+            <div class="text-sm text-gray-500">{{ title.description }}</div>
+            <div class="text-xs text-gray-400 mt-1">{{ title.earned_at|date:"Y/m/d" }} {% t "獲得" %}</div>
+          </div>
+          {% if title.is_displayed %}<span class="text-purple-500 font-bold text-sm">{% t "表示中" %}</span>{% endif %}
+        </div>
+      </div>
+    </label>
+    {% empty %}
+    <div class="card text-center bg-gray-50">
+      <p class="text-gray-500">{% t "まだ称号がありません。ログインや記録を続けると獲得できます！" %}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% if titles %}
+  <button type="submit" class="w-full bg-purple-500 text-white font-bold py-3 rounded-xl hover:bg-purple-600 transition">
+    ✅ {% t "この称号を表示する" %}
+  </button>
+  {% endif %}
+</form>
+
+<div class="text-center mt-4">
+  <a href="{% url 'gamification:dashboard' %}" class="text-gray-400 text-sm underline">← {% t "戻る" %}</a>
+</div>
+{% endblock %}
