@@ -1,6 +1,6 @@
 # ステップアップナビ 仕様書
 
-> 最終更新: 2026-08-07
+> 最終更新: 2026-08-19
 
 ---
 
@@ -792,3 +792,154 @@ Django 標準の管理サイト（`/admin/`）から以下のモデルを操作�
 10. **支援員ダッシュボードのメモ表示上限**: `SupporterNote` は対象ユーザーごとに最新3件のみダッシュボードに表示される（`[:3]`）。
 11. ~~**`get_supporter_advice` の重複定義**~~ **（修正済み）**: `daily/services.py` の未使用の重複定義を削除。`roadmap/services.py` の版を正規実装として維持。あわせて同関数のフォールバック処理で `daily_records[0]`（最古）を参照していたバグを `daily_records[-1]`（最新）に修正。
 12. **児童アドバイスデータの静的管理**: `daily/child_advice.py` の `CHILD_ADVICE` は4学年×9職業=36パターンを静的Pythonデータとして保持している。AIによる動的生成は行われない。
+
+---
+
+## 11. AI使用箇所 vs ハードコード（ルールベース）一覧
+
+アプリの各機能における実装方式を以下の区分で整理します：
+
+| 記号 | 意味 |
+|---|---|
+| 🤖 AI | OpenAI API（GPT-4o-mini / text-embedding-3-small）を使用 |
+| 🔧 ハードコード | Pythonコード内に固定データとして記述 |
+| 🗄️ DB管理 | Django Admin（管理画面）から追加・編集可能なDBデータ |
+| 📐 ルールベース | コード内の条件分岐・スコア計算などのロジック |
+
+### 11.1 診断機能
+
+| 機能 | 実装方式 | 詳細 |
+|---|---|---|
+| 診断質問13問 | 🔧 ハードコード | `diagnosis/services.py` の `DIAGNOSIS_QUESTIONS` リスト |
+| 回答スコアラベル（1〜5） | 🔧 ハードコード | `SCORE_LABELS`, `SCORE_EMOJIS` |
+| 特性ラベル（6特性の名前・説明） | 🔧 ハードコード | `TRAIT_LABELS` 辞書 |
+| 仕事タイプ定義（5種） | 🔧 ハードコード | `JOB_TYPES` リスト（キー・名前・絵文字・説明・色） |
+| 特性スコア計算（6特性） | 📐 ルールベース | カテゴリ別の平均計算。`_calc_trait_scores()` |
+| 仕事タイプ判定 | 📐 ルールベース | 特性スコアへの重み付け計算。`_determine_job_type()` |
+| 強み・課題の生成 | 🤖 AI（フォールバック: 🔧） | `analyze_with_ai()` → OpenAI API（gpt-4o-mini）。失敗時は `_fallback_analysis()` のハードコードデータで代替 |
+| 診断サマリー文 | 🤖 AI（フォールバック: 🔧） | OpenAI APIで生成。失敗時は仕事タイプ別固定文（`job_type_messages`） |
+| アバター自動更新 | 📐 ルールベース | 診断後に `_apply_diagnosis_to_avatar()` でスコアに基づき表情・服装を決定 |
+
+### 11.2 ロードマップ機能
+
+| 機能 | 実装方式 | 詳細 |
+|---|---|---|
+| ステップ定義（3ステップ） | 🔧 ハードコード | `roadmap/services.py` の `STEP_DEFINITIONS`（テーマ・絵文字・色・説明） |
+| ロードマップタスク生成 | 🤖 AI（フォールバック: 🔧） | `_generate_with_ai()` → OpenAI API（gpt-4o-mini）。失敗時は `_fallback_roadmap()` → `ROADMAP_DATA` 静的データで代替 |
+| フォールバック用ロードマップデータ | 🔧 ハードコード | `ROADMAP_DATA`（5仕事タイプ×3ステップ×タスク・励ましメッセージ） |
+| ロードマップキャッシュ | 🗄️ DB管理 | `RoadmapCache` モデル。一度生成したロードマップをDBにキャッシュ（Django Adminから手動削除可） |
+| 支援員向けAIアドバイス | 🤖 AI（フォールバック: 📐） | `get_supporter_advice()` → OpenAI API（gpt-4o-mini）。失敗時は最新記録の感情スコアによるルールベース固定文（記録なし / スコア4以上 / スコア2以下 / それ以外の4パターン） |
+
+### 11.3 日常記録・ダッシュボード（大人向け）
+
+| 機能 | 実装方式 | 詳細 |
+|---|---|---|
+| 気持ちスタンプ定義（1〜5） | 🔧 ハードコード | テンプレート内の絵文字・ラベル・カラー定義。`rag/services.py` の `EMOTION_LABELS` |
+| 体調スコア定義（1〜3） | 🔧 ハードコード | `rag/services.py` の `HEALTH_LABELS` |
+| 感情スタンプによるアバター表情変化 | 📐 ルールベース | ダッシュボード表示時: スタンプ≥4→happy、≤2→worried、それ以外→normal |
+| バッジカウント | 📐 ルールベース | 総 `DailyRecord` 件数をリアルタイムで計算（DBへの保存なし） |
+| 週間感情グラフ | 📐 ルールベース | 過去7日間の `DailyRecord` を集計して Chart.js に渡す |
+
+### 11.4 児童向けダッシュボード
+
+| 機能 | 実装方式 | 詳細 |
+|---|---|---|
+| なりたい職業選択（9種） | 🔧 ハードコード | `daily/child_advice.py` の `CAREER_CHOICES`（キー・絵文字・ラベルのタプルリスト） |
+| 学年別×職業別アドバイス | 🔧 ハードコード | `CHILD_ADVICE` 辞書（4学年×9職業×各4件=144件） |
+| 職業・学年ラベル（漢字・ひらがな） | 🔧 ハードコード | `CAREER_LABELS`, `CAREER_LABELS_HIRAGANA`, `GRADE_LABELS`, `GRADE_LABELS_HIRAGANA` |
+| アドバイスの追加・変更 | 🔧 ハードコード | コードを直接編集する必要あり（DBでは管理されていない） |
+
+### 11.5 AIチャット（アバターチャット）
+
+| 機能 | 実装方式 | 詳細 |
+|---|---|---|
+| システムプロンプト生成 | 📐 ルールベース（＋DB参照） | `get_avatar_system_prompt()` がユーザーのニックネーム・仕事タイプ・強み・課題（最新の `DiagnosisSession` から取得）を組み込んでプロンプトを組み立てる |
+| アバター返答生成 | 🤖 AI（フォールバック: 🔧） | `chat_with_avatar()` → OpenAI API（gpt-4o-mini、temperature=0.8、max_tokens=300）。`OPENAI_API_KEY` 未設定または例外発生時は `_fallback_avatar_response()` を使用 |
+| フォールバック返答 | 🔧 ハードコード | `_fallback_avatar_response()` のキーワードマッチング（つかれた系・できた系・むずかしい系・ふあん系・たのしい系の5パターン＋デフォルト）。ひらがな・漢字各2候補をランダム選択 |
+| チャット履歴 | 🗄️ DB管理 | `AvatarChatMessage` モデル。APIへは最新10件を送信 |
+
+### 11.6 RAG AI（支援記録ベースアドバイス）
+
+| 機能 | 実装方式 | 詳細 |
+|---|---|---|
+| 支援記録のベクトル化 | 🤖 AI | `embed_support_record()` → OpenAI API（text-embedding-3-small）でベクトル生成 → `SupportRecordEmbedding` モデルに保存 |
+| 類似記録検索 | 🤖 AI（フォールバック: 📐） | `search_similar_records()` → クエリをベクトル化してコサイン類似度で上位5件を取得。APIなし時は日付降順の最新5件 |
+| コサイン類似度計算 | 📐 ルールベース | `cosine_similarity()` → numpy でベクトル演算（AIではなく数学的処理） |
+| 児童向けRAGアドバイス生成 | 🤖 AI（フォールバック: 🔧） | `generate_rag_advice_for_child()` → 支援記録・発達スコアをコンテキストに OpenAI API（gpt-4o-mini、max_tokens=800）で生成。APIなし時は固定エラーメッセージ |
+| 利用者向けRAGアドバイス生成 | 🤖 AI（フォールバック: 🔧） | `generate_rag_advice_for_user()` → 日常記録・プロフィールをコンテキストに OpenAI API（gpt-4o-mini、max_tokens=800）で生成。APIなし時は固定エラーメッセージ |
+| コンテキスト組み立て | 📐 ルールベース | 支援記録・発達スコア・プロフィールを文字列に整形してプロンプトに渡す（AIは使用しない） |
+
+### 11.7 ひらがな変換
+
+| 機能 | 実装方式 | 詳細 |
+|---|---|---|
+| テンプレートテキストの自動変換 | 📐 ルールベース（pykakasi） | `{% t "漢字" %}` タグで pykakasi を使用して自動変換（`diagnosis/templatetags/text_mode.py`） |
+| 手動指定（優先） | 🔧 ハードコード | `{% t "漢字" "ひらがな" %}` の第2引数で上書き可能 |
+| 誤読の補正 | 🔧 ハードコード | `_POST_REPLACEMENTS` リストで `さむらい→し`（「士」の誤読）などを後処理補正 |
+| 変換結果キャッシュ | 📐 ルールベース | `@lru_cache(maxsize=2048)` で変換結果をメモリキャッシュ（APIは使用しない） |
+
+### 11.8 ゲーミフィケーション（称号・ポイント・ストリーク）
+
+| 機能 | 実装方式 | 詳細 |
+|---|---|---|
+| 称号定義（9種） | 🔧 ハードコード | `gamification/models.py` の `TITLE_DEFINITIONS`（キー・名前・説明・閾値・種別） |
+| ストリーク更新・ポイント付与 | 📐 ルールベース | `UserStreak.update_streak()` — 連続日数に応じてポイントを計算（基本10pt＋連続日数×2pt） |
+| 称号自動付与 | 📐 ルールベース | `UserTitle.check_and_award()` — ストリーク・ポイント・診断回数・記録回数・クイズ正解数と閾値を比較して自動付与 |
+| 称号獲得ボーナスポイント | 📐 ルールベース | 称号獲得時に +50pt 付与 |
+| スタンプ種別（6種） | 🔧 ハードコード | `learning/models.py` の `STAMP_TYPES`（login/record/quiz/read/emotion/challenge） |
+| 週間チャレンジ定義（5件） | 🔧 ハードコード（初回のみ） | `gamification/seed_data.py` の `CHALLENGES`。`python manage.py seed_data` で投入 |
+| チャレンジ進捗管理 | 📐 ルールベース | `UserChallengeProgress` モデルで進捗カウント。完了時にポイント付与 |
+| 模擬面接練習ポイント | 📐 ルールベース | 面接回答送信時に +15pt 付与（`learning/views.py`） |
+
+### 11.9 就労マナークイズ
+
+| 機能 | 実装方式 | 詳細 |
+|---|---|---|
+| クイズ問題・選択肢 | 🗄️ DB管理 | Django Admin から追加・編集可能（`MannerQuiz`, `QuizChoice` モデル） |
+| クイズカテゴリ（5種） | 🔧 ハードコード | `learning/models.py` の `QUIZ_CATEGORIES`（greeting/report/manner/safety/team） |
+| 初期8問 | 🔧 ハードコード（初回のみ） | `gamification/seed_data.py` の `QUIZZES` リスト。`python manage.py seed_data` で投入 |
+| 正解判定 | 📐 ルールベース | `QuizChoice.is_correct` フラグで判定 |
+| ポイント付与 | 📐 ルールベース | 正解: +20pt、不正解でも回答: +5pt |
+
+### 11.10 模擬面接練習
+
+| 機能 | 実装方式 | 詳細 |
+|---|---|---|
+| 面接質問6問 | 🔧 ハードコード | `learning/models.py` の `INTERVIEW_QUESTIONS`（id・質問文・ヒント・絵文字） |
+| AIフィードバック | 🤖 AI（フォールバック: 📐） | `_generate_interview_feedback()` → OpenAI API（gpt-4o-mini、100字以内の優しい評価）。APIなし時は回答の文字数（20字未満・50字未満・50字以上）による3段階ルールベースフィードバック |
+| 練習ポイント付与 | 📐 ルールベース | 回答送信時に +15pt 付与 |
+
+### 11.11 職業情報・求人マッチング
+
+| 機能 | 実装方式 | 詳細 |
+|---|---|---|
+| 職業5タイプの詳細情報 | 🔧 ハードコード | `diagnosis/job_data.py` の `JOB_TYPE_DETAILS`（特徴・1日のスケジュール・必要スキル・練習タスク・勤務先例） |
+| サンプル求人6件 | 🔧 ハードコード | `JOB_LISTINGS`（架空のサンプルデータ。農業2件・製造1件・清掃1件・食品加工1件・接客1件） |
+| 求人マッチング | 📐 ルールベース | `job_type` フィールドが一致する求人を表示するのみ（スコアリングや類似度計算なし） |
+
+### 11.12 連絡帳・スケジュール・スタンプ
+
+| 機能 | 実装方式 | 詳細 |
+|---|---|---|
+| 連絡帳（`ContactNote`） | 🗄️ DB管理 | 支援員が保護者へ送信。今日のようす（1〜5）・連絡内容・おうちでやってほしいこと等をDjango Admin・ビューから管理 |
+| 今日のようす選択肢（5段階） | 🔧 ハードコード | `ContactNote.mood` の choices（5=とても良かった〜1=心配）および絵文字マップ `get_mood_emoji()` |
+| 活動スケジュールテンプレート | 🗄️ DB管理 | `DailyScheduleTemplate` / `ScheduleItem` モデル。Django Adminや専用ビューから曜日別テンプレートを作成・編集 |
+| スタンプ種別（6種） | 🔧 ハードコード | `learning/models.py` の `STAMP_TYPES`（login/record/quiz/read/emotion/challenge） |
+| スタンプ付与タイミング | 📐 ルールベース | ログイン・記録・クイズ回答・読書記録・気持ち選択・チャレンジの各アクション時にビュー側でルールとして付与 |
+
+---
+
+## 12. ハードコード箇所の管理方法（今後の改善候補）
+
+各ハードコード箇所をより柔軟に管理するための対応方針を以下に記載する。
+
+| ハードコード箇所 | 現状の問題 | 改善方針 |
+|---|---|---|
+| `CHILD_ADVICE`（4学年×9職業×4件=144件） | コード直接編集が必要。非エンジニアが変更できない | `ChildAdvice` DBモデルを作成し、Django Admin から追加・編集できるようにする |
+| `DIAGNOSIS_QUESTIONS`（13問） | 問題文・カテゴリ変更にコード修正が必要 | `DiagnosisQuestion` DBモデル化。Admin から追加・並び替えを可能にする |
+| `INTERVIEW_QUESTIONS`（6問） | 問題・ヒント追加にコード修正が必要 | `InterviewQuestion` DBモデル化。Admin から管理 |
+| `ROADMAP_DATA`（フォールバック用静的データ） | 仕事タイプ追加時に Python コードの修正が必要 | `RoadmapFallback` DBモデル化（または `RoadmapCache` の手動投入フローを整備） |
+| `JOB_TYPE_DETAILS` / `JOB_LISTINGS` | 求人情報が架空データのため実用性がない | `JobListing` DBモデル化し、Django Admin から実際の求人・実習先情報を登録できるようにする |
+| `TITLE_DEFINITIONS`（9称号） | 称号の追加・閾値変更にコード修正が必要 | `TitleDefinition` DBモデル化。称号の名前・閾値を Admin から管理 |
+| `CHALLENGES`（週間チャレンジ5件） | 既に `WeeklyChallenge` DBモデルが存在するが、初回は seed_data でのみ投入 | Admin UI の整備とシード不要な初期データ管理フロー（`data migrations` や `fixtures`）に移行 |
+| フォールバック応答文（診断・ロードマップ・チャット） | 硬直的な固定文。改善にコード修正が必要 | 最低限の修正で `FallbackMessage` テーブル化し、Admin から編集可能にする（優先度は低） |
