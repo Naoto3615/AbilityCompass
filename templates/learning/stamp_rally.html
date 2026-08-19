@@ -23,11 +23,14 @@
 {% if stamps %}
 <div class="card fade-in mb-5">
   <h2 class="text-lg font-bold text-gray-700 mb-3">📜 {% t "さいきんのスタンプ" %}</h2>
-  <div class="grid grid-cols-5 gap-2">
+  <div class="space-y-2">
     {% for stamp in stamps %}
-    <div class="text-center p-2 bg-yellow-50 rounded-xl border border-yellow-100">
-      <div class="text-2xl">{{ stamp.stamp_emoji }}</div>
-      <div class="text-xs text-gray-400">{{ stamp.earned_at|date:"m/d" }}</div>
+    <div class="flex items-center gap-3 p-2 bg-yellow-50 rounded-xl border border-yellow-100">
+      <span class="text-2xl">{{ stamp.stamp_emoji }}</span>
+      <div class="flex-1">
+        <div class="text-sm font-bold text-gray-700">{% t stamp.note %}</div>
+        <div class="text-xs text-gray-400">{{ stamp.earned_at|date:"Y/m/d H:i" }}</div>
+      </div>
     </div>
     {% endfor %}
   </div>
